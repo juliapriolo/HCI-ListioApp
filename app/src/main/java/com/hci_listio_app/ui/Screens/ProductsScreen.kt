@@ -87,8 +87,11 @@ fun ProductsScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(categorias) { categoria ->
-                    CategoriaCard(categoria)
+                    CategoriaCard(categoria, onClick = {
+                        navController.navigate("category/${categoria.nombre}")
+                    })
                 }
+
 
                 item {
                     AddCategoriaCard(onClick = { /* TODO */ })

@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hci_listio_app.ui.Screens.HomeScreen
 import com.hci_listio_app.ui.Screens.ProductsScreen
+import com.hci_listio_app.ui.screens.CategoryProductsScreen
+
 
 @Composable
 fun AppNavigation() {
@@ -17,9 +19,10 @@ fun AppNavigation() {
         composable(Screen.Products.route) {
             ProductsScreen(navController = navController)
         }
-        // Se puede añadir la pantalla de perfil aquí cuando este creada
-        // composable(Screen.Profile.route) {
-        //     ProfileScreen(navController = navController)
-        // }
+        composable("category/{categoryName}") { backStackEntry ->
+            val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
+            CategoryProductsScreen(navController = navController, categoryName = categoryName)
+        }
+
     }
 }

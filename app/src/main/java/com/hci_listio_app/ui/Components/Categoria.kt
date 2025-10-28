@@ -26,13 +26,14 @@ import androidx.compose.ui.unit.sp
 data class Categoria(val nombre: String, val imagenRes: Int)
 
 @Composable
-fun CategoriaCard(categoria: Categoria) {
+fun CategoriaCard(categoria: Categoria, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
+            .clickable { onClick() }
     ) {
         Box {
             Image(
