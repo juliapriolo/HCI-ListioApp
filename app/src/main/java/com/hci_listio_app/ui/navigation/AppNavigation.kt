@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hci_listio_app.ui.Screens.HomeScreen
 import com.hci_listio_app.ui.Screens.ProductsScreen
+import com.hci_listio_app.ui.Screens.ProfileScreen
 import com.hci_listio_app.ui.screens.CategoryProductsScreen
 
 
@@ -18,6 +19,9 @@ fun AppNavigation() {
         }
         composable(Screen.Products.route) {
             ProductsScreen(navController = navController)
+        }
+        composable(Screen.Profile.route) {
+            ProfileScreen(navController = navController)
         }
         composable("category/{categoryName}") { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""

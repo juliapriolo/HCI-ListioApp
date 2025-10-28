@@ -36,7 +36,11 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Productos") },
             selected = currentRoute == Screen.Products.route,
-            onClick = { navController.navigate(Screen.Products.route) },
+            onClick = { 
+                navController.navigate(Screen.Products.route) {
+                    launchSingleTop = true
+                }
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = selectedIconColor,
                 unselectedIconColor = unselectedIconColor,
@@ -46,7 +50,11 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
             selected = currentRoute == Screen.Home.route,
-            onClick = { navController.navigate(Screen.Home.route) },
+            onClick = { 
+                navController.navigate(Screen.Home.route) {
+                    launchSingleTop = true
+                }
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = selectedIconColor,
                 unselectedIconColor = unselectedIconColor,
@@ -56,7 +64,11 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
             selected = currentRoute == Screen.Profile.route,
-            onClick = { navController.navigate(Screen.Profile.route) },
+            onClick = { 
+                navController.navigate(Screen.Profile.route) {
+                    launchSingleTop = true
+                }
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = selectedIconColor,
                 unselectedIconColor = unselectedIconColor,
