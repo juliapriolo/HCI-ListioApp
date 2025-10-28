@@ -53,7 +53,7 @@ fun CategoriaCard(categoria: Categoria) {
                     modifier = Modifier.padding(8.dp),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center, // Centrar texto si es multilinea
-                    fontSize = 18.sp // Aumentar un poco el tamaño para visibilidad
+                    fontSize = 20.sp // Aumentar un poco el tamaño para visibilidad
                 )
             }
         }
