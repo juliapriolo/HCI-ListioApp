@@ -156,7 +156,7 @@ fun ProfileScreen(navController: NavController) {
                     // Opción: Cerrar Sesión
                     ConfigurationItem(
                         text = "Cerrar Sesion",
-                        onClick = { /* TODO: Implementar cierre de sesión */ }
+                        onClick = { navController.navigate(Screen.Login.route) }
                     )
                 }
             }

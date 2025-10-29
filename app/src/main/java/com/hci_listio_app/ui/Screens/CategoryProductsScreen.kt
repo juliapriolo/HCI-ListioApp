@@ -1,4 +1,4 @@
-package com.hci_listio_app.ui.screens
+package com.hci_listio_app.ui.Screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

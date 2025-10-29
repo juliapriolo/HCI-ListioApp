@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    
+    <!-- Tab/handle -->
+    <path
+        android:fillColor="#6DCB5A"
+        android:pathData="M30,20 L50,20 L50,35 L30,35 L30,20 Z"/>
+    
+    <!-- Main folder shape -->
+    <path
+        android:fillColor="#6DCB5A"
+        android:pathData="M10,40 L110,40 L110,110 L10,110 Z"/>
+        
+</vector>
