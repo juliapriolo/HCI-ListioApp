@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hci_listio_app.ui.Screens.LoginScreen
+import com.hci_listio_app.ui.Screens.SignUpScreen
 import com.hci_listio_app.ui.Screens.ProductsScreen
 import com.hci_listio_app.ui.Screens.ProfileScreen
 import com.hci_listio_app.ui.Screens.CategoryProductsScreen
@@ -17,6 +18,9 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = Screen.Login.route) {
         composable(Screen.Login.route) {
             LoginScreen(navController = navController)
+        }
+        composable(Screen.SignUp.route) {
+            SignUpScreen(navController = navController)
         }
         composable(Screen.Home.route) {
             HomeScreen(navController = navController)
