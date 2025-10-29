@@ -1,4 +1,4 @@
-package com.hci_listio_app.ui.Screens
+package com.hci_listio_app.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,11 +20,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.hci_listio_app.R
+import com.hci_listio_app.ui.Components.AddProductDialog
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryProductsScreen(navController: NavController, categoryName: String) {
+    var showDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             ListioTopAppBar(
@@ -43,7 +46,7 @@ fun CategoryProductsScreen(navController: NavController, categoryName: String) {
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(R.drawable.empty_list_icon), // reemplazá con tu ícono
+                painter = painterResource(R.drawable.empty_list_icon),
                 contentDescription = "Empty list",
                 tint = Color(0xFF6DCB5A),
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -57,12 +60,22 @@ fun CategoryProductsScreen(navController: NavController, categoryName: String) {
             )
 
             Button(
-                onClick = { /* abrir modal o acción futura */ },
+                onClick = { showDialog = true }, // Abrir el diálogo
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar productos")
                 Text("Agregar productos", modifier = Modifier.padding(start = 4.dp))
             }
         }
+    }
+
+    if (showDialog) {
+        AddProductDialog(
+            onDismiss = { showDialog = false },
+            onSave = {
+                // TODO: Aquí va la lógica para guardar el producto
+                showDialog = false
+            }
+        )
     }
 }
