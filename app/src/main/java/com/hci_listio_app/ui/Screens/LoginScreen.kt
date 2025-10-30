@@ -3,6 +3,7 @@ package com.hci_listio_app.ui.Screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,7 +47,7 @@ fun LoginScreen(navController: NavController) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = Color.White,
         topBar = {
             ListioTopAppBar(
                 title = "Login"
@@ -68,7 +70,8 @@ fun LoginScreen(navController: NavController) {
                     text = "¡Bienvenido!",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
+                    color = Color(0xFF303F4F),
+                    modifier = Modifier.padding(bottom = 24.dp)
                 )
                 Image(
                     painter = painterResource(id = R.drawable.shopping_cart),
@@ -121,8 +124,24 @@ fun LoginScreen(navController: NavController) {
                         .padding(vertical = 8.dp),
                     shape = RoundedCornerShape(16.dp)
                 )
-                TextButton(onClick = { /* TODO: Handle password recovery */ }) {
-                    Text("¿Olvidaste tu contraseña? Hace click aca")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "¿Olvidaste tu contraseña? ",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                    Text(
+                        text = "Hacé clic acá",
+                        fontSize = 14.sp,
+                        color = Color(0xFF303F4F),
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.clickable { /* TODO: Handle password recovery */ }
+                    )
                 }
                 Button(
                     onClick = { navController.navigate(Screen.Home.route) },
@@ -133,10 +152,26 @@ fun LoginScreen(navController: NavController) {
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                 ) {
-                    Text("Inicia sesion", color = Color.White)
+                    Text("Iniciar sesión", color = Color.White, fontSize = 16.sp)
                 }
-                TextButton(onClick = { navController.navigate(Screen.SignUp.route) }) {
-                    Text("¿No tenes una cuenta? Registrate")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "¿No tenés una cuenta? ",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                    Text(
+                        text = "Registrate",
+                        fontSize = 14.sp,
+                        color = Color(0xFF303F4F),
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.clickable { navController.navigate(Screen.SignUp.route) }
+                    )
                 }
             }
         }

@@ -39,7 +39,7 @@ fun SignUpScreen(navController: NavController) {
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Color(0xFFF5F5F5),
+        containerColor = Color.White,
         topBar = {
             ListioTopAppBar(
                 title = "Sign up",
@@ -222,12 +222,12 @@ fun SignUpScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "¿Ya tenes una cuenta? ",
+                    text = "¿Ya tenés una cuenta? ",
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
                 Text(
-                    text = "Inicia sesion",
+                    text = "Iniciar sesión",
                     fontSize = 14.sp,
                     color = Color(0xFF303F4F),
                     fontWeight = FontWeight.Bold,

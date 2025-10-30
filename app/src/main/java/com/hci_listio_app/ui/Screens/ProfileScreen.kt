@@ -68,7 +68,7 @@ fun ProfileScreen(navController: NavController) {
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = "Configuracion",
+                title = "Configuración",
                 showBackButton = true,
                 onBackClick = { navController.navigate(Screen.Home.route) }
             )
@@ -153,9 +153,9 @@ fun ProfileScreen(navController: NavController) {
 
                     Divider(color = Color(0xFFE0E0E0))
 
-                    // Opción: Cerrar Sesión
+                    // Opción: Cerrar sesión
                     ConfigurationItem(
-                        text = "Cerrar Sesion",
+                        text = "Cerrar sesión",
                         onClick = { navController.navigate(Screen.Login.route) }
                     )
                 }
