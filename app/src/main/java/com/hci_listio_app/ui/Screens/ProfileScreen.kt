@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Person
@@ -28,12 +29,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.hci_listio_app.ui.Components.BottomNavigationBar
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.navigation.Screen
+import com.hci_listio_app.data.UserRepository
+import com.hci_listio_app.R
 
 @Composable
 fun ConfigurationItem(
@@ -94,7 +100,7 @@ fun ProfileScreen(navController: NavController) {
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Ícono circular verde
+                    // Foto de perfil o placeholder
                     Box(
                         modifier = Modifier
                             .size(64.dp)
@@ -102,12 +108,26 @@ fun ProfileScreen(navController: NavController) {
                             .background(Color(0xFF6DCB5A)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Usuario",
-                            tint = Color.White,
-                            modifier = Modifier.size(32.dp)
-                        )
+                        val bitmap = UserRepository.photoBitmap.value
+                        if (bitmap != null) {
+                            Image(
+                                bitmap = bitmap.asImageBitmap(),
+                                contentDescription = "Foto de perfil",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(id = R.drawable.perfilpredeterminado),
+                                contentDescription = "Usuario",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.size(16.dp))
@@ -140,7 +160,7 @@ fun ProfileScreen(navController: NavController) {
                     // Opción: Editar Perfil
                     ConfigurationItem(
                         text = "Editar Perfil",
-                        onClick = { /* TODO: Navegar a editar perfil */ }
+                        onClick = { navController.navigate(Screen.EditProfile.route) }
                     )
 
                     Divider(color = Color(0xFFE0E0E0))

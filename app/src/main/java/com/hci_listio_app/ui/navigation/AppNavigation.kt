@@ -9,6 +9,7 @@ import com.hci_listio_app.ui.Screens.SignUpScreen
 import com.hci_listio_app.ui.Screens.ProductsScreen
 import com.hci_listio_app.ui.Screens.ProfileScreen
 import com.hci_listio_app.ui.Screens.HomeScreen
+import com.hci_listio_app.ui.Screens.EditProfileScreen
 import com.hci_listio_app.ui.screens.CategoryProductsScreen
 
 
@@ -30,6 +31,9 @@ fun AppNavigation() {
         }
         composable(Screen.Profile.route) {
             ProfileScreen(navController = navController)
+        }
+        composable(Screen.EditProfile.route) {
+            EditProfileScreen(navController = navController)
         }
         composable("category/{categoryName}") { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
