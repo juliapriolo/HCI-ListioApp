@@ -168,7 +168,7 @@ fun ProfileScreen(navController: NavController) {
                     // Opción: Cambiar Idioma
                     ConfigurationItem(
                         text = "Cambiar Idioma",
-                        onClick = { /* TODO: Abrir selector de idioma */ }
+                        onClick = { navController.navigate(Screen.Language.route) }
                     )
 
                     Divider(color = Color(0xFFE0E0E0))
