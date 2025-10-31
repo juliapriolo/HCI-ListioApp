@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -128,28 +129,46 @@ fun EditProfileScreen(navController: NavController) {
 
                 Spacer(Modifier.height(16.dp))
 
-                // Avatar centrado
+                // Avatar centrado con icono de editar superpuesto
                 Box(
                     modifier = Modifier
                         .size(96.dp)
                         .align(Alignment.CenterHorizontally)
-                        .clip(CircleShape)
-                        .background(Color(0xFF6DCB5A)),
-                    contentAlignment = Alignment.Center
                 ) {
-                    if (photoState.value != null) {
-                        Image(
-                            bitmap = photoState.value!!.asImageBitmap(),
-                            contentDescription = "Foto de perfil",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(id = R.drawable.perfilpredeterminado),
-                            contentDescription = "Usuario",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clip(CircleShape)
+                            .background(Color(0xFF6DCB5A)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (photoState.value != null) {
+                            Image(
+                                bitmap = photoState.value!!.asImageBitmap(),
+                                contentDescription = "Foto de perfil",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(id = R.drawable.perfilpredeterminado),
+                                contentDescription = "Usuario",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                    IconButton(
+                        onClick = { pickImageLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(28.dp)
+                            .background(Color.White, CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "Editar foto",
+                            tint = Color(0xFF6DCB5A)
                         )
                     }
                 }
@@ -239,20 +258,7 @@ fun EditProfileScreen(navController: NavController) {
                     }
                 )
 
-                // Botón de galería (mismo estilo que Login), sobre Guardar cambios
-                Button(
-                    onClick = { pickImageLauncher.launch("image/*") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
-                ) {
-                    Text("Elegir foto de la galería", color = Color.White, fontSize = 16.sp)
-                }
-
-                Spacer(Modifier.height(4.dp))
+                // (Se reemplazó el botón de galería por el icono de editar en el avatar)
 
                 Button(
                     onClick = {
