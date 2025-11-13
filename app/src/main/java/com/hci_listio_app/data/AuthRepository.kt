@@ -52,6 +52,15 @@ class AuthRepository(
         return remoteDataSource.verifyAccount(code)
     }
 
+    suspend fun getProfile(): Result<UserProfileResponse> {
+        val token = _authToken.value
+        return if (token == null) {
+            Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
+        } else {
+            remoteDataSource.getProfile(token)
+        }
+    }
+
     fun setToken(token: String?) {
         _authToken.update { token }
     }

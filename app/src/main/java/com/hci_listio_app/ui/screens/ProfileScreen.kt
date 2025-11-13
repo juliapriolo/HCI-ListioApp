@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,6 +41,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material3.CircularProgressIndicator
 import com.hci_listio_app.ui.Components.BottomNavigationBar
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.navigation.Screen
@@ -79,6 +82,15 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(uiState.isLoggedOut) {
+        if (uiState.isLoggedOut) {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Profile.route) { inclusive = true }
+            }
+            viewModel.consumeLogoutSuccess()
+        }
+    }
+
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
@@ -90,12 +102,17 @@ fun ProfileScreen(
         },
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
             // Sección de Perfil de Usuario
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -144,13 +161,13 @@ fun ProfileScreen(
                     // Información del usuario
                     Column {
                         Text(
-                            text = uiState.nombre,
+                            text = "${uiState.nombre} ${uiState.apellido}".trim().ifEmpty { "Usuario" },
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF333333)
                         )
                         Text(
-                            text = uiState.email,
+                            text = uiState.email.ifEmpty { "No disponible" },
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )
@@ -185,8 +202,29 @@ fun ProfileScreen(
                     // Opción: Cerrar sesión
                     ConfigurationItem(
                         text = "Cerrar sesión",
-                        onClick = { navController.navigate(Screen.Login.route) }
+                        onClick = { viewModel.logout() }
                     )
+                }
+            }
+
+            // Mostrar mensaje de error si existe
+            uiState.errorMessage?.let { error ->
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+        }
+
+            // Mostrar indicador de carga
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }
@@ -196,12 +234,8 @@ fun ProfileScreen(
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    val previewViewModel = ProfileViewModel().apply {
-        updateUserInfo(nombre = "Ana", email = "ana@example.com")
-    }
     ProfileScreen(
-        navController = rememberNavController(),
-        viewModel = previewViewModel
+        navController = rememberNavController()
     )
 }
 
