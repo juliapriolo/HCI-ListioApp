@@ -1,55 +1,32 @@
-package com.hci_listio_app.ui.Screens
+package com.hci_listio_app.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.AddCategoriaCard
 import com.hci_listio_app.ui.Components.BottomNavigationBar
-import com.hci_listio_app.ui.Components.Categoria
 import com.hci_listio_app.ui.Components.CategoriaCard
 import com.hci_listio_app.ui.Components.ListioTopAppBar
-import com.hci_listio_app.ui.theme.HCIListioAppTheme
+import com.hci_listio_app.ui.viewmodels.ProductsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: ProductsViewModel = viewModel()
 ) {
-    val categorias = listOf(
-        Categoria("Bebidas", R.drawable.bebidas),
-        Categoria("Carnes y pescados", R.drawable.carnes),
-        Categoria("Lácteos", R.drawable.lacteos),
-        Categoria("Limpieza y Hogar", R.drawable.limpieza),
-        Categoria("Verdulería", R.drawable.verduleria)
-    )
+    val categorias by viewModel.categorias.collectAsState()
 
     Scaffold(
-        containerColor = Color(0xFFFAFAFA), // Fondo gris muy claro
+        containerColor = Color(0xFFFAFAFA),
         topBar = { ListioTopAppBar(title = "Productos") },
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { padding ->
@@ -69,7 +46,6 @@ fun ProductsScreen(
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFFF0F1F2),
                     unfocusedContainerColor = Color(0xFFF0F1F2),
-                    disabledContainerColor = Color(0xFFF0F1F2),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
@@ -87,24 +63,15 @@ fun ProductsScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(categorias) { categoria ->
-                    CategoriaCard(categoria, onClick = {
+                    CategoriaCard(categoria) {
                         navController.navigate("category/${categoria.nombre}")
-                    })
+                    }
                 }
-
 
                 item {
                     AddCategoriaCard(onClick = { /* TODO */ })
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProductsScreenPreview() {
-    HCIListioAppTheme {
-        ProductsScreen(navController = rememberNavController())
     }
 }
