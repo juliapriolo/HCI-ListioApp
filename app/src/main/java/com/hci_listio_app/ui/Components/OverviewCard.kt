@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,13 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.icons.Icons
-import androidx.compose.material3.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,14 +43,14 @@ fun OverviewCard(item: OverviewItem, modifier: Modifier = Modifier) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            androidx.compose.foundation.layout.Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = item.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.weight(1f))
-                    Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = "favorite")
+                    Icon(imageVector = Icons.Filled.FavoriteBorder, contentDescription = "favorite")
                 }
                 Spacer(modifier = Modifier.size(6.dp))
-                Text(text = if (item.isPrivate) "Privada" else "Pública", color = Color(0xFF4FC46F), style = MaterialTheme.typography.bodySmall)
+                Text(text = if (item.isPrivate) "Privada" else "Pública", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
                 Spacer(modifier = Modifier.size(6.dp))
                 Text(text = "Lista ${item.completed}/${item.total} Completada", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             }
@@ -60,7 +61,7 @@ fun OverviewCard(item: OverviewItem, modifier: Modifier = Modifier) {
                     Box(
                         modifier = Modifier
                             .size(36.dp)
-                            .background(color = Color(0xFFEDE7F6), shape = CircleShape)
+                            .background(color = MaterialTheme.colorScheme.primaryContainer, shape = CircleShape)
                             .clickable { },
                         contentAlignment = Alignment.Center
                     ) {
@@ -71,7 +72,7 @@ fun OverviewCard(item: OverviewItem, modifier: Modifier = Modifier) {
                     Box(
                         modifier = Modifier
                             .size(36.dp)
-                            .background(color = Color(0xFFF3E8FF), shape = CircleShape),
+                            .background(color = MaterialTheme.colorScheme.primaryContainer, shape = CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = "+${item.members.size - 3}")

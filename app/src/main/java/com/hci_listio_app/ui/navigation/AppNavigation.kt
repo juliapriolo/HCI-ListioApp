@@ -16,6 +16,7 @@ import com.hci_listio_app.ui.screens.HomeScreen
 import com.hci_listio_app.ui.screens.EditProfileScreen
 import com.hci_listio_app.ui.screens.LanguageScreen
 import com.hci_listio_app.ui.screens.ListScreen
+import com.hci_listio_app.ui.screens.ListOverview
 import com.hci_listio_app.ui.screens.CategoryProductsScreen
 
 
@@ -75,6 +76,9 @@ fun AppNavigation() {
         }
         composable(Screen.Language.route) {
             LanguageScreen(navController = navController)
+        }
+        composable(Screen.ListOverview.route) {
+            ListOverview(navController = navController)
         }
         composable("category/{categoryName}") { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""

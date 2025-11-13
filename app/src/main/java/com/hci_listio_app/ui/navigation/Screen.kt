@@ -16,6 +16,7 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile")
     object EditProfile : Screen("edit_profile")
     object Language : Screen("language")
+    object ListOverview : Screen("list_overview")
     object ShoppingList : Screen("list/{listName}") {
         fun createRoute(listName: String) = "list/$listName"
     }
