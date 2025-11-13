@@ -11,7 +11,9 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,17 +28,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.navigation.Screen
+import com.hci_listio_app.ui.viewmodels.SignUpViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(navController: NavController) {
-    var nombre by remember { mutableStateOf("") }
-    var apellido by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
+fun SignUpScreen(
+    navController: NavController,
+    viewModel: SignUpViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         containerColor = Color.White,
@@ -71,8 +72,8 @@ fun SignUpScreen(navController: NavController) {
 
                 // Nombre Field
                 OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
+                    value = uiState.nombre,
+                    onValueChange = viewModel::onNombreChange,
                     placeholder = { Text("Nombre") },
                     leadingIcon = {
                         Icon(
@@ -93,8 +94,8 @@ fun SignUpScreen(navController: NavController) {
 
                 // Apellido Field
                 OutlinedTextField(
-                    value = apellido,
-                    onValueChange = { apellido = it },
+                    value = uiState.apellido,
+                    onValueChange = viewModel::onApellidoChange,
                     placeholder = { Text("Apellido") },
                     leadingIcon = {
                         Icon(
@@ -115,8 +116,8 @@ fun SignUpScreen(navController: NavController) {
 
                 // Email Field
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = uiState.email,
+                    onValueChange = viewModel::onEmailChange,
                     placeholder = { Text("Email") },
                     leadingIcon = {
                         Icon(
@@ -137,8 +138,8 @@ fun SignUpScreen(navController: NavController) {
 
                 // Password Field
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = uiState.password,
+                    onValueChange = viewModel::onPasswordChange,
                     placeholder = { Text("Contraseña") },
                     leadingIcon = {
                         Icon(
@@ -147,12 +148,12 @@ fun SignUpScreen(navController: NavController) {
                             tint = Color.Gray
                         )
                     },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(
-                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                                imageVector = if (uiState.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (uiState.isPasswordVisible) "Hide password" else "Show password",
                                 tint = Color.Gray
                             )
                         }
@@ -169,8 +170,8 @@ fun SignUpScreen(navController: NavController) {
 
                 // Confirm Password Field
                 OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
+                    value = uiState.confirmPassword,
+                    onValueChange = viewModel::onConfirmPasswordChange,
                     placeholder = { Text("Confirmar contraseña") },
                     leadingIcon = {
                         Icon(
@@ -179,12 +180,12 @@ fun SignUpScreen(navController: NavController) {
                             tint = Color.Gray
                         )
                     },
-                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                        IconButton(onClick = viewModel::toggleConfirmPasswordVisibility) {
                             Icon(
-                                imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
+                                imageVector = if (uiState.isConfirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (uiState.isConfirmPasswordVisible) "Hide password" else "Show password",
                                 tint = Color.Gray
                             )
                         }
@@ -201,7 +202,7 @@ fun SignUpScreen(navController: NavController) {
 
                 // Registrarse Button
                 Button(
-                    onClick = { /* TODO: Handle sign up */ },
+                    onClick = viewModel::onSubmit,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
@@ -242,5 +243,8 @@ fun SignUpScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
-    SignUpScreen(navController = rememberNavController())
+    SignUpScreen(
+        navController = rememberNavController(),
+        viewModel = SignUpViewModel()
+    )
 }
