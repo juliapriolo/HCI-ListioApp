@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.navigation.Screen
 import com.hci_listio_app.ui.viewmodels.ForgotPasswordViewModel
@@ -52,7 +54,7 @@ fun ForgotPasswordScreen(
         containerColor = Color.White,
         topBar = {
             ListioTopAppBar(
-                title = "Recuperar contraseña",
+                title = stringResource(R.string.forgot_password_title),
                 showBackButton = true,
                 onBackClick = { navController.navigateUp() }
             )
@@ -77,7 +79,7 @@ fun ForgotPasswordScreen(
                         ForgotPasswordStep.STEP_EMAIL -> {
                             // Paso 1: Ingresar email
                             Text(
-                                text = "Recuperar contraseña",
+                                text = stringResource(R.string.forgot_password_recover),
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF303F4F),
@@ -85,7 +87,7 @@ fun ForgotPasswordScreen(
                             )
 
                             Text(
-                                text = "Ingresá tu email y te enviaremos un código para restablecer tu contraseña",
+                                text = stringResource(R.string.forgot_password_description),
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.padding(bottom = 24.dp)
@@ -99,11 +101,11 @@ fun ForgotPasswordScreen(
                                     }
                                     viewModel.onEmailChange(it)
                                 },
-                                label = { Text("Email") },
+                                label = { Text(stringResource(R.string.forgot_password_email)) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Email,
-                                        contentDescription = "Icono de email"
+                                        contentDescription = stringResource(R.string.forgot_password_email_icon)
                                     )
                                 },
                                 modifier = Modifier
@@ -126,13 +128,13 @@ fun ForgotPasswordScreen(
                                 shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                             ) {
-                                Text("Enviar código", color = Color.White, fontSize = 16.sp)
+                                Text(stringResource(R.string.forgot_password_send_code), color = Color.White, fontSize = 16.sp)
                             }
 
                             // Success Message
                             if (uiState.isEmailSent) {
                                 Text(
-                                    text = "Código enviado. Revisá tu email.",
+                                    text = stringResource(R.string.forgot_password_code_sent),
                                     color = Color(0xFF6DCB5A),
                                     fontSize = 14.sp,
                                     modifier = Modifier
@@ -144,7 +146,7 @@ fun ForgotPasswordScreen(
                         ForgotPasswordStep.STEP_RESET -> {
                             // Paso 2: Ingresar código y nueva contraseña
                             Text(
-                                text = "Restablecer contraseña",
+                                text = stringResource(R.string.forgot_password_reset),
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF303F4F),
@@ -152,7 +154,11 @@ fun ForgotPasswordScreen(
                             )
 
                             Text(
-                                text = "Ingresá el código que enviamos a ${uiState.email.ifEmpty { "tu email" }} y tu nueva contraseña",
+                                text = if (uiState.email.isNotEmpty()) {
+                                    stringResource(R.string.forgot_password_reset_description, uiState.email)
+                                } else {
+                                    stringResource(R.string.forgot_password_reset_description_default)
+                                },
                                 fontSize = 14.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.padding(bottom = 24.dp)
@@ -166,11 +172,11 @@ fun ForgotPasswordScreen(
                                     }
                                     viewModel.onCodeChange(it)
                                 },
-                                label = { Text("Código de verificación") },
+                                label = { Text(stringResource(R.string.forgot_password_code)) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Email,
-                                        contentDescription = "Icono de código",
+                                        contentDescription = stringResource(R.string.forgot_password_code_icon),
                                         tint = Color.Gray
                                     )
                                 },
@@ -192,11 +198,11 @@ fun ForgotPasswordScreen(
                                     }
                                     viewModel.onNewPasswordChange(it)
                                 },
-                                label = { Text("Nueva contraseña") },
+                                label = { Text(stringResource(R.string.forgot_password_new_password)) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Lock,
-                                        contentDescription = "Icono de contraseña"
+                                        contentDescription = stringResource(R.string.forgot_password_password_icon)
                                     )
                                 },
                                 visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -207,7 +213,11 @@ fun ForgotPasswordScreen(
                                         Icons.Filled.VisibilityOff
                                     }
 
-                                    val description = if (uiState.isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                                    val description = if (uiState.isPasswordVisible) {
+                                        stringResource(R.string.login_hide_password)
+                                    } else {
+                                        stringResource(R.string.login_show_password)
+                                    }
 
                                     IconButton(onClick = viewModel::togglePasswordVisibility) {
                                         Icon(imageVector = image, contentDescription = description)
@@ -231,11 +241,11 @@ fun ForgotPasswordScreen(
                                     }
                                     viewModel.onConfirmPasswordChange(it)
                                 },
-                                label = { Text("Confirmar contraseña") },
+                                label = { Text(stringResource(R.string.forgot_password_confirm_password)) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Lock,
-                                        contentDescription = "Icono de confirmar contraseña"
+                                        contentDescription = stringResource(R.string.forgot_password_confirm_password_icon)
                                     )
                                 },
                                 visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -246,7 +256,11 @@ fun ForgotPasswordScreen(
                                         Icons.Filled.VisibilityOff
                                     }
 
-                                    val description = if (uiState.isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                                    val description = if (uiState.isPasswordVisible) {
+                                        stringResource(R.string.login_hide_password)
+                                    } else {
+                                        stringResource(R.string.login_show_password)
+                                    }
 
                                     IconButton(onClick = viewModel::togglePasswordVisibility) {
                                         Icon(imageVector = image, contentDescription = description)
@@ -272,7 +286,7 @@ fun ForgotPasswordScreen(
                                 shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                             ) {
-                                Text("Restablecer contraseña", color = Color.White, fontSize = 16.sp)
+                                Text(stringResource(R.string.forgot_password_reset_button), color = Color.White, fontSize = 16.sp)
                             }
                         }
                     }

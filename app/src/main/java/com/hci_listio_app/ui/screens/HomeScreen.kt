@@ -13,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.BottomNavigationBar
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.navigation.Screen
@@ -23,7 +25,7 @@ import com.hci_listio_app.ui.navigation.Screen
 fun HomeScreen(navController: NavController) {
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
-        topBar = { ListioTopAppBar(title = "Inicio") },
+        topBar = { ListioTopAppBar(title = stringResource(R.string.home_title)) },
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { padding ->
         Column(
@@ -39,10 +41,10 @@ fun HomeScreen(navController: NavController) {
                     )
                 }
             ) {
-                Text("Ver mi lista")
+                Text(stringResource(R.string.home_view_list))
             }
 
-            Text("Pantalla de Inicio")
+            Text(stringResource(R.string.home_screen))
         }
     }
 }

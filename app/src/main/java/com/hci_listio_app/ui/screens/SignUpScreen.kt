@@ -21,12 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.navigation.Screen
 import com.hci_listio_app.ui.viewmodels.SignUpViewModel
@@ -55,7 +57,7 @@ fun SignUpScreen(
         containerColor = Color.White,
         topBar = {
             ListioTopAppBar(
-                title = "Registrarse",
+                title = stringResource(R.string.signup_title),
                 showBackButton = true,
                 onBackClick = { navController.navigateUp() }
             )
@@ -78,7 +80,7 @@ fun SignUpScreen(
                 ) {
                     // Title
                     Text(
-                        text = "Registrarse",
+                        text = stringResource(R.string.signup_title),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF303F4F),
@@ -89,11 +91,11 @@ fun SignUpScreen(
                     OutlinedTextField(
                         value = uiState.nombre,
                         onValueChange = viewModel::onNombreChange,
-                        placeholder = { Text("Nombre") },
+                        placeholder = { Text(stringResource(R.string.signup_name)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Person,
-                                contentDescription = "Nombre Icon",
+                                contentDescription = stringResource(R.string.signup_name_icon),
                                 tint = Color.Gray
                             )
                         },
@@ -111,11 +113,11 @@ fun SignUpScreen(
                     OutlinedTextField(
                         value = uiState.apellido,
                         onValueChange = viewModel::onApellidoChange,
-                        placeholder = { Text("Apellido") },
+                        placeholder = { Text(stringResource(R.string.signup_surname)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Person,
-                                contentDescription = "Apellido Icon",
+                                contentDescription = stringResource(R.string.signup_surname_icon),
                                 tint = Color.Gray
                             )
                         },
@@ -133,11 +135,11 @@ fun SignUpScreen(
                     OutlinedTextField(
                         value = uiState.email,
                         onValueChange = viewModel::onEmailChange,
-                        placeholder = { Text("Email") },
+                        placeholder = { Text(stringResource(R.string.signup_email)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Email,
-                                contentDescription = "Icono de email",
+                                contentDescription = stringResource(R.string.signup_email_icon),
                                 tint = Color.Gray
                             )
                         },
@@ -155,11 +157,11 @@ fun SignUpScreen(
                     OutlinedTextField(
                         value = uiState.password,
                         onValueChange = viewModel::onPasswordChange,
-                        placeholder = { Text("Contraseña") },
+                        placeholder = { Text(stringResource(R.string.signup_password)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Icono de contraseña",
+                                contentDescription = stringResource(R.string.signup_password_icon),
                                 tint = Color.Gray
                             )
                         },
@@ -168,7 +170,7 @@ fun SignUpScreen(
                             IconButton(onClick = viewModel::togglePasswordVisibility) {
                                 Icon(
                                     imageVector = if (uiState.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = if (uiState.isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                    contentDescription = if (uiState.isPasswordVisible) stringResource(R.string.login_hide_password) else stringResource(R.string.login_show_password),
                                     tint = Color.Gray
                                 )
                             }
@@ -187,11 +189,11 @@ fun SignUpScreen(
                     OutlinedTextField(
                         value = uiState.confirmPassword,
                         onValueChange = viewModel::onConfirmPasswordChange,
-                        placeholder = { Text("Confirmar contraseña") },
+                        placeholder = { Text(stringResource(R.string.signup_confirm_password)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Icono de confirmar contraseña",
+                                contentDescription = stringResource(R.string.signup_confirm_password_icon),
                                 tint = Color.Gray
                             )
                         },
@@ -200,7 +202,7 @@ fun SignUpScreen(
                             IconButton(onClick = viewModel::toggleConfirmPasswordVisibility) {
                                 Icon(
                                     imageVector = if (uiState.isConfirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = if (uiState.isConfirmPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                    contentDescription = if (uiState.isConfirmPasswordVisible) stringResource(R.string.login_hide_password) else stringResource(R.string.login_show_password),
                                     tint = Color.Gray
                                 )
                             }
@@ -226,7 +228,7 @@ fun SignUpScreen(
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                     ) {
-                        Text("Registrarse", color = Color.White, fontSize = 16.sp)
+                        Text(stringResource(R.string.signup_button), color = Color.White, fontSize = 16.sp)
                     }
 
                     // Error Message
@@ -251,12 +253,12 @@ fun SignUpScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "¿Ya tenés una cuenta? ",
+                        text = stringResource(R.string.signup_has_account),
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
                     Text(
-                        text = "Iniciar sesión",
+                        text = stringResource(R.string.signup_login),
                         fontSize = 14.sp,
                         color = Color(0xFF303F4F),
                         fontWeight = FontWeight.Bold,
