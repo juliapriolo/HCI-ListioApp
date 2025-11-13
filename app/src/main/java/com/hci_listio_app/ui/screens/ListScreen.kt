@@ -20,32 +20,33 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hci_listio_app.R
+import com.hci_listio_app.ui.Components.AddProductDialog
+import com.hci_listio_app.ui.Components.EditItemDialog
 import com.hci_listio_app.ui.Components.ListItem
 import com.hci_listio_app.ui.Components.ListItemData
 import com.hci_listio_app.ui.Components.ListioTopAppBar
+import com.hci_listio_app.ui.viewmodels.ListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListScreen(navController: NavController, listName: String = "Compras Cumpleaños") {
-    // Estado de los items de la lista
-    var items by remember {
-        mutableStateOf(
-            listOf(
-                ListItemData("1", "Servilletas", isChecked = true),
-                ListItemData("2", "Globos", isChecked = false),
-                ListItemData("3", "Hamburguesas - 24 unidades", isChecked = false),
-                ListItemData("4", "Queso - 500 gramos", isChecked = false),
-                ListItemData("5", "Coca Cola - 10 Botellas de 2,25", isChecked = false),
-                ListItemData("6", "Cebollas - 3 unidades", isChecked = false),
-                ListItemData("7", "Helado - 5 kg", isChecked = false)
-            )
-        )
-    }
+fun ListScreen(
+    navController: NavController,
+    listName: String = "Compras Cumpleaños",
+    viewModel: ListViewModel = viewModel()
+) {
+    // Observar estados del ViewModel
+    val items by viewModel.items.collectAsState()
+    val completedCount by viewModel.completedCount.collectAsState()
+    val totalCount by viewModel.totalCount.collectAsState()
 
-    val completedCount = items.count { it.isChecked }
-    val totalCount = items.size
+    // Estados locales para diálogos
+    var showAddDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
+    var itemToEdit by remember { mutableStateOf<ListItemData?>(null) }
 
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
@@ -58,7 +59,7 @@ fun ListScreen(navController: NavController, listName: String = "Compras Cumplea
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO: Add new item */ },
+                onClick = { showAddDialog = true },
                 containerColor = Color(0xFF6DCB5A),
                 contentColor = Color.White
             ) {
@@ -143,7 +144,7 @@ fun ListScreen(navController: NavController, listName: String = "Compras Cumplea
 
                         Spacer(modifier = Modifier.weight(1f))
 
-                        // Botón filtro (menú de tres puntos en la imagen)
+                        // Botón filtro
                         IconButton(onClick = { /* TODO: Filter options */ }) {
                             Icon(
                                 imageVector = Icons.Default.FilterList,
@@ -208,12 +209,11 @@ fun ListScreen(navController: NavController, listName: String = "Compras Cumplea
                     ListItem(
                         item = item,
                         onCheckedChange = { checked ->
-                            items = items.map {
-                                if (it.id == item.id) it.copy(isChecked = checked) else it
-                            }
+                            viewModel.toggleItemCheck(item.id, checked)
                         },
                         onMoreClick = {
-                            // TODO: Edit item
+                            itemToEdit = item
+                            showEditDialog = true
                         }
                     )
                 }
@@ -221,7 +221,7 @@ fun ListScreen(navController: NavController, listName: String = "Compras Cumplea
                 // Botón agregar más productos al final
                 item {
                     Button(
-                        onClick = { /* TODO: Add product */ },
+                        onClick = { showAddDialog = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
@@ -240,5 +240,36 @@ fun ListScreen(navController: NavController, listName: String = "Compras Cumplea
                 }
             }
         }
+    }
+
+    // Diálogo para agregar producto
+    if (showAddDialog) {
+        AddProductDialog(
+            onDismiss = { showAddDialog = false },
+            onSave = { productName ->
+                viewModel.addItem(productName)
+                showAddDialog = false
+            }
+        )
+    }
+
+    // Diálogo para editar item
+    if (showEditDialog && itemToEdit != null) {
+        EditItemDialog(
+            itemName = itemToEdit!!.name,
+            quantity = "",
+            unit = "24",
+            brand = "Paty",
+            store = "Supermercado Coto",
+            onDismiss = {
+                showEditDialog = false
+                itemToEdit = null
+            },
+            onSave = { name, quantity, unit, brand, store ->
+                viewModel.editItem(itemToEdit!!.id, name, quantity, unit, brand, store)
+                showEditDialog = false
+                itemToEdit = null
+            }
+        )
     }
 }
