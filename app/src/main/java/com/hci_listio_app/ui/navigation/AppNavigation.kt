@@ -78,7 +78,7 @@ fun AppNavigation() {
             LanguageScreen(navController = navController)
         }
         composable(Screen.ListOverview.route) {
-            ListOverview(navController = navController)
+            ListOverview()
         }
         composable("category/{categoryName}") { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
