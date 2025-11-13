@@ -67,6 +67,18 @@ fun LoginScreen(
         }
     }
 
+    // Redirección automática a verificación cuando se detecta cuenta no verificada
+    LaunchedEffect(uiState.shouldNavigateToVerification) {
+        if (uiState.shouldNavigateToVerification && uiState.verificationEmail.isNotEmpty()) {
+            navController.navigate(
+                Screen.VerifyAccount.createRoute(uiState.verificationEmail)
+            ) {
+                popUpTo(Screen.Login.route) { inclusive = false }
+            }
+            viewModel.consumeNavigationToVerification()
+        }
+    }
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -171,7 +183,7 @@ fun LoginScreen(
                         color = Color(0xFF303F4F),
                         fontWeight = FontWeight.Bold,
                         textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable { /* TODO: Handle password recovery */ }
+                        modifier = Modifier.clickable { navController.navigate(Screen.ForgotPassword.route) }
                     )
                 }
                 Button(

@@ -3,6 +3,8 @@ package com.hci_listio_app.ui.viewmodels
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hci_listio_app.data.AuthRepository
+import com.hci_listio_app.data.AuthRepositoryProvider
 import com.hci_listio_app.data.UserRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +22,9 @@ data class EditProfileUiState(
     val confirmPassword: String = "",
     val isCurrentPasswordVisible: Boolean = false,
     val isNewPasswordVisible: Boolean = false,
-    val isConfirmPasswordVisible: Boolean = false
+    val isConfirmPasswordVisible: Boolean = false,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 ) {
     val passwordsMatch: Boolean get() = newPassword == confirmPassword
 }
@@ -30,6 +34,7 @@ sealed interface EditProfileEvent {
 }
 
 class EditProfileViewModel(
+    private val authRepository: AuthRepository = AuthRepositoryProvider.instance,
     private val userRepository: UserRepository = UserRepository
 ) : ViewModel() {
 
@@ -73,16 +78,67 @@ class EditProfileViewModel(
 
     fun saveChanges() {
         val state = _uiState.value
-        if (!state.passwordsMatch) return
-
-        userRepository.updatePhoto(state.photoBitmap)
-        if (state.newPassword.isNotEmpty()) {
-            userRepository.updatePassword(state.newPassword)
+        
+        // Validar que las contraseñas coincidan
+        if (!state.passwordsMatch) {
+            _uiState.update {
+                it.copy(errorMessage = "Las contraseñas no coinciden.")
+            }
+            return
         }
+
+        // Validar que si hay nueva contraseña, también haya contraseña actual
+        if (state.newPassword.isNotEmpty() && state.currentPassword.isEmpty()) {
+            _uiState.update {
+                it.copy(errorMessage = "Debes ingresar tu contraseña actual para cambiarla.")
+            }
+            return
+        }
+
+        // Validar que la nueva contraseña no esté vacía si se intenta cambiar
+        if (state.currentPassword.isNotEmpty() && state.newPassword.isEmpty()) {
+            _uiState.update {
+                it.copy(errorMessage = "Debes ingresar una nueva contraseña.")
+            }
+            return
+        }
+
+        if (state.isLoading) return
 
         viewModelScope.launch {
-            _events.emit(EditProfileEvent.Saved)
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            // Guardar la foto localmente (siempre se guarda)
+            userRepository.updatePhoto(state.photoBitmap)
+
+            // Cambiar contraseña en la API solo si hay nueva contraseña
+            var passwordChangeSuccess = true
+            if (state.newPassword.isNotEmpty()) {
+                val result = authRepository.changePassword(state.currentPassword, state.newPassword)
+                if (result.isSuccess) {
+                    // Si el cambio de contraseña fue exitoso, también actualizar localmente
+                    userRepository.updatePassword(state.newPassword)
+                } else {
+                    passwordChangeSuccess = false
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.exceptionOrNull()?.message ?: "Error al cambiar la contraseña."
+                        )
+                    }
+                }
+            }
+
+            // Solo emitir evento de éxito si todo fue exitoso
+            if (passwordChangeSuccess) {
+                _uiState.update { it.copy(isLoading = false) }
+                _events.emit(EditProfileEvent.Saved)
+            }
         }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 }
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hci_listio_app.data.AuthRepository
 import com.hci_listio_app.data.AuthRepositoryProvider
+import com.hci_listio_app.data.remote.UnverifiedAccountException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,9 @@ data class LoginUiState(
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isLoggedIn: Boolean = false
+    val isLoggedIn: Boolean = false,
+    val shouldNavigateToVerification: Boolean = false,
+    val verificationEmail: String = ""
 )
 
 class LoginViewModel(
@@ -63,14 +66,30 @@ class LoginViewModel(
                     current.copy(
                         isLoading = false,
                         errorMessage = null,
-                        isLoggedIn = true
+                        isLoggedIn = true,
+                        shouldNavigateToVerification = false,
+                        verificationEmail = ""
                     )
                 } else {
-                    current.copy(
-                        isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error desconocido.",
-                        isLoggedIn = false
-                    )
+                    val exception = result.exceptionOrNull()
+                    // Detectar cuenta no verificada
+                    if (exception is UnverifiedAccountException) {
+                        current.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            isLoggedIn = false,
+                            shouldNavigateToVerification = true,
+                            verificationEmail = exception.email
+                        )
+                    } else {
+                        current.copy(
+                            isLoading = false,
+                            errorMessage = exception?.message ?: "Error desconocido.",
+                            isLoggedIn = false,
+                            shouldNavigateToVerification = false,
+                            verificationEmail = ""
+                        )
+                    }
                 }
             }
         }
@@ -82,5 +101,14 @@ class LoginViewModel(
 
     fun dismissError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun consumeNavigationToVerification() {
+        _uiState.update { 
+            it.copy(
+                shouldNavigateToVerification = false,
+                verificationEmail = ""
+            ) 
+        }
     }
 }

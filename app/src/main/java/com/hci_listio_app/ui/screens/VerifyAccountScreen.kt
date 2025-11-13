@@ -44,8 +44,16 @@ fun VerifyAccountScreen(
     // Navegar a Login cuando la verificación sea exitosa
     LaunchedEffect(uiState.isVerificationSuccessful) {
         if (uiState.isVerificationSuccessful) {
-            navController.navigate(Screen.Login.route) {
-                popUpTo(Screen.SignUp.route) { inclusive = true }
+            // Si viene desde signup (con password), hacer popUpTo SignUp
+            // Si viene desde login (sin password), solo navegar a Login
+            if (password.isNotEmpty()) {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(Screen.SignUp.route) { inclusive = true }
+                }
+            } else {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(Screen.Login.route) { inclusive = false }
+                }
             }
             viewModel.consumeVerificationSuccess()
         }

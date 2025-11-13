@@ -25,7 +25,7 @@ class AuthRemoteDataSource(
         safeApiCall { api.register(payload) }
 
     suspend fun login(email: String, password: String): Result<LoginResponse> =
-        safeApiCall { api.login(LoginRequest(email, password)) }
+        safeApiCall(email) { api.login(LoginRequest(email, password)) }
 
     suspend fun getProfile(token: String): Result<UserProfileResponse> =
         safeApiCall { api.getProfile(bearer(token)) }
@@ -52,18 +52,47 @@ class AuthRemoteDataSource(
         safeApiCall { api.logout(bearer(token)) }
 
     private suspend fun <T> safeApiCall(block: suspend () -> T): Result<T> =
+        safeApiCall(null, block)
+
+    private suspend fun <T> safeApiCall(email: String?, block: suspend () -> T): Result<T> =
         withContext(Dispatchers.IO) {
             try {
                 Result.success(block())
             } catch (error: Throwable) {
-                Result.failure(mapError(error))
+                Result.failure(mapError(error, email))
             }
         }
 
-    private fun mapError(error: Throwable): Throwable {
+    private fun mapError(error: Throwable, email: String? = null): Throwable {
         return when (error) {
             is HttpException -> {
                 val errorMessage = extractErrorMessage(error) ?: getDefaultHttpErrorMessage(error.code())
+                
+                // Detectar cuenta no verificada: error 401 en login
+                if (error.code() == 401 && email != null) {
+                    // Verificar si el mensaje indica cuenta no verificada
+                    val lowerMessage = errorMessage.lowercase()
+                    // Buscar indicadores de cuenta no verificada en el mensaje
+                    val isUnverified = lowerMessage.contains("verific") || 
+                                      lowerMessage.contains("verificada") || 
+                                      lowerMessage.contains("verificar") || 
+                                      lowerMessage.contains("verification") ||
+                                      lowerMessage.contains("no verificada") ||
+                                      lowerMessage.contains("not verified") ||
+                                      lowerMessage.contains("unverified")
+                    
+                    if (isUnverified) {
+                        return UnverifiedAccountException(
+                            email = email,
+                            message = "Tu cuenta no está verificada. Por favor, verifica tu cuenta para poder iniciar sesión.",
+                            cause = error
+                        )
+                    }
+                    // Si el mensaje no es específico, pero es un 401 en login, 
+                    // podría ser cuenta no verificada o credenciales inválidas
+                    // Por ahora, solo lo marcamos si el mensaje contiene palabras relacionadas con verificación
+                }
+                
                 ApiException(
                     statusCode = error.code(),
                     message = errorMessage,
@@ -120,6 +149,12 @@ class ApiException(
 ) : Exception(message, cause)
 
 class NetworkException(
+    override val message: String,
+    override val cause: Throwable? = null
+) : Exception(message, cause)
+
+class UnverifiedAccountException(
+    val email: String,
     override val message: String,
     override val cause: Throwable? = null
 ) : Exception(message, cause)

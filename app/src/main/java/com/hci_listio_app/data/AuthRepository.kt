@@ -61,6 +61,23 @@ class AuthRepository(
         }
     }
 
+    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
+        val token = _authToken.value
+        return if (token == null) {
+            Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
+        } else {
+            remoteDataSource.changePassword(token, currentPassword, newPassword)
+        }
+    }
+
+    suspend fun forgotPassword(email: String): Result<Unit> {
+        return remoteDataSource.forgotPassword(email)
+    }
+
+    suspend fun resetPassword(code: String, newPassword: String): Result<Unit> {
+        return remoteDataSource.resetPassword(code, newPassword)
+    }
+
     fun setToken(token: String?) {
         _authToken.update { token }
     }

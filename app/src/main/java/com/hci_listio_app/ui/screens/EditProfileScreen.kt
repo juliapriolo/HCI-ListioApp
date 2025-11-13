@@ -30,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -114,18 +115,21 @@ fun EditProfileScreen(
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Card principal similar a Login/SignUp
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                    .padding(24.dp)
+                modifier = Modifier.fillMaxSize()
             ) {
+                // Card principal similar a Login/SignUp
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                        .padding(24.dp)
+                ) {
                 Text(
                     text = "Editar Perfil",
                     fontSize = 28.sp,
@@ -263,11 +267,23 @@ fun EditProfileScreen(
 
                 // (Se reemplazó el botón de galería por el icono de editar en el avatar)
 
+                // Mostrar mensaje de error si existe
+                uiState.errorMessage?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    )
+                }
+
                 Button(
                     onClick = {
                         viewModel.saveChanges()
                     },
-                    enabled = passwordsMatch,
+                    enabled = passwordsMatch && !uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
@@ -276,6 +292,17 @@ fun EditProfileScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                 ) {
                     Text("Guardar cambios", color = Color.White, fontSize = 16.sp)
+                }
+                }
+            }
+
+            // Mostrar indicador de carga
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }

@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.hci_listio_app.ui.screens.LoginScreen
 import com.hci_listio_app.ui.screens.SignUpScreen
 import com.hci_listio_app.ui.screens.VerifyAccountScreen
+import com.hci_listio_app.ui.screens.ForgotPasswordScreen
 import com.hci_listio_app.ui.screens.ProductsScreen
 import com.hci_listio_app.ui.screens.ProfileScreen
 import com.hci_listio_app.ui.screens.HomeScreen
@@ -56,6 +57,9 @@ fun AppNavigation() {
                 email = email,
                 password = password
             )
+        }
+        composable(Screen.ForgotPassword.route) {
+            ForgotPasswordScreen(navController = navController)
         }
         composable(Screen.Home.route) {
             HomeScreen(navController = navController)

@@ -4,12 +4,13 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object SignUp : Screen("signup")
     object VerifyAccount : Screen("verify_account/{email}/{password}") {
-        fun createRoute(email: String, password: String): String {
+        fun createRoute(email: String, password: String = ""): String {
             val encodedEmail = java.net.URLEncoder.encode(email, "UTF-8")
             val encodedPassword = java.net.URLEncoder.encode(password, "UTF-8")
             return "verify_account/$encodedEmail/$encodedPassword"
         }
     }
+    object ForgotPassword : Screen("forgot_password")
     object Home : Screen("home")
     object Products : Screen("products")
     object Profile : Screen("profile")
