@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
@@ -71,18 +72,27 @@ fun VerifyAccountScreen(
             )
         }
     ) { padding ->
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
+            val isTablet = maxWidth >= 600.dp
+            
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
                 // Main Content - White Card
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .then(
+                            if (isTablet) {
+                                Modifier.widthIn(max = 600.dp)
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
+                        )
                         .verticalScroll(rememberScrollState())
                         .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                         .padding(32.dp)
@@ -131,7 +141,13 @@ fun VerifyAccountScreen(
                         onClick = viewModel::onSubmit,
                         enabled = !uiState.isLoading && !uiState.isResendingCode,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .then(
+                                if (isTablet) {
+                                    Modifier.widthIn(min = 400.dp).align(Alignment.CenterHorizontally)
+                                } else {
+                                    Modifier.fillMaxWidth()
+                                }
+                            )
                             .padding(vertical = 16.dp)
                             .height(50.dp),
                         shape = RoundedCornerShape(16.dp),
@@ -145,7 +161,13 @@ fun VerifyAccountScreen(
                         onClick = viewModel::onResendCode,
                         enabled = !uiState.isLoading && !uiState.isResendingCode && uiState.canResendCode,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .then(
+                                if (isTablet) {
+                                    Modifier.widthIn(min = 400.dp).align(Alignment.CenterHorizontally)
+                                } else {
+                                    Modifier.fillMaxWidth()
+                                }
+                            )
                             .padding(bottom = 8.dp)
                     ) {
                         if (uiState.isResendingCode) {

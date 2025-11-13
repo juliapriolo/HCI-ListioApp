@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
@@ -105,122 +107,135 @@ fun ProfileScreen(
         },
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { padding ->
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            val isTablet = maxWidth >= 600.dp
+            
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
-            // Sección de Perfil de Usuario
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Row(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .then(
+                            if (isTablet) {
+                                Modifier.widthIn(max = 600.dp)
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
+                        )
+                        .verticalScroll(rememberScrollState())
                         .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Foto de perfil o placeholder
-                    Box(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF6DCB5A)),
-                        contentAlignment = Alignment.Center
+                    // Sección de Perfil de Usuario
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
-                    val bitmap = uiState.photoBitmap
-                    if (bitmap != null) {
-                            Image(
-                                bitmap = bitmap.asImageBitmap(),
-                                contentDescription = stringResource(R.string.profile_photo),
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Foto de perfil o placeholder
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
+                                    .size(64.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF6DCB5A)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                val bitmap = uiState.photoBitmap
+                                if (bitmap != null) {
+                                    Image(
+                                        bitmap = bitmap.asImageBitmap(),
+                                        contentDescription = stringResource(R.string.profile_photo),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.perfilpredeterminado),
+                                        contentDescription = stringResource(R.string.profile_user_icon),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.size(16.dp))
+
+                            // Información del usuario
+                            Column {
+                                Text(
+                                    text = "${uiState.nombre} ${uiState.apellido}".trim().ifEmpty { stringResource(R.string.profile_user) },
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF333333)
+                                )
+                                Text(
+                                    text = uiState.email.ifEmpty { stringResource(R.string.profile_not_available) },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
+
+                    // Lista de Opciones Configurables
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Column {
+                            // Opción: Editar Perfil
+                            ConfigurationItem(
+                                text = stringResource(R.string.profile_edit),
+                                onClick = { navController.navigate(Screen.EditProfile.route) }
                             )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.perfilpredeterminado),
-                                contentDescription = stringResource(R.string.profile_user_icon),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
+
+                            Divider(color = Color(0xFFE0E0E0))
+
+                            // Opción: Cambiar Idioma
+                            ConfigurationItem(
+                                text = stringResource(R.string.profile_change_language),
+                                onClick = { navController.navigate(Screen.Language.route) }
+                            )
+
+                            Divider(color = Color(0xFFE0E0E0))
+
+                            // Opción: Cerrar sesión
+                            ConfigurationItem(
+                                text = stringResource(R.string.profile_logout),
+                                onClick = { viewModel.logout() }
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    // Información del usuario
-                    Column {
+                    // Mostrar mensaje de error si existe
+                    uiState.errorMessage?.let { error ->
                         Text(
-                            text = "${uiState.nombre} ${uiState.apellido}".trim().ifEmpty { stringResource(R.string.profile_user) },
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF333333)
-                        )
-                        Text(
-                            text = uiState.email.ifEmpty { stringResource(R.string.profile_not_available) },
+                            text = error,
+                            color = Color.Red,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     }
                 }
             }
-
-            // Lista de Opciones Configurables
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column {
-                    // Opción: Editar Perfil
-                    ConfigurationItem(
-                        text = stringResource(R.string.profile_edit),
-                        onClick = { navController.navigate(Screen.EditProfile.route) }
-                    )
-
-                    Divider(color = Color(0xFFE0E0E0))
-
-                    // Opción: Cambiar Idioma
-                    ConfigurationItem(
-                        text = stringResource(R.string.profile_change_language),
-                        onClick = { navController.navigate(Screen.Language.route) }
-                    )
-
-                    Divider(color = Color(0xFFE0E0E0))
-
-                    // Opción: Cerrar sesión
-                    ConfigurationItem(
-                        text = stringResource(R.string.profile_logout),
-                        onClick = { viewModel.logout() }
-                    )
-                }
-            }
-
-            // Mostrar mensaje de error si existe
-            uiState.errorMessage?.let { error ->
-                Text(
-                    text = error,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            }
-        }
 
             // Mostrar indicador de carga
             if (uiState.isLoading) {

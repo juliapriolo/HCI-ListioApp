@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -65,18 +66,27 @@ fun SignUpScreen(
             )
         }
     ) { padding ->
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
+            val isTablet = maxWidth >= 600.dp
+            
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
                 // Main Content - White Card
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .then(
+                            if (isTablet) {
+                                Modifier.widthIn(max = 600.dp)
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
+                        )
                         .verticalScroll(rememberScrollState())
                         .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                         .padding(32.dp)
@@ -225,7 +235,13 @@ fun SignUpScreen(
                         onClick = viewModel::onSubmit,
                         enabled = !uiState.isLoading,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .then(
+                                if (isTablet) {
+                                    Modifier.widthIn(min = 400.dp).align(Alignment.CenterHorizontally)
+                                } else {
+                                    Modifier.fillMaxWidth()
+                                }
+                            )
                             .padding(vertical = 16.dp)
                             .height(50.dp),
                         shape = RoundedCornerShape(16.dp),
@@ -245,29 +261,29 @@ fun SignUpScreen(
                                 .padding(top = 8.dp)
                         )
                     }
-                }
 
-                // Footer Link
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 32.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.signup_has_account),
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = stringResource(R.string.signup_login),
-                        fontSize = 14.sp,
-                        color = Color(0xFF303F4F),
-                        fontWeight = FontWeight.Bold,
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable { navController.navigate(Screen.Login.route) }
-                    )
+                    // Footer Link
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 16.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.signup_has_account),
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = stringResource(R.string.signup_login),
+                            fontSize = 14.sp,
+                            color = Color(0xFF303F4F),
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline,
+                            modifier = Modifier.clickable { navController.navigate(Screen.Login.route) }
+                        )
+                    }
                 }
             }
 

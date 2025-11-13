@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -78,83 +81,107 @@ fun LanguageScreen(
             )
         }
     ) { padding ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                    .padding(32.dp)
+            val isTablet = maxWidth >= 600.dp
+            
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
-                Text(
-                    text = stringResource(R.string.language_select),
-                    fontSize = 32.sp,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                    color = Color(0xFF303F4F),
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
-            }
-
-            // Sección con padding 16.dp para igualar márgenes de configuración de perfil
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                // Card estilo lista de configuración de perfil
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column {
-                        LanguageOption(
-                            label = stringResource(R.string.language_spanish),
-                            selected = uiState.selectedLanguage == "es",
-                            onClick = { viewModel.onLanguageSelected("es") }
+                Column(
+                    modifier = Modifier
+                        .then(
+                            if (isTablet) {
+                                Modifier.widthIn(max = 600.dp)
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
                         )
-                        Divider(color = Color(0xFFE0E0E0))
-                        LanguageOption(
-                            label = stringResource(R.string.language_english),
-                            selected = uiState.selectedLanguage == "en",
-                            onClick = { viewModel.onLanguageSelected("en") }
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                            .padding(32.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.language_select),
+                            fontSize = 32.sp,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            color = Color(0xFF303F4F),
+                            modifier = Modifier.padding(bottom = 24.dp)
                         )
                     }
-                }
 
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Button(
-                    onClick = { 
-                        if (activity != null) {
-                            viewModel.saveLanguage(activity)
+                    // Sección con padding 16.dp para igualar márgenes de configuración de perfil
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        // Card estilo lista de configuración de perfil
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Column {
+                                LanguageOption(
+                                    label = stringResource(R.string.language_spanish),
+                                    selected = uiState.selectedLanguage == "es",
+                                    onClick = { viewModel.onLanguageSelected("es") }
+                                )
+                                Divider(color = Color(0xFFE0E0E0))
+                                LanguageOption(
+                                    label = stringResource(R.string.language_english),
+                                    selected = uiState.selectedLanguage == "en",
+                                    onClick = { viewModel.onLanguageSelected("en") }
+                                )
+                            }
                         }
-                    },
-                    enabled = !uiState.isLoading,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.language_save),
-                            color = Color.White,
-                            fontSize = 16.sp
-                        )
+
+                        Spacer(modifier = Modifier.size(8.dp))
+
+                        Button(
+                            onClick = { 
+                                if (activity != null) {
+                                    viewModel.saveLanguage(activity)
+                                }
+                            },
+                            enabled = !uiState.isLoading,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A)),
+                            modifier = Modifier
+                                .then(
+                                    if (isTablet) {
+                                        Modifier.widthIn(min = 400.dp).align(Alignment.CenterHorizontally)
+                                    } else {
+                                        Modifier.fillMaxWidth()
+                                    }
+                                )
+                                .padding(vertical = 16.dp)
+                                .height(50.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            if (uiState.isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.language_save),
+                                    color = Color.White,
+                                    fontSize = 16.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
