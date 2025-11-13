@@ -35,9 +35,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,27 +53,23 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.hci_listio_app.ui.Components.ListioTopAppBar
-import com.hci_listio_app.data.UserRepository
 import com.hci_listio_app.R
-import kotlinx.coroutines.launch
+import com.hci_listio_app.ui.viewmodels.EditProfileEvent
+import com.hci_listio_app.ui.viewmodels.EditProfileViewModel
+import kotlinx.coroutines.flow.collectLatest
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(navController: NavController) {
+fun EditProfileScreen(
+    navController: NavController,
+    viewModel: EditProfileViewModel = viewModel()
+) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
-    val currentPhoto = UserRepository.photoBitmap.value
-    val photoState = remember { mutableStateOf<Bitmap?>(currentPhoto) }
-
-    val currentPassword = UserRepository.password.value
-    val currentPasswordInput = remember { mutableStateOf("") }
-    val newPasswordInput = remember { mutableStateOf("") }
-    val confirmPasswordInput = remember { mutableStateOf("") }
-    val passwordVisible = remember { mutableStateOf(false) }
-    val newPasswordVisible = remember { mutableStateOf(false) }
-    val confirmPasswordVisible = remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
 
     // Galería (solo opción activa)
     val context = LocalContext.current
@@ -88,10 +85,23 @@ fun EditProfileScreen(navController: NavController) {
                     @Suppress("DEPRECATION")
                     MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
                 }
-                photoState.value = bitmap
+                viewModel.onPhotoSelected(bitmap)
             } catch (_: Exception) { }
         }
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                EditProfileEvent.Saved -> {
+                    snackbarHostState.showSnackbar("Cambios guardados")
+                    navController.navigateUp()
+                }
+            }
+        }
+    }
+
+    val passwordsMatch = uiState.passwordsMatch
 
     Scaffold(
         containerColor = Color.White,
@@ -138,21 +148,19 @@ fun EditProfileScreen(navController: NavController) {
                             .background(Color(0xFF6DCB5A)),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (photoState.value != null) {
-                            Image(
-                                bitmap = photoState.value!!.asImageBitmap(),
-                                contentDescription = "Foto de perfil",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.perfilpredeterminado),
-                                contentDescription = "Usuario",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+                    uiState.photoBitmap?.let { bitmap ->
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Foto de perfil",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } ?: Image(
+                        painter = painterResource(id = R.drawable.perfilpredeterminado),
+                        contentDescription = "Usuario",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
                     }
                     IconButton(
                         onClick = { pickImageLauncher.launch("image/*") },
@@ -173,8 +181,8 @@ fun EditProfileScreen(navController: NavController) {
 
                 // Campos de contraseña
                 OutlinedTextField(
-                    value = currentPasswordInput.value,
-                    onValueChange = { currentPasswordInput.value = it },
+                    value = uiState.currentPassword,
+                    onValueChange = viewModel::onCurrentPasswordChange,
                     label = { Text("Contraseña actual") },
                     leadingIcon = {
                         Icon(
@@ -186,11 +194,11 @@ fun EditProfileScreen(navController: NavController) {
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     shape = RoundedCornerShape(16.dp),
-                    visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (uiState.isCurrentPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
+                        IconButton(onClick = viewModel::toggleCurrentPasswordVisibility) {
                             Icon(
-                                imageVector = if (passwordVisible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                imageVector = if (uiState.isCurrentPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                                 contentDescription = null
                             )
                         }
@@ -198,8 +206,8 @@ fun EditProfileScreen(navController: NavController) {
                 )
 
                 OutlinedTextField(
-                    value = newPasswordInput.value,
-                    onValueChange = { newPasswordInput.value = it },
+                    value = uiState.newPassword,
+                    onValueChange = viewModel::onNewPasswordChange,
                     label = { Text("Nueva contraseña") },
                     leadingIcon = {
                         Icon(
@@ -211,21 +219,20 @@ fun EditProfileScreen(navController: NavController) {
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     shape = RoundedCornerShape(16.dp),
-                    visualTransformation = if (newPasswordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (uiState.isNewPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { newPasswordVisible.value = !newPasswordVisible.value }) {
+                        IconButton(onClick = viewModel::toggleNewPasswordVisibility) {
                             Icon(
-                                imageVector = if (newPasswordVisible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                imageVector = if (uiState.isNewPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                                 contentDescription = null
                             )
                         }
                     }
                 )
 
-                val passwordsMatch = newPasswordInput.value == confirmPasswordInput.value
                 OutlinedTextField(
-                    value = confirmPasswordInput.value,
-                    onValueChange = { confirmPasswordInput.value = it },
+                    value = uiState.confirmPassword,
+                    onValueChange = viewModel::onConfirmPasswordChange,
                     label = { Text("Confirmar nueva contraseña") },
                     leadingIcon = {
                         Icon(
@@ -237,17 +244,17 @@ fun EditProfileScreen(navController: NavController) {
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     shape = RoundedCornerShape(16.dp),
-                    isError = confirmPasswordInput.value.isNotEmpty() && !passwordsMatch,
+                    isError = uiState.confirmPassword.isNotEmpty() && !passwordsMatch,
                     supportingText = {
-                        if (confirmPasswordInput.value.isNotEmpty() && !passwordsMatch) {
+                        if (uiState.confirmPassword.isNotEmpty() && !passwordsMatch) {
                             Text("Las contraseñas no coinciden", color = Color.Red)
                         }
                     },
-                    visualTransformation = if (confirmPasswordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { confirmPasswordVisible.value = !confirmPasswordVisible.value }) {
+                        IconButton(onClick = viewModel::toggleConfirmPasswordVisibility) {
                             Icon(
-                                imageVector = if (confirmPasswordVisible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                imageVector = if (uiState.isConfirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                                 contentDescription = null
                             )
                         }
@@ -258,19 +265,7 @@ fun EditProfileScreen(navController: NavController) {
 
                 Button(
                     onClick = {
-                        // Validación simple: si ingresó actual (mock opcional) y coinciden nuevas
-                        if (passwordsMatch) {
-                            // Guardar bitmap si hay
-                            UserRepository.updatePhoto(photoState.value)
-                            // Guardar contraseña nueva (sin reglas, mock)
-                            if (newPasswordInput.value.isNotEmpty()) {
-                                UserRepository.updatePassword(newPasswordInput.value)
-                            }
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Cambios guardados")
-                            }
-                            navController.navigateUp()
-                        }
+                        viewModel.saveChanges()
                     },
                     enabled = passwordsMatch,
                     modifier = Modifier
@@ -285,6 +280,20 @@ fun EditProfileScreen(navController: NavController) {
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditProfileScreenPreview() {
+    val previewViewModel = EditProfileViewModel().apply {
+        onCurrentPasswordChange("actual123")
+        onNewPasswordChange("nueva123")
+        onConfirmPasswordChange("nueva123")
+    }
+    EditProfileScreen(
+        navController = rememberNavController(),
+        viewModel = previewViewModel
+    )
 }
 
 
