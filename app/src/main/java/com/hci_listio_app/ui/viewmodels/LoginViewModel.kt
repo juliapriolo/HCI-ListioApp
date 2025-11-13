@@ -1,18 +1,27 @@
 package com.hci_listio_app.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.hci_listio_app.data.AuthRepository
+import com.hci_listio_app.data.AuthRepositoryProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
-    val isPasswordVisible: Boolean = false
+    val isPasswordVisible: Boolean = false,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val isLoggedIn: Boolean = false
 )
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(
+    private val authRepository: AuthRepository = AuthRepositoryProvider.instance
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -30,8 +39,48 @@ class LoginViewModel : ViewModel() {
     }
 
     fun onSubmit() {
-        // TODO: Implementar flujo de login real.
+        val email = uiState.value.email.trim()
+        val password = uiState.value.password
+
+        if (email.isEmpty() || password.isEmpty()) {
+            _uiState.update {
+                it.copy(
+                    errorMessage = "Ingresá un email y contraseña válidos."
+                )
+            }
+            return
+        }
+
+        if (uiState.value.isLoading) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val result = authRepository.login(email, password)
+
+            _uiState.update { current ->
+                if (result.isSuccess) {
+                    current.copy(
+                        isLoading = false,
+                        errorMessage = null,
+                        isLoggedIn = true
+                    )
+                } else {
+                    current.copy(
+                        isLoading = false,
+                        errorMessage = result.exceptionOrNull()?.message ?: "Error desconocido.",
+                        isLoggedIn = false
+                    )
+                }
+            }
+        }
+    }
+
+    fun consumeLoginSuccess() {
+        _uiState.update { it.copy(isLoggedIn = false) }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 }
-
-

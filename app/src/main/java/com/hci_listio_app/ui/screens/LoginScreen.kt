@@ -1,21 +1,34 @@
-
 package com.hci_listio_app.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,16 +42,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.hci_listio_app.R
-import com.hci_listio_app.ui.navigation.Screen
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hci_listio_app.ui.Components.ListioTopAppBar
+import com.hci_listio_app.ui.navigation.Screen
 import com.hci_listio_app.ui.viewmodels.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,6 +58,15 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(uiState.isLoggedIn) {
+        if (uiState.isLoggedIn) {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+            viewModel.consumeLoginSuccess()
+        }
+    }
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -57,12 +75,11 @@ fun LoginScreen(
             )
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Main Content - White Card
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -86,7 +103,12 @@ fun LoginScreen(
                 )
                 OutlinedTextField(
                     value = uiState.email,
-                    onValueChange = viewModel::onEmailChange,
+                    onValueChange = {
+                        if (uiState.errorMessage != null) {
+                            viewModel.dismissError()
+                        }
+                        viewModel.onEmailChange(it)
+                    },
                     label = { Text("Email") },
                     leadingIcon = {
                         Icon(
@@ -101,7 +123,12 @@ fun LoginScreen(
                 )
                 OutlinedTextField(
                     value = uiState.password,
-                    onValueChange = viewModel::onPasswordChange,
+                    onValueChange = {
+                        if (uiState.errorMessage != null) {
+                            viewModel.dismissError()
+                        }
+                        viewModel.onPasswordChange(it)
+                    },
                     label = { Text("Contraseña") },
                     leadingIcon = {
                         Icon(
@@ -111,12 +138,13 @@ fun LoginScreen(
                     },
                     visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        val image = if (uiState.isPasswordVisible)
+                        val image = if (uiState.isPasswordVisible) {
                             Icons.Filled.Visibility
-                        else
+                        } else {
                             Icons.Filled.VisibilityOff
+                        }
 
-                        val description = if (uiState.isPasswordVisible) "Hide password" else "Show password"
+                        val description = if (uiState.isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
 
                         IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(imageVector = image, contentDescription = description)
@@ -147,10 +175,7 @@ fun LoginScreen(
                     )
                 }
                 Button(
-                    onClick = {
-                        viewModel.onSubmit()
-                        navController.navigate(Screen.Home.route)
-                    },
+                    onClick = { viewModel.onSubmit() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
@@ -179,6 +204,23 @@ fun LoginScreen(
                         modifier = Modifier.clickable { navController.navigate(Screen.SignUp.route) }
                     )
                 }
+
+                uiState.errorMessage?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    )
+                }
+            }
+
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
     }
@@ -192,3 +234,4 @@ fun LoginScreenPreview() {
         viewModel = LoginViewModel()
     )
 }
+

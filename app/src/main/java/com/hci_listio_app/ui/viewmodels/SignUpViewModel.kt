@@ -1,10 +1,14 @@
 package com.hci_listio_app.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.hci_listio_app.data.AuthRepository
+import com.hci_listio_app.data.AuthRepositoryProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class SignUpUiState(
     val nombre: String = "",
@@ -13,32 +17,39 @@ data class SignUpUiState(
     val password: String = "",
     val confirmPassword: String = "",
     val isPasswordVisible: Boolean = false,
-    val isConfirmPasswordVisible: Boolean = false
+    val isConfirmPasswordVisible: Boolean = false,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val isRegistrationSuccessful: Boolean = false,
+    val registeredEmail: String = "",
+    val registeredPassword: String = ""
 )
 
-class SignUpViewModel : ViewModel() {
+class SignUpViewModel(
+    private val authRepository: AuthRepository = AuthRepositoryProvider.instance
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState: StateFlow<SignUpUiState> = _uiState.asStateFlow()
 
     fun onNombreChange(value: String) {
-        _uiState.update { it.copy(nombre = value) }
+        _uiState.update { it.copy(nombre = value, errorMessage = null) }
     }
 
     fun onApellidoChange(value: String) {
-        _uiState.update { it.copy(apellido = value) }
+        _uiState.update { it.copy(apellido = value, errorMessage = null) }
     }
 
     fun onEmailChange(value: String) {
-        _uiState.update { it.copy(email = value) }
+        _uiState.update { it.copy(email = value, errorMessage = null) }
     }
 
     fun onPasswordChange(value: String) {
-        _uiState.update { it.copy(password = value) }
+        _uiState.update { it.copy(password = value, errorMessage = null) }
     }
 
     fun onConfirmPasswordChange(value: String) {
-        _uiState.update { it.copy(confirmPassword = value) }
+        _uiState.update { it.copy(confirmPassword = value, errorMessage = null) }
     }
 
     fun togglePasswordVisibility() {
@@ -50,7 +61,75 @@ class SignUpViewModel : ViewModel() {
     }
 
     fun onSubmit() {
-        // TODO: Implementar registro con repositorio o caso de uso.
+        val nombre = uiState.value.nombre.trim()
+        val apellido = uiState.value.apellido.trim()
+        val email = uiState.value.email.trim()
+        val password = uiState.value.password
+        val confirmPassword = uiState.value.confirmPassword
+
+        // Validación de campos vacíos
+        if (nombre.isEmpty() || apellido.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            _uiState.update {
+                it.copy(
+                    errorMessage = "Completá todos los campos."
+                )
+            }
+            return
+        }
+
+        // Validación de email básica
+        if (!email.contains("@")) {
+            _uiState.update {
+                it.copy(
+                    errorMessage = "Ingresá un email válido."
+                )
+            }
+            return
+        }
+
+        // Validación de contraseñas coincidentes
+        if (password != confirmPassword) {
+            _uiState.update {
+                it.copy(
+                    errorMessage = "Las contraseñas no coinciden."
+                )
+            }
+            return
+        }
+
+        if (uiState.value.isLoading) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val result = authRepository.register(nombre, apellido, email, password)
+
+            _uiState.update { current ->
+                if (result.isSuccess) {
+                    current.copy(
+                        isLoading = false,
+                        errorMessage = null,
+                        isRegistrationSuccessful = true,
+                        registeredEmail = email,
+                        registeredPassword = password
+                    )
+                } else {
+                    current.copy(
+                        isLoading = false,
+                        errorMessage = result.exceptionOrNull()?.message ?: "Error desconocido.",
+                        isRegistrationSuccessful = false
+                    )
+                }
+            }
+        }
+    }
+
+    fun consumeRegistrationSuccess() {
+        _uiState.update { it.copy(isRegistrationSuccessful = false) }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 }
 
