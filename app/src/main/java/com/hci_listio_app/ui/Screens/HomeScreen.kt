@@ -3,6 +3,7 @@ package com.hci_listio_app.ui.Screens
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -13,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.hci_listio_app.ui.Components.BottomNavigationBar
 import com.hci_listio_app.ui.Components.ListioTopAppBar
+import com.hci_listio_app.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +31,14 @@ fun HomeScreen(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Text("Pantalla de Inicio")
+        }
+
+        Button(
+            onClick = {
+                navController.navigate(Screen.ShoppingList.createRoute("Compras Cumpleaños"))
+            },
+        ) {
+            Text("Ver mi lista")
         }
     }
 }

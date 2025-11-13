@@ -1,7 +1,8 @@
-package com.hci_listio_app.ui.screens
+package com.hci_listio_app.ui.Screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
