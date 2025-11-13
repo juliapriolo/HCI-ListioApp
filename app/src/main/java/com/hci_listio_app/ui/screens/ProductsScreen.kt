@@ -1,4 +1,4 @@
-package com.hci_listio_app.ui.Screens
+package com.hci_listio_app.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*

@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.hci_listio_app.ui.Screens.LoginScreen
-import com.hci_listio_app.ui.Screens.SignUpScreen
-import com.hci_listio_app.ui.Screens.ProductsScreen
-import com.hci_listio_app.ui.Screens.ProfileScreen
-import com.hci_listio_app.ui.Screens.HomeScreen
-import com.hci_listio_app.ui.Screens.EditProfileScreen
-import com.hci_listio_app.ui.Screens.LanguageScreen
-import com.hci_listio_app.ui.Screens.ListScreen
+import com.hci_listio_app.ui.screens.LoginScreen
+import com.hci_listio_app.ui.screens.SignUpScreen
+import com.hci_listio_app.ui.screens.ProductsScreen
+import com.hci_listio_app.ui.screens.ProfileScreen
+import com.hci_listio_app.ui.screens.HomeScreen
+import com.hci_listio_app.ui.screens.EditProfileScreen
+import com.hci_listio_app.ui.screens.LanguageScreen
+import com.hci_listio_app.ui.screens.ListScreen
 import com.hci_listio_app.ui.screens.CategoryProductsScreen
 
 

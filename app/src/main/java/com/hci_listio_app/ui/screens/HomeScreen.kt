@@ -1,6 +1,8 @@
-package com.hci_listio_app.ui.Screens
+package com.hci_listio_app.ui.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -20,25 +22,27 @@ import com.hci_listio_app.ui.navigation.Screen
 @Composable
 fun HomeScreen(navController: NavController) {
     Scaffold(
-        containerColor = Color(0xFFFAFAFA), // Fondo gris muy claro
+        containerColor = Color(0xFFFAFAFA),
         topBar = { ListioTopAppBar(title = "Inicio") },
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Pantalla de Inicio")
-        }
+            Button(
+                onClick = {
+                    navController.navigate(
+                        Screen.ShoppingList.createRoute("Compras Cumpleaños")
+                    )
+                }
+            ) {
+                Text("Ver mi lista")
+            }
 
-        Button(
-            onClick = {
-                navController.navigate(Screen.ShoppingList.createRoute("Compras Cumpleaños"))
-            },
-        ) {
-            Text("Ver mi lista")
+            Text("Pantalla de Inicio")
         }
     }
 }
