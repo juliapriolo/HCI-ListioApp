@@ -109,7 +109,7 @@ fun VerifyAccountScreen(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Email,
-                                contentDescription = "Código Icon",
+                                contentDescription = "Icono de código",
                                 tint = Color.Gray
                             )
                         },

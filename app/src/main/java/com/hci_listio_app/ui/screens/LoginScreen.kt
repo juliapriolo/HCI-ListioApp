@@ -125,7 +125,7 @@ fun LoginScreen(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Email,
-                            contentDescription = "Email Icon"
+                            contentDescription = "Icono de email"
                         )
                     },
                     modifier = Modifier
@@ -145,7 +145,7 @@ fun LoginScreen(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
-                            contentDescription = "Password Icon"
+                            contentDescription = "Icono de contraseña"
                         )
                     },
                     visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),

@@ -55,7 +55,7 @@ fun SignUpScreen(
         containerColor = Color.White,
         topBar = {
             ListioTopAppBar(
-                title = "Sign up",
+                title = "Registrarse",
                 showBackButton = true,
                 onBackClick = { navController.navigateUp() }
             )
@@ -137,7 +137,7 @@ fun SignUpScreen(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Email,
-                                contentDescription = "Email Icon",
+                                contentDescription = "Icono de email",
                                 tint = Color.Gray
                             )
                         },
@@ -159,7 +159,7 @@ fun SignUpScreen(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Password Icon",
+                                contentDescription = "Icono de contraseña",
                                 tint = Color.Gray
                             )
                         },
@@ -168,7 +168,7 @@ fun SignUpScreen(
                             IconButton(onClick = viewModel::togglePasswordVisibility) {
                                 Icon(
                                     imageVector = if (uiState.isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = if (uiState.isPasswordVisible) "Hide password" else "Show password",
+                                    contentDescription = if (uiState.isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
                                     tint = Color.Gray
                                 )
                             }
@@ -191,7 +191,7 @@ fun SignUpScreen(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Confirm Password Icon",
+                                contentDescription = "Icono de confirmar contraseña",
                                 tint = Color.Gray
                             )
                         },
@@ -200,7 +200,7 @@ fun SignUpScreen(
                             IconButton(onClick = viewModel::toggleConfirmPasswordVisibility) {
                                 Icon(
                                     imageVector = if (uiState.isConfirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = if (uiState.isConfirmPasswordVisible) "Hide password" else "Show password",
+                                    contentDescription = if (uiState.isConfirmPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
                                     tint = Color.Gray
                                 )
                             }

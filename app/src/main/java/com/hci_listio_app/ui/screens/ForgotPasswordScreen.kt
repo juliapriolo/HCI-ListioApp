@@ -103,7 +103,7 @@ fun ForgotPasswordScreen(
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Email,
-                                        contentDescription = "Email Icon"
+                                        contentDescription = "Icono de email"
                                     )
                                 },
                                 modifier = Modifier
@@ -170,7 +170,7 @@ fun ForgotPasswordScreen(
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Email,
-                                        contentDescription = "Código Icon",
+                                        contentDescription = "Icono de código",
                                         tint = Color.Gray
                                     )
                                 },
@@ -196,7 +196,7 @@ fun ForgotPasswordScreen(
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Lock,
-                                        contentDescription = "Password Icon"
+                                        contentDescription = "Icono de contraseña"
                                     )
                                 },
                                 visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -235,7 +235,7 @@ fun ForgotPasswordScreen(
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Lock,
-                                        contentDescription = "Confirm Password Icon"
+                                        contentDescription = "Icono de confirmar contraseña"
                                     )
                                 },
                                 visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
