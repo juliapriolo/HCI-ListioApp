@@ -9,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.AddCategoriaCard
 import com.hci_listio_app.ui.Components.BottomNavigationBar
 import com.hci_listio_app.ui.Components.CategoriaCard
@@ -28,7 +30,7 @@ fun ProductsScreen(
 
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
-        topBar = { ListioTopAppBar(title = "Productos") },
+        topBar = { ListioTopAppBar(title = stringResource(R.string.products_title)) },
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { padding ->
         Column(
@@ -40,7 +42,7 @@ fun ProductsScreen(
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
-                placeholder = { Text("Buscar producto por nombre") },
+                placeholder = { Text(stringResource(R.string.products_search)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
@@ -53,7 +55,7 @@ fun ProductsScreen(
             )
 
             Spacer(Modifier.height(16.dp))
-            Text("Buscar por categorías:", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.products_search_categories), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
             // Grid de categorías

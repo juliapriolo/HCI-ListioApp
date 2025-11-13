@@ -10,6 +10,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,6 +50,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -71,6 +74,7 @@ fun EditProfileScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsState()
+    val changesSavedMessage = stringResource(R.string.edit_profile_changes_saved)
 
     // Galería (solo opción activa)
     val context = LocalContext.current
@@ -95,7 +99,7 @@ fun EditProfileScreen(
         viewModel.events.collectLatest { event ->
             when (event) {
                 EditProfileEvent.Saved -> {
-                    snackbarHostState.showSnackbar("Cambios guardados")
+                    snackbarHostState.showSnackbar(changesSavedMessage)
                     navController.navigateUp()
                 }
             }
@@ -108,7 +112,7 @@ fun EditProfileScreen(
         containerColor = Color.White,
         topBar = {
             ListioTopAppBar(
-                title = "Editar perfil",
+                title = stringResource(R.string.edit_profile_title),
                 showBackButton = true,
                 onBackClick = { navController.navigateUp() }
             )
@@ -127,11 +131,12 @@ fun EditProfileScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
                         .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                         .padding(24.dp)
                 ) {
                 Text(
-                    text = "Editar Perfil",
+                    text = stringResource(R.string.edit_profile_edit),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF303F4F),
@@ -155,13 +160,13 @@ fun EditProfileScreen(
                     uiState.photoBitmap?.let { bitmap ->
                         Image(
                             bitmap = bitmap.asImageBitmap(),
-                            contentDescription = "Foto de perfil",
+                            contentDescription = stringResource(R.string.edit_profile_photo),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
                     } ?: Image(
                         painter = painterResource(id = R.drawable.perfilpredeterminado),
-                        contentDescription = "Usuario",
+                        contentDescription = stringResource(R.string.profile_user_icon),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -175,7 +180,7 @@ fun EditProfileScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
-                            contentDescription = "Editar foto",
+                            contentDescription = stringResource(R.string.edit_profile_edit_photo),
                             tint = Color(0xFF6DCB5A)
                         )
                     }
@@ -187,7 +192,7 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = uiState.currentPassword,
                     onValueChange = viewModel::onCurrentPasswordChange,
-                    label = { Text("Contraseña actual") },
+                    label = { Text(stringResource(R.string.edit_profile_current_password)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
@@ -212,7 +217,7 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = uiState.newPassword,
                     onValueChange = viewModel::onNewPasswordChange,
-                    label = { Text("Nueva contraseña") },
+                    label = { Text(stringResource(R.string.edit_profile_new_password)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
@@ -237,7 +242,7 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = uiState.confirmPassword,
                     onValueChange = viewModel::onConfirmPasswordChange,
-                    label = { Text("Confirmar nueva contraseña") },
+                    label = { Text(stringResource(R.string.edit_profile_confirm_password)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
@@ -251,7 +256,7 @@ fun EditProfileScreen(
                     isError = uiState.confirmPassword.isNotEmpty() && !passwordsMatch,
                     supportingText = {
                         if (uiState.confirmPassword.isNotEmpty() && !passwordsMatch) {
-                            Text("Las contraseñas no coinciden", color = Color.Red)
+                            Text(stringResource(R.string.edit_profile_passwords_not_match), color = Color.Red)
                         }
                     },
                     visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -291,7 +296,7 @@ fun EditProfileScreen(
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                 ) {
-                    Text("Guardar cambios", color = Color.White, fontSize = 16.sp)
+                    Text(stringResource(R.string.edit_profile_save), color = Color.White, fontSize = 16.sp)
                 }
                 }
             }

@@ -11,14 +11,14 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.EmptyState
 import com.hci_listio_app.ui.Components.ListHeader
 import com.hci_listio_app.ui.Components.ListsTabs
@@ -36,7 +36,6 @@ data class ListOverviewItem(
 
 @Composable
 fun ListOverview(
-    navController: NavController,
     username: String = "Pedro",
     lists: List<ListOverviewItem> = emptyList(),
     modifier: Modifier = Modifier,
@@ -73,8 +72,8 @@ fun ListOverview(
             }
         }
 
-        FloatingActionButton(onClick = onFabClick, modifier = Modifier.padding(20.dp), containerColor = MaterialTheme.colorScheme.primary) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = "Agregar")
+        FloatingActionButton(onClick = onFabClick, modifier = Modifier.padding(20.dp)) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar")
         }
     }
 }
@@ -83,7 +82,7 @@ fun ListOverview(
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun ListOverviewEmptyPreview() {
-    ListOverview(navController = rememberNavController(), username = "Pedro", lists = emptyList())
+    ListOverview(username = "Pedro", lists = emptyList())
 }
 
 @Preview(showBackground = true)
@@ -95,5 +94,5 @@ fun ListOverviewPopulatedPreview() {
         ListOverviewItem(title = "Lista viaje fin de semana", isPrivate = true, completed = 0, total = 16, members = listOf("Marta"))
     )
 
-    ListOverview(navController = rememberNavController(), username = "Pedro", lists = items)
+    ListOverview(username = "Pedro", lists = items)
 }

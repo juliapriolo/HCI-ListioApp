@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -83,7 +86,7 @@ fun LoginScreen(
         containerColor = Color.White,
         topBar = {
             ListioTopAppBar(
-                title = "Login"
+                title = stringResource(R.string.login_title)
             )
         }
     ) { padding ->
@@ -95,11 +98,12 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                     .padding(32.dp)
             ) {
                 Text(
-                    text = "¡Bienvenido!",
+                    text = stringResource(R.string.login_welcome),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF303F4F),
@@ -121,11 +125,11 @@ fun LoginScreen(
                         }
                         viewModel.onEmailChange(it)
                     },
-                    label = { Text("Email") },
+                    label = { Text(stringResource(R.string.login_email)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Email,
-                            contentDescription = "Icono de email"
+                            contentDescription = stringResource(R.string.login_email_icon)
                         )
                     },
                     modifier = Modifier
@@ -141,11 +145,11 @@ fun LoginScreen(
                         }
                         viewModel.onPasswordChange(it)
                     },
-                    label = { Text("Contraseña") },
+                    label = { Text(stringResource(R.string.login_password)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
-                            contentDescription = "Icono de contraseña"
+                            contentDescription = stringResource(R.string.login_password_icon)
                         )
                     },
                     visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -156,7 +160,10 @@ fun LoginScreen(
                             Icons.Filled.VisibilityOff
                         }
 
-                        val description = if (uiState.isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                        val description = if (uiState.isPasswordVisible) 
+                            stringResource(R.string.login_hide_password) 
+                        else 
+                            stringResource(R.string.login_show_password)
 
                         IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(imageVector = image, contentDescription = description)
@@ -173,12 +180,12 @@ fun LoginScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "¿Olvidaste tu contraseña? ",
+                        text = stringResource(R.string.login_forgot_password),
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
                     Text(
-                        text = "Hacé clic acá",
+                        text = stringResource(R.string.login_forgot_password_click),
                         fontSize = 14.sp,
                         color = Color(0xFF303F4F),
                         fontWeight = FontWeight.Bold,
@@ -195,7 +202,7 @@ fun LoginScreen(
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                 ) {
-                    Text("Iniciar sesión", color = Color.White, fontSize = 16.sp)
+                    Text(stringResource(R.string.login_button), color = Color.White, fontSize = 16.sp)
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -203,12 +210,12 @@ fun LoginScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "¿No tenés una cuenta? ",
+                        text = stringResource(R.string.login_no_account),
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
                     Text(
-                        text = "Registrate",
+                        text = stringResource(R.string.login_signup),
                         fontSize = 14.sp,
                         color = Color(0xFF303F4F),
                         fontWeight = FontWeight.Bold,

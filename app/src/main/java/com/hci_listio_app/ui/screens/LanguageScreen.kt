@@ -1,8 +1,11 @@
 package com.hci_listio_app.ui.screens
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -23,26 +27,52 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.ListioTopAppBar
+import com.hci_listio_app.ui.viewmodels.LanguageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LanguageScreen(navController: NavController) {
-    val selected = remember { mutableStateOf("es") }
+fun LanguageScreen(
+    navController: NavController
+) {
+    val context = LocalContext.current
+    val viewModel: LanguageViewModel = viewModel(
+        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return LanguageViewModel(context) as T
+            }
+        }
+    )
+    val uiState by viewModel.uiState.collectAsState()
+    val activity = context as? Activity
+
+    LaunchedEffect(uiState.isLanguageChanged) {
+        if (uiState.isLanguageChanged) {
+            viewModel.consumeLanguageChange()
+        }
+    }
 
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = "Idioma",
+                title = stringResource(R.string.language_title),
                 showBackButton = true,
                 onBackClick = { navController.navigateUp() }
             )
@@ -51,6 +81,7 @@ fun LanguageScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
             Column(
@@ -60,7 +91,7 @@ fun LanguageScreen(navController: NavController) {
                     .padding(32.dp)
             ) {
                 Text(
-                    text = "Selecciona Idioma",
+                    text = stringResource(R.string.language_select),
                     fontSize = 32.sp,
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                     color = Color(0xFF303F4F),
@@ -83,15 +114,15 @@ fun LanguageScreen(navController: NavController) {
                 ) {
                     Column {
                         LanguageOption(
-                            label = "Español",
-                            selected = selected.value == "es",
-                            onClick = { selected.value = "es" }
+                            label = stringResource(R.string.language_spanish),
+                            selected = uiState.selectedLanguage == "es",
+                            onClick = { viewModel.onLanguageSelected("es") }
                         )
                         Divider(color = Color(0xFFE0E0E0))
                         LanguageOption(
-                            label = "Inglés",
-                            selected = selected.value == "en",
-                            onClick = { selected.value = "en" }
+                            label = stringResource(R.string.language_english),
+                            selected = uiState.selectedLanguage == "en",
+                            onClick = { viewModel.onLanguageSelected("en") }
                         )
                     }
                 }
@@ -99,7 +130,12 @@ fun LanguageScreen(navController: NavController) {
                 Spacer(modifier = Modifier.size(8.dp))
 
                 Button(
-                    onClick = { navController.navigateUp() },
+                    onClick = { 
+                        if (activity != null) {
+                            viewModel.saveLanguage(activity)
+                        }
+                    },
+                    enabled = !uiState.isLoading,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A)),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -107,7 +143,19 @@ fun LanguageScreen(navController: NavController) {
                         .height(50.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(text = "Guardar", color = Color.White, fontSize = 16.sp)
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.language_save),
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
         }

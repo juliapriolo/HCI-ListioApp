@@ -12,7 +12,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,11 +26,15 @@ import androidx.navigation.NavController
 import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.AddProductDialog
 import com.hci_listio_app.ui.Components.ListioTopAppBar
+import com.hci_listio_app.ui.viewmodels.CategoryProductsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryProductsScreen(navController: NavController, categoryName: String) {
-    var showDialog by remember { mutableStateOf(false) }
+fun CategoryProductsScreen(
+    navController: NavController,
+    categoryName: String,
+    viewModel: CategoryProductsViewModel = viewModel()
+) {
 
     Scaffold(
         topBar = {
@@ -60,7 +68,7 @@ fun CategoryProductsScreen(navController: NavController, categoryName: String) {
             )
 
             Button(
-                onClick = { showDialog = true }, // Abrir el diálogo
+                onClick = { viewModel.onAddProductClicked() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar productos")
@@ -69,12 +77,11 @@ fun CategoryProductsScreen(navController: NavController, categoryName: String) {
         }
     }
 
-    if (showDialog) {
+    if (viewModel.showDialog) {
         AddProductDialog(
-            onDismiss = { showDialog = false },
-            onSave = {
-                // TODO: Aquí va la lógica para guardar el producto
-                showDialog = false
+            onDismiss = { viewModel.onDialogDismiss() },
+            onSave = { productName ->
+                viewModel.onProductSaved(productName)
             }
         )
     }
