@@ -1,0 +1,130 @@
+<resources>
+    <string name="app_name">HCI-Listio-App</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_products">Products</string>
+    <string name="nav_profile">Settings</string>
+    
+    <!-- Login Screen -->
+    <string name="login_title">Login</string>
+    <string name="login_welcome">Welcome!</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_forgot_password">Forgot your password?</string>
+    <string name="login_forgot_password_click">Click here</string>
+    <string name="login_button">Sign in</string>
+    <string name="login_no_account">Don\'t have an account?</string>
+    <string name="login_signup">Sign up</string>
+    <string name="login_show_password">Show password</string>
+    <string name="login_hide_password">Hide password</string>
+    <string name="login_email_icon">Email icon</string>
+    <string name="login_password_icon">Password icon</string>
+    
+    <!-- Sign Up Screen -->
+    <string name="signup_title">Sign up</string>
+    <string name="signup_name">Name</string>
+    <string name="signup_surname">Surname</string>
+    <string name="signup_email">Email</string>
+    <string name="signup_password">Password</string>
+    <string name="signup_confirm_password">Confirm password</string>
+    <string name="signup_button">Sign up</string>
+    <string name="signup_has_account">Already have an account?</string>
+    <string name="signup_login">Sign in</string>
+    <string name="signup_name_icon">Name Icon</string>
+    <string name="signup_surname_icon">Surname Icon</string>
+    <string name="signup_email_icon">Email icon</string>
+    <string name="signup_password_icon">Password icon</string>
+    <string name="signup_confirm_password_icon">Confirm password icon</string>
+    
+    <!-- Forgot Password Screen -->
+    <string name="forgot_password_title">Recover password</string>
+    <string name="forgot_password_recover">Recover password</string>
+    <string name="forgot_password_description">Enter your email and we\'ll send you a code to reset your password</string>
+    <string name="forgot_password_email">Email</string>
+    <string name="forgot_password_send_code">Send code</string>
+    <string name="forgot_password_code_sent">Code sent. Check your email.</string>
+    <string name="forgot_password_reset">Reset password</string>
+    <string name="forgot_password_reset_description">Enter the code we sent to %1$s and your new password</string>
+    <string name="forgot_password_reset_description_default">Enter the code we sent to your email and your new password</string>
+    <string name="forgot_password_code">Verification code</string>
+    <string name="forgot_password_new_password">New password</string>
+    <string name="forgot_password_confirm_password">Confirm password</string>
+    <string name="forgot_password_reset_button">Reset password</string>
+    <string name="forgot_password_email_icon">Email icon</string>
+    <string name="forgot_password_code_icon">Code icon</string>
+    <string name="forgot_password_password_icon">Password icon</string>
+    <string name="forgot_password_confirm_password_icon">Confirm password icon</string>
+    
+    <!-- Verify Account Screen -->
+    <string name="verify_account_title">Verify account</string>
+    <string name="verify_account_description">Enter the verification code we sent to %1$s</string>
+    <string name="verify_account_description_default">Enter the verification code we sent to your email</string>
+    <string name="verify_account_code">Verification code</string>
+    <string name="verify_account_button">Verify account</string>
+    <string name="verify_account_resend">Resend code</string>
+    <string name="verify_account_code_resent">Code resent. Check your email.</string>
+    <string name="verify_account_code_icon">Code icon</string>
+    
+    <!-- Profile Screen -->
+    <string name="profile_title">Settings</string>
+    <string name="profile_user">User</string>
+    <string name="profile_not_available">Not available</string>
+    <string name="profile_edit">Edit Profile</string>
+    <string name="profile_change_language">Change Language</string>
+    <string name="profile_logout">Sign out</string>
+    <string name="profile_photo">Profile photo</string>
+    <string name="profile_user_icon">User</string>
+    
+    <!-- Edit Profile Screen -->
+    <string name="edit_profile_title">Edit profile</string>
+    <string name="edit_profile_edit">Edit Profile</string>
+    <string name="edit_profile_current_password">Current password</string>
+    <string name="edit_profile_new_password">New password</string>
+    <string name="edit_profile_confirm_password">Confirm new password</string>
+    <string name="edit_profile_passwords_not_match">Passwords do not match</string>
+    <string name="edit_profile_save">Save changes</string>
+    <string name="edit_profile_photo">Profile photo</string>
+    <string name="edit_profile_edit_photo">Edit photo</string>
+    <string name="edit_profile_changes_saved">Changes saved</string>
+    
+    <!-- Language Screen -->
+    <string name="language_title">Language</string>
+    <string name="language_select">Select Language</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_english">English</string>
+    <string name="language_save">Save</string>
+    
+    <!-- Products Screen -->
+    <string name="products_title">Products</string>
+    <string name="products_search">Search product by name</string>
+    <string name="products_search_categories">Search by categories:</string>
+    
+    <!-- Category Products Screen -->
+    <string name="category_products_empty">Start adding products to the category</string>
+    <string name="category_products_empty_subtitle">Your category is empty</string>
+    <string name="category_products_add">Add products</string>
+    <string name="category_products_add_icon">Add products</string>
+    <string name="category_products_empty_icon">Empty list</string>
+    
+    <!-- List Screen -->
+    <string name="list_completed">List %1$d/%2$d Completed</string>
+    <string name="list_all">All</string>
+    <string name="list_add_product">Add product</string>
+    <string name="list_add_more">Add more products</string>
+    <string name="list_add_user">Add user</string>
+    <string name="list_options">Options</string>
+    <string name="list_user">User %1$d</string>
+    
+    <!-- Home Screen -->
+    <string name="home_title">Home</string>
+    <string name="home_view_list">View my list</string>
+    <string name="home_screen">Home Screen</string>
+    
+    <!-- Common -->
+    <string name="common_save">Save</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_loading">Loading…</string>
+    <string name="common_error">Error</string>
+    <string name="common_success">Success</string>
+</resources>

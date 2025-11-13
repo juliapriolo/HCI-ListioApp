@@ -39,13 +39,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material3.CircularProgressIndicator
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.BottomNavigationBar
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.navigation.Screen
-import com.hci_listio_app.R
 import com.hci_listio_app.ui.viewmodels.ProfileViewModel
 
 @Composable
@@ -95,7 +96,7 @@ fun ProfileScreen(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = "Configuración",
+                title = stringResource(R.string.profile_title),
                 showBackButton = true,
                 onBackClick = { navController.navigate(Screen.Home.route) }
             )
@@ -138,7 +139,7 @@ fun ProfileScreen(
                     if (bitmap != null) {
                             Image(
                                 bitmap = bitmap.asImageBitmap(),
-                                contentDescription = "Foto de perfil",
+                                contentDescription = stringResource(R.string.profile_photo),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(CircleShape),
@@ -147,7 +148,7 @@ fun ProfileScreen(
                         } else {
                             Image(
                                 painter = painterResource(id = R.drawable.perfilpredeterminado),
-                                contentDescription = "Usuario",
+                                contentDescription = stringResource(R.string.profile_user_icon),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(CircleShape),
@@ -161,13 +162,13 @@ fun ProfileScreen(
                     // Información del usuario
                     Column {
                         Text(
-                            text = "${uiState.nombre} ${uiState.apellido}".trim().ifEmpty { "Usuario" },
+                            text = "${uiState.nombre} ${uiState.apellido}".trim().ifEmpty { stringResource(R.string.profile_user) },
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF333333)
                         )
                         Text(
-                            text = uiState.email.ifEmpty { "No disponible" },
+                            text = uiState.email.ifEmpty { stringResource(R.string.profile_not_available) },
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )
@@ -185,7 +186,7 @@ fun ProfileScreen(
                 Column {
                     // Opción: Editar Perfil
                     ConfigurationItem(
-                        text = "Editar Perfil",
+                        text = stringResource(R.string.profile_edit),
                         onClick = { navController.navigate(Screen.EditProfile.route) }
                     )
 
@@ -193,7 +194,7 @@ fun ProfileScreen(
 
                     // Opción: Cambiar Idioma
                     ConfigurationItem(
-                        text = "Cambiar Idioma",
+                        text = stringResource(R.string.profile_change_language),
                         onClick = { navController.navigate(Screen.Language.route) }
                     )
 
@@ -201,7 +202,7 @@ fun ProfileScreen(
 
                     // Opción: Cerrar sesión
                     ConfigurationItem(
-                        text = "Cerrar sesión",
+                        text = stringResource(R.string.profile_logout),
                         onClick = { viewModel.logout() }
                     )
                 }
