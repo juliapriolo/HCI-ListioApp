@@ -2,6 +2,7 @@ package com.hci_listio_app.data.remote
 
 import com.hci_listio_app.BuildConfig
 import com.hci_listio_app.data.remote.api.AuthApiService
+import com.hci_listio_app.data.remote.api.ListApiService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -46,6 +47,10 @@ object NetworkModule {
 
     val authApiService: AuthApiService by lazy {
         retrofit.create(AuthApiService::class.java)
+    }
+
+    val listApiService: ListApiService by lazy {
+        retrofit.create(ListApiService::class.java)
     }
 }
 

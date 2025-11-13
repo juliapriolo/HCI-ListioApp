@@ -37,7 +37,7 @@ fun HomeScreen(navController: NavController) {
             Button(
                 onClick = {
                     navController.navigate(
-                        Screen.ShoppingList.createRoute("Compras Cumpleaños")
+                        Screen.ShoppingList.createRoute(1)
                     )
                 }
             ) {

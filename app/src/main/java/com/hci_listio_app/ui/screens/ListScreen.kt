@@ -35,24 +35,37 @@ import com.hci_listio_app.ui.viewmodels.ListViewModel
 @Composable
 fun ListScreen(
     navController: NavController,
-    listName: String = "Compras Cumpleaños",
+    listId: Long = 1L,
+    listName: String = "Mi Lista",
     viewModel: ListViewModel = viewModel()
 ) {
-    // Observar estados del ViewModel
-    val items by viewModel.items.collectAsState()
-    val completedCount by viewModel.completedCount.collectAsState()
-    val totalCount by viewModel.totalCount.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // Estados locales para diálogos
     var showAddDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var showShareDialog by remember { mutableStateOf(false) }
     var itemToEdit by remember { mutableStateOf<ListItemData?>(null) }
+
+    // Cargar la lista cuando se monta el composable
+    LaunchedEffect(listId) {
+        viewModel.loadList(listId)
+    }
+
+    // Mostrar mensajes de error
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { error ->
+            snackbarHostState.showSnackbar(error)
+            viewModel.dismissError()
+        }
+    }
 
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = listName,
+                title = uiState.listName.ifEmpty { listName },
                 showBackButton = true,
                 onBackClick = { navController.navigateUp() }
             )
@@ -65,178 +78,223 @@ fun ListScreen(
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar producto")
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Header con avatares y estado
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Column(
+                // Header con avatares y estado
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    // Avatares de usuarios
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Avatar 1
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF6DCB5A)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.perfilpredeterminado),
-                                contentDescription = "Usuario 1",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        // Avatar 2
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF6DCB5A)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.perfilpredeterminado),
-                                contentDescription = "Usuario 2",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        // Botón añadir usuario
-                        IconButton(
-                            onClick = { /* TODO: Add user */ },
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFE0E0E0))
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Añadir usuario",
-                                tint = Color.Gray
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        // Botón filtro
-                        IconButton(onClick = { /* TODO: Filter options */ }) {
-                            Icon(
-                                imageVector = Icons.Default.FilterList,
-                                contentDescription = "Opciones",
-                                tint = Color.Gray
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Estado de la lista y filtro
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.empty_list_icon),
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Lista $completedCount/$totalCount Completada",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Todos",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Lista de items
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(vertical = 8.dp)
-            ) {
-                items(items) { item ->
-                    ListItem(
-                        item = item,
-                        onCheckedChange = { checked ->
-                            viewModel.toggleItemCheck(item.id, checked)
-                        },
-                        onMoreClick = {
-                            itemToEdit = item
-                            showEditDialog = true
-                        }
-                    )
-                }
-
-                // Botón agregar más productos al final
-                item {
-                    Button(
-                        onClick = { showAddDialog = true },
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF6DCB5A)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                            .padding(16.dp)
+                    ) {
+                        // Avatares de usuarios
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Avatar 1
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF6DCB5A)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.perfilpredeterminado),
+                                    contentDescription = "Usuario 1",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            // Avatar 2
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF6DCB5A)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.perfilpredeterminado),
+                                    contentDescription = "Usuario 2",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            // Botón añadir usuario
+                            IconButton(
+                                onClick = { showShareDialog = true },
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFE0E0E0))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Añadir usuario",
+                                    tint = Color.Gray
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            // Botón filtro
+                            IconButton(onClick = { /* TODO: Filter options */ }) {
+                                Icon(
+                                    imageVector = Icons.Default.FilterList,
+                                    contentDescription = "Opciones",
+                                    tint = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Estado de la lista y filtro
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.empty_list_icon),
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Lista ${uiState.completedCount}/${uiState.totalCount} Completada",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray
+                        )
+                    }
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Todos",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Lista de items
+                if (uiState.items.isEmpty() && !uiState.isLoading) {
+                    // Estado vacío
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
+                            painter = painterResource(id = R.drawable.empty_list_icon),
+                            contentDescription = "Lista vacía",
+                            tint = Color(0xFF6DCB5A),
+                            modifier = Modifier.size(80.dp)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Agregar más productos")
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Tu lista está vacía",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Empieza a agregar productos",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray
+                        )
                     }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 8.dp)
+                    ) {
+                        items(uiState.items) { item ->
+                            ListItem(
+                                item = item,
+                                onCheckedChange = { checked ->
+                                    viewModel.toggleItemCheck(item.id, checked)
+                                },
+                                onMoreClick = {
+                                    itemToEdit = item
+                                    showEditDialog = true
+                                }
+                            )
+                        }
+
+                        // Botón agregar más productos al final
+                        item {
+                            Button(
+                                onClick = { showAddDialog = true },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF6DCB5A)
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Agregar más productos")
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Indicador de carga
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color(0xFF6DCB5A))
                 }
             }
         }
@@ -255,6 +313,26 @@ fun ListScreen(
 
     // Diálogo para editar item
     if (showEditDialog && itemToEdit != null) {
+        EditItemDialog(
+            itemName = itemToEdit!!.name,
+            quantity = "",
+            unit = "24",
+            brand = "Paty",
+            store = "Supermercado Coto",
+            onDismiss = {
+                showEditDialog = false
+                itemToEdit = null
+            },
+            onSave = { name, quantity, unit, brand, store ->
+                viewModel.editItem(itemToEdit!!.id, name, quantity, unit, brand, store)
+                showEditDialog = false
+                itemToEdit = null
+            }
+        )
+    }
+
+    // Diálogo para compartir lista
+    if (showShareDialog && itemToEdit != null) {
         EditItemDialog(
             itemName = itemToEdit!!.name,
             quantity = "",
