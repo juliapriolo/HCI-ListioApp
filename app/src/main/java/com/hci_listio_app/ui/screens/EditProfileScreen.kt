@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -119,185 +121,200 @@ fun EditProfileScreen(
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
+            val isTablet = maxWidth >= 600.dp
+            
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
                 // Card principal similar a Login/SignUp
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .then(
+                            if (isTablet) {
+                                Modifier.widthIn(max = 600.dp)
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
+                        )
                         .verticalScroll(rememberScrollState())
                         .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                         .padding(24.dp)
                 ) {
-                Text(
-                    text = stringResource(R.string.edit_profile_edit),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF303F4F),
-                )
+                    Text(
+                        text = stringResource(R.string.edit_profile_edit),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF303F4F),
+                    )
 
-                Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                // Avatar centrado con icono de editar superpuesto
-                Box(
-                    modifier = Modifier
-                        .size(96.dp)
-                        .align(Alignment.CenterHorizontally)
-                ) {
+                    // Avatar centrado con icono de editar superpuesto
                     Box(
                         modifier = Modifier
-                            .matchParentSize()
-                            .clip(CircleShape)
-                            .background(Color(0xFF6DCB5A)),
-                        contentAlignment = Alignment.Center
+                            .size(96.dp)
+                            .align(Alignment.CenterHorizontally)
                     ) {
-                    uiState.photoBitmap?.let { bitmap ->
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = stringResource(R.string.edit_profile_photo),
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    } ?: Image(
-                        painter = painterResource(id = R.drawable.perfilpredeterminado),
-                        contentDescription = stringResource(R.string.profile_user_icon),
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    }
-                    IconButton(
-                        onClick = { pickImageLauncher.launch("image/*") },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .size(28.dp)
-                            .background(Color.White, CircleShape)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Edit,
-                            contentDescription = stringResource(R.string.edit_profile_edit_photo),
-                            tint = Color(0xFF6DCB5A)
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                // Campos de contraseña
-                OutlinedTextField(
-                    value = uiState.currentPassword,
-                    onValueChange = viewModel::onCurrentPasswordChange,
-                    label = { Text(stringResource(R.string.edit_profile_current_password)) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = null
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    visualTransformation = if (uiState.isCurrentPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = viewModel::toggleCurrentPasswordVisibility) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .clip(CircleShape)
+                                .background(Color(0xFF6DCB5A)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            uiState.photoBitmap?.let { bitmap ->
+                                Image(
+                                    bitmap = bitmap.asImageBitmap(),
+                                    contentDescription = stringResource(R.string.edit_profile_photo),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } ?: Image(
+                                painter = painterResource(id = R.drawable.perfilpredeterminado),
+                                contentDescription = stringResource(R.string.profile_user_icon),
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        IconButton(
+                            onClick = { pickImageLauncher.launch("image/*") },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(28.dp)
+                                .background(Color.White, CircleShape)
+                        ) {
                             Icon(
-                                imageVector = if (uiState.isCurrentPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                contentDescription = null
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = stringResource(R.string.edit_profile_edit_photo),
+                                tint = Color(0xFF6DCB5A)
                             )
                         }
                     }
-                )
 
-                OutlinedTextField(
-                    value = uiState.newPassword,
-                    onValueChange = viewModel::onNewPasswordChange,
-                    label = { Text(stringResource(R.string.edit_profile_new_password)) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = null
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    visualTransformation = if (uiState.isNewPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = viewModel::toggleNewPasswordVisibility) {
+                    Spacer(Modifier.height(24.dp))
+
+                    // Campos de contraseña
+                    OutlinedTextField(
+                        value = uiState.currentPassword,
+                        onValueChange = viewModel::onCurrentPasswordChange,
+                        label = { Text(stringResource(R.string.edit_profile_current_password)) },
+                        leadingIcon = {
                             Icon(
-                                imageVector = if (uiState.isNewPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                imageVector = Icons.Default.Lock,
                                 contentDescription = null
                             )
-                        }
-                    }
-                )
-
-                OutlinedTextField(
-                    value = uiState.confirmPassword,
-                    onValueChange = viewModel::onConfirmPasswordChange,
-                    label = { Text(stringResource(R.string.edit_profile_confirm_password)) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = null
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    isError = uiState.confirmPassword.isNotEmpty() && !passwordsMatch,
-                    supportingText = {
-                        if (uiState.confirmPassword.isNotEmpty() && !passwordsMatch) {
-                            Text(stringResource(R.string.edit_profile_passwords_not_match), color = Color.Red)
-                        }
-                    },
-                    visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = viewModel::toggleConfirmPasswordVisibility) {
-                            Icon(
-                                imageVector = if (uiState.isConfirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                )
-
-                // (Se reemplazó el botón de galería por el icono de editar en el avatar)
-
-                // Mostrar mensaje de error si existe
-                uiState.errorMessage?.let { error ->
-                    Text(
-                        text = error,
-                        color = Color.Red,
-                        fontSize = 14.sp,
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
+                            .padding(vertical = 8.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        visualTransformation = if (uiState.isCurrentPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = viewModel::toggleCurrentPasswordVisibility) {
+                                Icon(
+                                    imageVector = if (uiState.isCurrentPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                    contentDescription = null
+                                )
+                            }
+                        }
                     )
-                }
 
-                Button(
-                    onClick = {
-                        viewModel.saveChanges()
-                    },
-                    enabled = passwordsMatch && !uiState.isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
-                ) {
-                    Text(stringResource(R.string.edit_profile_save), color = Color.White, fontSize = 16.sp)
-                }
+                    OutlinedTextField(
+                        value = uiState.newPassword,
+                        onValueChange = viewModel::onNewPasswordChange,
+                        label = { Text(stringResource(R.string.edit_profile_new_password)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        visualTransformation = if (uiState.isNewPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = viewModel::toggleNewPasswordVisibility) {
+                                Icon(
+                                    imageVector = if (uiState.isNewPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+
+                    OutlinedTextField(
+                        value = uiState.confirmPassword,
+                        onValueChange = viewModel::onConfirmPasswordChange,
+                        label = { Text(stringResource(R.string.edit_profile_confirm_password)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        isError = uiState.confirmPassword.isNotEmpty() && !passwordsMatch,
+                        supportingText = {
+                            if (uiState.confirmPassword.isNotEmpty() && !passwordsMatch) {
+                                Text(stringResource(R.string.edit_profile_passwords_not_match), color = Color.Red)
+                            }
+                        },
+                        visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = viewModel::toggleConfirmPasswordVisibility) {
+                                Icon(
+                                    imageVector = if (uiState.isConfirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+
+                    // (Se reemplazó el botón de galería por el icono de editar en el avatar)
+
+                    // Mostrar mensaje de error si existe
+                    uiState.errorMessage?.let { error ->
+                        Text(
+                            text = error,
+                            color = Color.Red,
+                            fontSize = 14.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            viewModel.saveChanges()
+                        },
+                        enabled = passwordsMatch && !uiState.isLoading,
+                        modifier = Modifier
+                            .then(
+                                if (isTablet) {
+                                    Modifier.widthIn(min = 400.dp).align(Alignment.CenterHorizontally)
+                                } else {
+                                    Modifier.fillMaxWidth()
+                                }
+                            )
+                            .padding(vertical = 16.dp)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
+                    ) {
+                        Text(stringResource(R.string.edit_profile_save), color = Color.White, fontSize = 16.sp)
+                    }
                 }
             }
 

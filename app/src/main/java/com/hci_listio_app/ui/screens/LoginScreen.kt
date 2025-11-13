@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -90,18 +92,31 @@ fun LoginScreen(
             )
         }
     ) { padding ->
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-                    .padding(32.dp)
+            val isTablet = maxWidth >= 600.dp
+            val isLandscape = maxWidth > maxHeight
+            
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
+                Column(
+                    modifier = Modifier
+                        .then(
+                            if (isTablet) {
+                                Modifier.widthIn(max = 600.dp)
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
+                        )
+                        .verticalScroll(rememberScrollState())
+                        .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                        .padding(32.dp)
+                ) {
                 Text(
                     text = stringResource(R.string.login_welcome),
                     fontSize = 32.sp,
@@ -196,7 +211,13 @@ fun LoginScreen(
                 Button(
                     onClick = { viewModel.onSubmit() },
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .then(
+                            if (isTablet || isLandscape) {
+                                Modifier.widthIn(min = 400.dp).align(Alignment.CenterHorizontally)
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
+                        )
                         .padding(vertical = 16.dp)
                         .height(50.dp),
                     shape = RoundedCornerShape(16.dp),
@@ -233,6 +254,7 @@ fun LoginScreen(
                             .fillMaxWidth()
                             .padding(top = 8.dp)
                     )
+                }
                 }
             }
 
