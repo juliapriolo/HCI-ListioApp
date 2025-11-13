@@ -15,7 +15,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,14 +37,17 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hci_listio_app.ui.Components.ListioTopAppBar
+import com.hci_listio_app.ui.viewmodels.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+fun LoginScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         containerColor = Color.White,
@@ -80,8 +85,8 @@ fun LoginScreen(navController: NavController) {
                         .align(Alignment.CenterHorizontally)
                 )
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = uiState.email,
+                    onValueChange = viewModel::onEmailChange,
                     label = { Text("Email") },
                     leadingIcon = {
                         Icon(
@@ -95,8 +100,8 @@ fun LoginScreen(navController: NavController) {
                     shape = RoundedCornerShape(16.dp)
                 )
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = uiState.password,
+                    onValueChange = viewModel::onPasswordChange,
                     label = { Text("Contraseña") },
                     leadingIcon = {
                         Icon(
@@ -104,16 +109,16 @@ fun LoginScreen(navController: NavController) {
                             contentDescription = "Password Icon"
                         )
                     },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        val image = if (passwordVisible)
+                        val image = if (uiState.isPasswordVisible)
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff
 
-                        val description = if (passwordVisible) "Hide password" else "Show password"
+                        val description = if (uiState.isPasswordVisible) "Hide password" else "Show password"
 
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(imageVector = image, contentDescription = description)
                         }
                     },
@@ -142,7 +147,10 @@ fun LoginScreen(navController: NavController) {
                     )
                 }
                 Button(
-                    onClick = { navController.navigate(Screen.Home.route) },
+                    onClick = {
+                        viewModel.onSubmit()
+                        navController.navigate(Screen.Home.route)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
@@ -179,5 +187,8 @@ fun LoginScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(navController = rememberNavController())
+    LoginScreen(
+        navController = rememberNavController(),
+        viewModel = LoginViewModel()
+    )
 }
