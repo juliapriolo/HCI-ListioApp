@@ -1,5 +1,6 @@
 package com.hci_listio_app.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,7 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import com.hci_listio_app.R
+import com.hci_listio_app.data.ListHistoryManager
 import com.hci_listio_app.ui.Components.AddProductDialog
 import com.hci_listio_app.ui.Components.EditItemDialog
 import com.hci_listio_app.ui.Components.ListItem
@@ -39,10 +43,15 @@ fun ListScreen(
     navController: NavController,
     listId: Long = 1L,
     listName: String = "Mi Lista",
+    originTab: Int = -1,
     viewModel: ListViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = com.hci_listio_app.ui.Components.rememberAppSnackbarHostState()
+    val archivedIds by ListHistoryManager.archivedListIds.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val isArchived = uiState.listId?.let { archivedIds.contains(it) } ?: false
+    val showCompletedBanner = !isArchived && uiState.totalCount > 0 && uiState.completedCount == uiState.totalCount
     val shareDialogUsers = remember(uiState.owner, uiState.sharedMembers) {
         val seenIds = mutableSetOf<Long>()
         val participants = mutableListOf<SharedUser>()
@@ -81,6 +90,18 @@ fun ListScreen(
     var showShareDialog by remember { mutableStateOf(false) }
     var itemToEdit by remember { mutableStateOf<ListItemData?>(null) }
 
+    val navigateBack = remember(navController, originTab) {
+        {
+            if (originTab >= 0) {
+                navController.previousBackStackEntry?.savedStateHandle?.set("overviewTab", originTab)
+            }
+            navController.popBackStack()
+            Unit
+        }
+    }
+
+    BackHandler(onBack = navigateBack)
+
     // Cargar la lista cuando se monta el composable
     LaunchedEffect(listId) {
         viewModel.loadList(listId)
@@ -100,7 +121,7 @@ fun ListScreen(
             ListioTopAppBar(
                 title = uiState.listName.ifEmpty { listName },
                 showBackButton = true,
-                onBackClick = { navController.navigateUp() }
+                onBackClick = navigateBack
             )
         },
         floatingActionButton = {
@@ -122,6 +143,21 @@ fun ListScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
+                if (showCompletedBanner) {
+                    CompletedListBanner(
+                        onMoveToHistory = {
+                            uiState.listId?.let { listId ->
+                                ListHistoryManager.moveToHistory(listId)
+                                coroutineScope.launch {
+                                    snackbarHostState.showToast("Lista movida al historial")
+                                }
+                                navigateBack()
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+ 
                 // Header con avatares y estado
                 Card(
                     modifier = Modifier
@@ -384,5 +420,44 @@ private fun MemberAvatar(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+    }
+}
+
+@Composable
+private fun CompletedListBanner(onMoveToHistory: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Lista completada",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFF388E3C)
+                )
+                Text(
+                    text = "¿Mover al historial?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF388E3C)
+                )
+            }
+            IconButton(onClick = onMoveToHistory) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Mover al historial",
+                    tint = Color(0xFF388E3C)
+                )
+            }
+        }
     }
 }

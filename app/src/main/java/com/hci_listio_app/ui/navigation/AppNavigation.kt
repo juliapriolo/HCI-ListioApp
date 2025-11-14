@@ -91,11 +91,16 @@ fun AppNavigation() {
         composable(
             route = Screen.ShoppingList.route,
             arguments = listOf(
-                navArgument("listId") { type = NavType.LongType }
+                navArgument("listId") { type = NavType.LongType },
+                navArgument("originTab") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
             )
         ) { backStackEntry ->
             val listId = backStackEntry.arguments?.getLong("listId") ?: 1L
-            ListScreen(navController, listId)
+            val originTab = backStackEntry.arguments?.getInt("originTab") ?: -1
+            ListScreen(navController, listId, originTab = originTab)
         }
     }
 }
