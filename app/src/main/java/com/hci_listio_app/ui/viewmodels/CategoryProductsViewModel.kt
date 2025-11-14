@@ -1,77 +1,64 @@
 package com.hci_listio_app.ui.viewmodels
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import com.hci_listio_app.data.AuthRepositoryProvider
-import com.hci_listio_app.data.ProductRepository
-import com.hci_listio_app.data.remote.NetworkModule
-import com.hci_listio_app.data.remote.ProductRemoteDataSource
+import com.hci_listio_app.data.model.Product
+import com.hci_listio_app.data.remote.dto.CategoryRef
 import com.hci_listio_app.data.remote.dto.ProductRequest
-import com.hci_listio_app.data.remote.dto.CategoryId
+import com.hci_listio_app.data.repository.CategoryProductsRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class CategoryProductsViewModel : ViewModel() {
-    private val _products = mutableStateOf<List<String>>(emptyList())
-    val products: State<List<String>> = _products
+data class CategoryProductsUiState(
+    val products: List<Product> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null
+)
 
-    var showDialog by mutableStateOf(false)
-        private set
+class CategoryProductsViewModel(
+    private val repository: CategoryProductsRepository,
+    private val token: String,
+    private val categoryId: Long
+) : ViewModel() {
 
-    var isLoading by mutableStateOf(false)
-        private set
+    private val _uiState = MutableStateFlow(CategoryProductsUiState())
+    val uiState: StateFlow<CategoryProductsUiState> = _uiState.asStateFlow()
 
-    var errorMessage by mutableStateOf<String?>(null)
-        private set
-
-    // Repositorios y data source
-    private val authRepository = AuthRepositoryProvider.instance
-    private val productRepository = ProductRepository(
-        ProductRemoteDataSource.create(NetworkModule.baseUrl)
-    )
-
-    private var currentCategoryId: Long? = null
-
-    fun setCategoryId(categoryId: Long) {
-        currentCategoryId = categoryId
-    }
-
-    fun onAddProductClicked() {
-        showDialog = true
-    }
-
-    fun onDialogDismiss() {
-        showDialog = false
-        errorMessage = null
-    }
-
-    fun onProductSaved(product: String) {
-        val categoryId = currentCategoryId
-        val token = authRepository.authToken.value
-        if (categoryId == null || token == null) {
-            errorMessage = "Falta información de categoría o autenticación."
-            return
-        }
-        isLoading = true
+    fun addProduct(productName: String) {
         viewModelScope.launch {
-            val result = productRepository.addProduct(
-                token,
-                ProductRequest(
-                    name = product,
-                    category = CategoryId(categoryId)
-                )
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            val request = ProductRequest(
+                name = productName,
+                category = CategoryRef(id = categoryId),
+                metadata = emptyMap()
             )
-            isLoading = false
-            if (result.isSuccess) {
-                _products.value = _products.value + product
-                showDialog = false
-            } else {
-                errorMessage = result.exceptionOrNull()?.message ?: "Error al agregar producto"
-            }
+
+            val result = repository.addProduct(token, request)
+
+            result.fold(
+                onSuccess = { product ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            products = it.products + product
+                        )
+                    }
+                },
+
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message ?: "Error desconocido"
+                        )
+                    }
+                }
+            )
+
         }
     }
 }

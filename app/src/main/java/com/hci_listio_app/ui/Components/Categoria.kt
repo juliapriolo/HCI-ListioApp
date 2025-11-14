@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-data class Categoria(val nombre: String, val imagenRes: Int)
+data class Categoria(val id: Long, val nombre: String, val imagenRes: Int)
 
 @Composable
 fun CategoriaCard(categoria: Categoria, onClick: () -> Unit) {

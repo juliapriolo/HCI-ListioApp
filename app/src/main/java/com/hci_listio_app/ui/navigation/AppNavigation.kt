@@ -6,101 +6,96 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.hci_listio_app.ui.screens.LoginScreen
-import com.hci_listio_app.ui.screens.SignUpScreen
-import com.hci_listio_app.ui.screens.VerifyAccountScreen
-import com.hci_listio_app.ui.screens.ForgotPasswordScreen
-import com.hci_listio_app.ui.screens.ProductsScreen
-import com.hci_listio_app.ui.screens.ProfileScreen
-import com.hci_listio_app.ui.screens.HomeScreen
-import com.hci_listio_app.ui.screens.EditProfileScreen
-import com.hci_listio_app.ui.screens.LanguageScreen
-import com.hci_listio_app.ui.screens.ListScreen
-import com.hci_listio_app.ui.screens.ListOverview
-import com.hci_listio_app.ui.screens.CategoryProductsScreen
-
+import com.hci_listio_app.ui.screens.*
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.Login.route) {
+
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Login.route
+    ) {
+
         composable(Screen.Login.route) {
-            LoginScreen(navController = navController)
+            LoginScreen(navController)
         }
+
         composable(Screen.SignUp.route) {
-            SignUpScreen(navController = navController)
+            SignUpScreen(navController)
         }
+
         composable(
             route = Screen.VerifyAccount.route,
             arguments = listOf(
-                navArgument("email") {
-                    type = NavType.StringType
-                },
-                navArgument("password") {
-                    type = NavType.StringType
-                }
+                navArgument("email") { type = NavType.StringType },
+                navArgument("password") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val emailArg = backStackEntry.arguments?.getString("email") ?: ""
-            val passwordArg = backStackEntry.arguments?.getString("password") ?: ""
-            val email = try {
-                java.net.URLDecoder.decode(emailArg, "UTF-8")
-            } catch (e: Exception) {
-                emailArg
-            }
-            val password = try {
-                java.net.URLDecoder.decode(passwordArg, "UTF-8")
-            } catch (e: Exception) {
-                passwordArg
-            }
-            VerifyAccountScreen(
-                navController = navController,
-                email = email,
-                password = password
-            )
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            val password = backStackEntry.arguments?.getString("password") ?: ""
+            VerifyAccountScreen(navController, email, password)
         }
+
         composable(Screen.ForgotPassword.route) {
-            ForgotPasswordScreen(navController = navController)
+            ForgotPasswordScreen(navController)
         }
+
         composable(Screen.Home.route) {
-            HomeScreen(navController = navController)
+            HomeScreen(navController)
         }
+
         composable(Screen.Products.route) {
-            ProductsScreen(navController = navController)
+            ProductsScreen(navController)
         }
+
         composable(Screen.Profile.route) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(navController)
         }
+
         composable(Screen.EditProfile.route) {
-            EditProfileScreen(navController = navController)
+            EditProfileScreen(navController)
         }
+
         composable(Screen.Language.route) {
-            LanguageScreen(navController = navController)
+            LanguageScreen(navController)
         }
+
         composable(Screen.ListOverview.route) {
-            ListOverview(navController = navController)
+            ListOverview(navController)
         }
+
+        // ------------------------
+        // ⭐ CATEGORY PRODUCTS
+        // ------------------------
         composable(
             route = "category/{categoryName}?categoryId={categoryId}",
             arguments = listOf(
                 navArgument("categoryName") { type = NavType.StringType },
-                navArgument("categoryId") { type = NavType.LongType; defaultValue = -1L }
+                navArgument("categoryId") {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                }
             )
         ) { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
-            val categoryId = backStackEntry.arguments?.getLong("categoryId")?.takeIf { it >= 0 }
+            val categoryId = backStackEntry.arguments?.getLong("categoryId") ?: -1L
+
             CategoryProductsScreen(
                 navController = navController,
                 categoryName = categoryName,
                 categoryId = categoryId
             )
         }
+
         composable(
             route = Screen.ShoppingList.route,
-            arguments = listOf(navArgument("listId") { type = NavType.LongType })
+            arguments = listOf(
+                navArgument("listId") { type = NavType.LongType }
+            )
         ) { backStackEntry ->
             val listId = backStackEntry.arguments?.getLong("listId") ?: 1L
-            ListScreen(navController = navController, listId = listId)
+            ListScreen(navController, listId)
         }
     }
 }

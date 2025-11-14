@@ -6,7 +6,9 @@ import com.hci_listio_app.data.remote.dto.ProductResponse
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class ProductRemoteDataSource(private val api: ProductApiService) {
+class ProductRemoteDataSource(
+    private val api: ProductApiService = NetworkModule.productApiService
+) {
     suspend fun addProduct(token: String, product: ProductRequest): Result<ProductResponse> =
         safeApiCall { api.addProduct("Bearer $token", product) }
 
@@ -16,15 +18,4 @@ class ProductRemoteDataSource(private val api: ProductApiService) {
         } catch (e: Exception) {
             Result.failure(e)
         }
-
-    companion object {
-        fun create(baseUrl: String): ProductRemoteDataSource {
-            val retrofit = Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-            val api = retrofit.create(ProductApiService::class.java)
-            return ProductRemoteDataSource(api)
-        }
-    }
 }

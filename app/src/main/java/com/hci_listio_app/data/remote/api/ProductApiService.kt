@@ -7,7 +7,8 @@ import com.hci_listio_app.data.remote.dto.ProductRequest
 import com.hci_listio_app.data.remote.dto.ProductResponse
 
 interface ProductApiService {
-    @POST("api/products")
+
+    @POST("products") // SE DEBE USAR ASÍ
     suspend fun addProduct(
         @Header("Authorization") authorization: String,
         @Body product: ProductRequest
