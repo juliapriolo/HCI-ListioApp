@@ -57,7 +57,7 @@ interface ListApiService {
         @Query("pantry_id") pantryId: Long? = null,
         @Query("category_id") categoryId: Long? = null,
         @Query("search") search: String? = null
-    ): List<ShoppingListItemResponse>
+    ): JsonElement
 
     @PUT("shopping-lists/{id}/items/{item_id}")
     suspend fun updateItem(

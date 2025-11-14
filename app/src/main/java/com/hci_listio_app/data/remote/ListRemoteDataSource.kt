@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -17,6 +18,7 @@ class ListRemoteDataSource(
 
     private val gson = Gson()
     private val listType = object : TypeToken<List<ShoppingListResponse>>() {}.type
+    private val itemsType = object : TypeToken<List<ShoppingListItemResponse>>() {}.type
 
     // Obtener todas las listas
     suspend fun getLists(
@@ -30,26 +32,35 @@ class ListRemoteDataSource(
         }
 
     private fun parseListsPayload(element: JsonElement): List<ShoppingListResponse> {
-        return when {
-            element.isJsonArray -> gson.fromJson(element, listType)
-            element.isJsonObject -> {
-                val obj = element.asJsonObject
-                val arrayNode = findListsArray(obj)
-                    ?: throw ApiException(0, "Formato desconocido al obtener listas.")
-                gson.fromJson(arrayNode, listType)
-            }
-            else -> emptyList()
-        }
+        return parsePayload(element, listType, arrayKeys = arrayOf("content", "data", "lists", "items", "results"))
     }
 
-    private fun findListsArray(obj: JsonObject): JsonElement? {
-        return when {
-            obj.has("content") -> obj.get("content")
-            obj.has("data") -> obj.get("data")
-            obj.has("lists") -> obj.get("lists")
-            obj.has("items") -> obj.get("items")
+    private fun parseItemsPayload(element: JsonElement): List<ShoppingListItemResponse> {
+        return parsePayload(element, itemsType, arrayKeys = arrayOf("items", "content", "data", "listItems", "results"))
+    }
+
+    private fun <T> parsePayload(element: JsonElement, type: Type, arrayKeys: Array<String>): List<T> {
+        val arrayElement = when {
+            element.isJsonArray -> element
+            element.isJsonObject -> findArrayNode(element.asJsonObject, arrayKeys)
             else -> null
+        } ?: throw ApiException(0, "Formato desconocido al obtener datos.")
+
+        return gson.fromJson(arrayElement, type)
+    }
+
+    private fun findArrayNode(obj: JsonObject, keys: Array<String>): JsonElement? {
+        keys.forEach { key ->
+            if (obj.has(key)) {
+                val candidate = obj.get(key)
+                if (candidate.isJsonArray) return candidate
+                // Si el nodo es un objeto que contiene un array, intenta encontrarlo recursivamente
+                if (candidate.isJsonObject) {
+                    findArrayNode(candidate.asJsonObject, keys)?.let { return it }
+                }
+            }
         }
+        return obj.entrySet().firstOrNull { it.value.isJsonArray }?.value
     }
 
     // Obtener una lista específica
@@ -102,11 +113,12 @@ class ListRemoteDataSource(
         purchased: Boolean? = null
     ): Result<List<ShoppingListItemResponse>> =
         safeApiCall {
-            api.getItems(
+            val element = api.getItems(
                 bearer(token),
                 listId,
                 purchased = purchased
             )
+            parseItemsPayload(element)
         }
 
     // Actualizar item
