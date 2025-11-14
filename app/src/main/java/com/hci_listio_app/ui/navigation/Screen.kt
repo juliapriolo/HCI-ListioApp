@@ -17,7 +17,10 @@ sealed class Screen(val route: String) {
     object EditProfile : Screen("edit_profile")
     object Language : Screen("language")
     object ListOverview : Screen("list_overview")
-    object ShoppingList : Screen("list/{listId}") {
-        fun createRoute(listId: Long) = "list/$listId"
+    object ShoppingList : Screen("list/{listId}?originTab={originTab}") {
+        fun createRoute(listId: Long, originTab: Int? = null): String {
+            val tab = originTab ?: -1
+            return "list/$listId?originTab=$tab"
+        }
     }
 }

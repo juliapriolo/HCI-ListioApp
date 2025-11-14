@@ -2,6 +2,7 @@ package com.hci_listio_app.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hci_listio_app.data.ListHistoryManager
 import com.hci_listio_app.data.ListRepository
 import com.hci_listio_app.data.ListRepositoryProvider
 import com.hci_listio_app.data.remote.dto.ShoppingListResponse
@@ -15,7 +16,8 @@ data class ListOverviewUiState(
     val lists: List<ShoppingListResponse> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val favorites: Set<Long> = emptySet()
+    val favorites: Set<Long> = emptySet(),
+    val archivedListIds: Set<Long> = emptySet()
 )
 
 class ListOverviewViewModel(
@@ -27,6 +29,15 @@ class ListOverviewViewModel(
 
     init {
         loadLists()
+        observeHistoryChanges()
+    }
+
+    private fun observeHistoryChanges() {
+        viewModelScope.launch {
+            ListHistoryManager.archivedListIds.collect { archived ->
+                _uiState.update { it.copy(archivedListIds = archived) }
+            }
+        }
     }
 
     fun loadLists() {
@@ -86,10 +97,17 @@ class ListOverviewViewModel(
         }
     }
 
-    fun deleteList(listId: Long, onResult: (Boolean, String?) -> Unit) {
+    fun deleteList(listId: Long, fromHistory: Boolean, onResult: (Boolean, String?) -> Unit) {
+        if (!fromHistory) {
+            ListHistoryManager.moveToHistory(listId)
+            onResult(true, null)
+            return
+        }
+
         viewModelScope.launch {
             val result = listRepository.deleteList(listId)
             if (result.isSuccess) {
+                ListHistoryManager.removeFromHistory(listId)
                 _uiState.update { current ->
                     current.copy(lists = current.lists.filterNot { it.id == listId })
                 }
@@ -100,5 +118,13 @@ class ListOverviewViewModel(
                 onResult(false, message)
             }
         }
+    }
+
+    fun moveToHistory(listId: Long) {
+        ListHistoryManager.moveToHistory(listId)
+    }
+
+    fun restoreList(listId: Long) {
+        ListHistoryManager.removeFromHistory(listId)
     }
 }

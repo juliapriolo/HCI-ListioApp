@@ -39,8 +39,6 @@ fun ListOverview(
     val lifecycleOwner = LocalLifecycleOwner.current
     var listBeingEdited by remember { mutableStateOf<Pair<Long, String>?>(null) }
     var listBeingDeleted by remember { mutableStateOf<Pair<Long, String>?>(null) }
-
-    // Reload lists whenever the screen comes back to the foreground
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -49,6 +47,19 @@ fun ListOverview(
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val restoredTabFlow = remember(savedStateHandle) {
+        savedStateHandle?.getStateFlow("overviewTab", -1)
+    }
+    val restoredTab = restoredTabFlow?.collectAsState()?.value
+
+    LaunchedEffect(restoredTab) {
+        if (restoredTab != null && restoredTab >= 0 && restoredTab != selected.value) {
+            selected.value = restoredTab
+            savedStateHandle?.remove<Int>("overviewTab")
+        }
     }
 
     // Mostrar mensajes de error
@@ -104,15 +115,19 @@ fun ListOverview(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                val archivedIds = uiState.archivedListIds
                 val filteredLists = uiState.lists
                     .filter { list ->
                         query.value.isBlank() || list.name.contains(query.value, ignoreCase = true)
                     }
                     .filter { list ->
+                        val sharedMembers = if (list.users.isNotEmpty()) list.users else list.sharedWith
+                        val isShared = sharedMembers.isNotEmpty()
+                        val isArchived = archivedIds.contains(list.id)
                         when (selected.value) {
-                            1 -> (list.sharedWith.isNotEmpty())
-                            2 -> list.lastPurchasedAt != null || list.items.any { it.purchased }
-                            else -> list.sharedWith.isEmpty()
+                            1 -> !isArchived && isShared
+                            2 -> isArchived
+                            else -> !isArchived && !isShared
                         }
                     }
 
@@ -122,11 +137,14 @@ fun ListOverview(
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         filteredLists.forEach { list ->
                             val sharedMembers = if (list.users.isNotEmpty()) list.users else list.sharedWith
+                            val isShared = sharedMembers.isNotEmpty()
+                            val isArchived = archivedIds.contains(list.id)
+
                             OverviewCard(
                                 item = OverviewItem(
                                     id = list.id.toString(),
                                     title = list.name,
-                                    isPrivate = true,
+                                    isPrivate = !isShared,
                                     completed = list.items.count { it.purchased },
                                     total = list.items.size,
                                     members = sharedMembers.map { "${it.name} ${it.surname}" },
@@ -134,12 +152,23 @@ fun ListOverview(
                                 ),
                                 onClick = {
                                     navController.navigate(
-                                        com.hci_listio_app.ui.navigation.Screen.ShoppingList.createRoute(list.id)
+                                        com.hci_listio_app.ui.navigation.Screen.ShoppingList.createRoute(
+                                            list.id,
+                                            selected.value
+                                        )
                                     )
                                 },
                                 onToggleFavorite = { viewModel.toggleFavorite(list.id) },
-                                onEdit = { listBeingEdited = list.id to list.name },
+                                onEdit = if (!isArchived) { { listBeingEdited = list.id to list.name } } else null,
                                 onDelete = { listBeingDeleted = list.id to list.name },
+                                onRestore = if (isArchived) {
+                                    {
+                                        viewModel.restoreList(list.id)
+                                        coroutineScope.launch {
+                                            snackbarHostState.showToast("Lista recuperada")
+                                        }
+                                    }
+                                } else null,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp)
@@ -240,15 +269,25 @@ fun ListOverview(
             onDismissRequest = { listBeingDeleted = null },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.deleteList(id) { success, message ->
+                    val deletingHistory = selected.value == 2
+                    viewModel.deleteList(id, deletingHistory) { success, message ->
                         coroutineScope.launch {
-                            snackbarHostState.showToast(
-                                if (success) "Lista eliminada" else message ?: "No se pudo eliminar la lista."
-                            )
+                            val defaultMessage = if (deletingHistory) {
+                                if (success) "Lista eliminada" else "No se pudo eliminar la lista."
+                            } else {
+                                if (success) "Lista movida al historial" else "No se pudo mover la lista al historial."
+                            }
+                            snackbarHostState.showToast(message ?: defaultMessage)
                         }
                     }
                     listBeingDeleted = null
-                }) { Text("Eliminar", color = Color(0xFFD32F2F)) }
+                }) {
+                    val deletingHistory = selected.value == 2
+                    Text(
+                        if (deletingHistory) "Eliminar" else "Mover al historial",
+                        color = if (deletingHistory) Color(0xFFD32F2F) else Color(0xFF6DCB5A)
+                    )
+                }
             },
             dismissButton = {
                 TextButton(onClick = { listBeingDeleted = null }) { Text("Cancelar") }

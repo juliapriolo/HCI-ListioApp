@@ -50,14 +50,15 @@ fun OverviewCard(
     onClick: (() -> Unit)? = null,
     onToggleFavorite: (() -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
-    onDelete: (() -> Unit)? = null
+    onDelete: (() -> Unit)? = null,
+    onRestore: (() -> Unit)? = null
 ) {
     val combinedModifier = if (onClick != null) modifier
         .fillMaxWidth()
         .clickable { onClick() }
     else modifier.fillMaxWidth()
 
-    val optionsAvailable = onEdit != null || onDelete != null
+    val optionsAvailable = onEdit != null || onDelete != null || onRestore != null
     val (menuExpanded, setMenuExpanded) = remember { mutableStateOf(false) }
 
     Card(
@@ -85,6 +86,12 @@ fun OverviewCard(
                                     DropdownMenuItem(text = { Text("Editar nombre") }, onClick = {
                                         setMenuExpanded(false)
                                         onEdit()
+                                    })
+                                }
+                                if (onRestore != null) {
+                                    DropdownMenuItem(text = { Text("Recuperar lista") }, onClick = {
+                                        setMenuExpanded(false)
+                                        onRestore()
                                     })
                                 }
                                 if (onDelete != null) {
