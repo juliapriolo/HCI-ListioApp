@@ -8,7 +8,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hci_listio_app.ui.Components.*
@@ -29,6 +32,18 @@ fun ListOverview(
     val showCreateDialog = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = rememberAppSnackbarHostState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Reload lists whenever the screen comes back to the foreground
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadLists()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     // Mostrar mensajes de error
     LaunchedEffect(uiState.errorMessage) {
@@ -88,6 +103,7 @@ fun ListOverview(
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         uiState.lists.forEach { list ->
+                            val sharedMembers = if (list.users.isNotEmpty()) list.users else list.sharedWith
                             OverviewCard(
                                 item = OverviewItem(
                                     id = list.id.toString(),
@@ -95,7 +111,7 @@ fun ListOverview(
                                     isPrivate = true,
                                     completed = list.items.count { it.purchased },
                                     total = list.items.size,
-                                    members = list.users.map { "${it.name} ${it.surname}" }
+                                    members = sharedMembers.map { "${it.name} ${it.surname}" }
                                 ),
                                 onClick = {
                                     navController.navigate(
@@ -152,6 +168,8 @@ fun ListOverview(
                 if (createdId != null) {
                     coroutineScope.launch {
                         snackbarHostState.showToast("Lista creada")
+                        // Refrescar las listas en el overview para que la nueva aparezca inmediatamente
+                        viewModel.loadLists()
                         navController.navigate(
                             com.hci_listio_app.ui.navigation.Screen.ShoppingList.createRoute(createdId)
                         )

@@ -2,6 +2,10 @@ package com.hci_listio_app.data.remote
 
 import com.hci_listio_app.data.remote.api.ListApiService
 import com.hci_listio_app.data.remote.dto.*
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -11,6 +15,9 @@ class ListRemoteDataSource(
     private val api: ListApiService
 ) {
 
+    private val gson = Gson()
+    private val listType = object : TypeToken<List<ShoppingListResponse>>() {}.type
+
     // Obtener todas las listas
     suspend fun getLists(
         token: String,
@@ -18,9 +25,32 @@ class ListRemoteDataSource(
         size: Int? = null
     ): Result<List<ShoppingListResponse>> =
         safeApiCall {
-            val response = api.getLists(bearer(token), page, size)
-            response.content  // Extraer solo el array de listas
+            val element = api.getLists(bearer(token), page, size)
+            parseListsPayload(element)
         }
+
+    private fun parseListsPayload(element: JsonElement): List<ShoppingListResponse> {
+        return when {
+            element.isJsonArray -> gson.fromJson(element, listType)
+            element.isJsonObject -> {
+                val obj = element.asJsonObject
+                val arrayNode = findListsArray(obj)
+                    ?: throw ApiException(0, "Formato desconocido al obtener listas.")
+                gson.fromJson(arrayNode, listType)
+            }
+            else -> emptyList()
+        }
+    }
+
+    private fun findListsArray(obj: JsonObject): JsonElement? {
+        return when {
+            obj.has("content") -> obj.get("content")
+            obj.has("data") -> obj.get("data")
+            obj.has("lists") -> obj.get("lists")
+            obj.has("items") -> obj.get("items")
+            else -> null
+        }
+    }
 
     // Obtener una lista específica
     suspend fun getList(token: String, listId: Long): Result<ShoppingListResponse> =

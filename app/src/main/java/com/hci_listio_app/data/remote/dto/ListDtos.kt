@@ -1,26 +1,36 @@
 package com.hci_listio_app.data.remote.dto
 
+import com.google.gson.annotations.SerializedName
+
 // Respuesta de lista
 data class ShoppingListResponse(
-    val id: Long,
-    val name: String,
-    val items: List<ShoppingListItemResponse>,
-    val users: List<UserProfileResponse>,
-    val createdAt: String,
-    val updatedAt: String
+    val id: Long = 0L,
+    val name: String = "",
+    val description: String? = null,
+    val recurring: Boolean? = null,
+    val metadata: Map<String, Any?>? = null,
+    val owner: UserProfileResponse? = null,
+    @SerializedName("sharedWith")
+    val sharedWith: List<UserProfileResponse> = emptyList(),
+    val lastPurchasedAt: String? = null,
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
+    val items: List<ShoppingListItemResponse> = emptyList(),
+    // Algunos endpoints devuelven "users" y otros "sharedWith"; mantenemos ambos por compatibilidad
+    val users: List<UserProfileResponse> = emptyList()
 )
 
 // Respuesta de item de lista (según la API real)
 data class ShoppingListItemResponse(
-    val id: Long,
-    val productName: String,
+    val id: Long = 0L,
+    val productName: String = "",
     val quantity: Int? = null,
     val purchased: Boolean = false,
     val productId: Long? = null,
     val categoryId: Long? = null,
     val pantryId: Long? = null,
-    val createdAt: String,
-    val updatedAt: String,
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
     val lastPurchasedAt: String? = null
 )
 
@@ -65,10 +75,10 @@ data class AddUserToListRequest(
 // Respuesta paginada de listas
 data class PaginatedListsResponse(
     val content: List<ShoppingListResponse>,
-    val page: Int,
-    val size: Int,
-    val totalElements: Int,
-    val totalPages: Int,
-    val isFirst: Boolean,
-    val isLast: Boolean
+    val page: Int? = null,
+    val size: Int? = null,
+    val totalElements: Int? = null,
+    val totalPages: Int? = null,
+    val isFirst: Boolean? = null,
+    val isLast: Boolean? = null
 )

@@ -1,6 +1,7 @@
 package com.hci_listio_app.data.remote.api
 
 import com.hci_listio_app.data.remote.dto.*
+import com.google.gson.JsonElement
 import retrofit2.http.*
 
 interface ListApiService {
@@ -10,7 +11,7 @@ interface ListApiService {
         @Header("Authorization") authorization: String,
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null
-    ): PaginatedListsResponse
+    ): JsonElement
 
     @GET("shopping-lists/{id}")
     suspend fun getList(
