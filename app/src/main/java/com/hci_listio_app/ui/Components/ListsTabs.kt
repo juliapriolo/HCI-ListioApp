@@ -1,10 +1,17 @@
 package com.hci_listio_app.ui.Components
 
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun ListsTabs(
@@ -13,10 +20,26 @@ fun ListsTabs(
     onSelectedChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    TabRow(selectedTabIndex = selectedIndex, modifier = modifier) {
-        tabs.forEachIndexed { index, title ->
-            Tab(selected = selectedIndex == index, onClick = { onSelectedChange(index) }) {
-                Text(text = title)
+    Surface(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        Row(modifier = Modifier.padding(4.dp)) {
+            tabs.forEachIndexed { index, title ->
+                val isSelected = index == selectedIndex
+                val bg = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                val txtColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                Surface(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .clickable { onSelectedChange(index) }
+                        .background(bg),
+                    color = bg
+                ) {
+                    Text(text = title, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), color = txtColor)
+                }
             }
         }
     }

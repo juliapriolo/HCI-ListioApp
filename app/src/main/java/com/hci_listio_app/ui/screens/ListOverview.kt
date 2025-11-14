@@ -1,6 +1,7 @@
 package com.hci_listio_app.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.hci_listio_app.R
+import com.hci_listio_app.ui.Components.BottomNavigationBar
 import com.hci_listio_app.ui.Components.EmptyState
 import com.hci_listio_app.ui.Components.ListHeader
 import com.hci_listio_app.ui.Components.ListsTabs
@@ -37,48 +42,60 @@ data class ListOverviewItem(
 
 @Composable
 fun ListOverview(
+    navController: NavController,
     username: String = "Pedro",
     lists: List<ListOverviewItem> = emptyList(),
     modifier: Modifier = Modifier,
     onFabClick: () -> Unit = {},
     onItemClick: (String) -> Unit = {}
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        ListHeader(username = username)
+    val query = remember { mutableStateOf("") }
+    val tabs = listOf("Personal", "Compartidas", "Historial")
+    val selected = remember { mutableStateOf(0) }
 
+    androidx.compose.material3.Scaffold(
+        containerColor = Color(0xFFFAFAFA),
+        topBar = { ListHeader(username = username) },
+        floatingActionButton = {
+            androidx.compose.material3.FloatingActionButton(
+                onClick = onFabClick,
+                containerColor = Color.White,
+                contentColor = Color(0xFF6DCB5A)
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar")
+            }
+        },
+        bottomBar = { BottomNavigationBar(navController = navController) },
+        modifier = modifier
+    ) { padding ->
         Column(modifier = Modifier
             .fillMaxWidth()
+            .padding(padding)
             .padding(horizontal = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            val query = remember { mutableStateOf("") }
             SearchBar(query = query.value, onQueryChange = { query.value = it }, modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            val tabs = listOf("Personal", "Compartidas", "Historial")
-            val selected = remember { mutableStateOf(0) }
-            ListsTabs(tabs = tabs, selectedIndex = selected.value, onSelectedChange = { selected.value = it })
+            ListsTabs(tabs = tabs, selectedIndex = selected.value, onSelectedChange = { selected.value = it }, modifier = Modifier.fillMaxWidth())
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             if (lists.isEmpty()) {
-                EmptyState()
+                EmptyState(modifier = Modifier.fillMaxWidth())
             } else {
-                Column {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     lists.forEach { item ->
                         OverviewCard(
                             item = OverviewItem(item.id, item.title, item.isPrivate, item.completed, item.total, item.members),
-                            onClick = { onItemClick(item.id) }
+                            onClick = { onItemClick(item.id) },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                         )
                     }
                 }
             }
-        }
-
-        FloatingActionButton(onClick = onFabClick, modifier = Modifier.padding(20.dp)) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar")
         }
     }
 }
@@ -87,7 +104,7 @@ fun ListOverview(
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun ListOverviewEmptyPreview() {
-    ListOverview(username = "Pedro", lists = emptyList())
+    ListOverview(navController = rememberNavController(), username = "Pedro", lists = emptyList())
 }
 
 @Preview(showBackground = true)
@@ -99,5 +116,5 @@ fun ListOverviewPopulatedPreview() {
         ListOverviewItem(id = "3", title = "Lista viaje fin de semana", isPrivate = true, completed = 0, total = 16, members = listOf("Marta"))
     )
 
-    ListOverview(username = "Pedro", lists = items)
+    ListOverview(navController = rememberNavController(), username = "Pedro", lists = items)
 }

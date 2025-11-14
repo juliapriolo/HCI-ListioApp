@@ -18,7 +18,6 @@ import com.hci_listio_app.ui.screens.LanguageScreen
 import com.hci_listio_app.ui.screens.ListScreen
 import com.hci_listio_app.ui.screens.ListOverview
 import com.hci_listio_app.ui.screens.CategoryProductsScreen
-import com.hci_listio_app.ui.screens.CreateListScreen
 
 
 @Composable
@@ -79,26 +78,15 @@ fun AppNavigation() {
             LanguageScreen(navController = navController)
         }
         composable(Screen.ListOverview.route) {
-            ListOverview(
-                onFabClick = { navController.navigate(Screen.CreateList.createRoute()) },
-                onItemClick = { listId ->
-                    navController.navigate(Screen.ShoppingList.createRoute(listId))
-                }
-            )
+            ListOverview(navController = navController)
         }
         composable("category/{categoryName}") { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
             CategoryProductsScreen(navController = navController, categoryName = categoryName)
         }
-        composable(Screen.CreateList.route) {
-            CreateListScreen(navController = navController)
-        }
-        composable(
-            route = Screen.ShoppingList.route,
-            arguments = listOf(navArgument("listId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val listId = backStackEntry.arguments?.getString("listId") ?: "1"
-            ListScreen(navController = navController, listId = listId)
+        composable(Screen.ShoppingList.route) { backStackEntry ->
+            val listName = backStackEntry.arguments?.getString("listName") ?: "Mi Lista"
+            ListScreen(navController = navController, listName = listName)
         }
     }
 }
