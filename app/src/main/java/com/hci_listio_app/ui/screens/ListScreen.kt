@@ -20,7 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hci_listio_app.R
@@ -31,6 +30,8 @@ import com.hci_listio_app.ui.Components.ListItemData
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.Components.showToast
 import com.hci_listio_app.ui.viewmodels.ListViewModel
+import com.hci_listio_app.ui.Components.ShareListDialog
+import com.hci_listio_app.ui.Components.SharedUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -333,21 +334,19 @@ fun ListScreen(
     }
 
     // Diálogo para compartir lista
-    if (showShareDialog && itemToEdit != null) {
-        EditItemDialog(
-            itemName = itemToEdit!!.name,
-            quantity = "",
-            unit = "24",
-            brand = "Paty",
-            store = "Supermercado Coto",
-            onDismiss = {
-                showEditDialog = false
-                itemToEdit = null
+    if (showShareDialog) {
+        ShareListDialog(
+            currentUsers = listOf(
+                SharedUser(1L, "Pedro M.", "Creador"),
+                SharedUser(2L, "Martina P.", "Editor")
+            ), // Esto debería venir del viewModel
+            onDismiss = { showShareDialog = false },
+            onShare = { email ->
+                // viewModel.shareListWithUser(email)
+                showShareDialog = false
             },
-            onSave = { name, quantity, unit, brand, store ->
-                viewModel.editItem(itemToEdit!!.id, name, quantity, unit, brand, store)
-                showEditDialog = false
-                itemToEdit = null
+            onRemoveUser = { userId ->
+                // viewModel.removeUserFromList(userId)
             }
         )
     }
