@@ -93,16 +93,20 @@ class ListRemoteDataSource(
     suspend fun addItem(
         token: String,
         listId: Long,
-        productName: String,
-        quantity: Int? = null,
-        productId: Long? = null,
-        categoryId: Long? = null
+        productId: Long,
+        quantity: Int? = 1,
+        unit: String = "kg"
     ): Result<ShoppingListItemResponse> =
         safeApiCall {
             api.addItem(
                 bearer(token),
                 listId,
-                CreateItemRequest(productName, quantity, productId, categoryId)
+                CreateItemRequest(
+                    product = ProductRef(id = productId),
+                    quantity = quantity,
+                    unit = unit,
+                    metadata = emptyMap()
+                )
             )
         }
 

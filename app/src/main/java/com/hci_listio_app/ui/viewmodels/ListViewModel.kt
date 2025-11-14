@@ -74,7 +74,9 @@ class ListViewModel(
                         ListItemData(
                             id = item.id.toString(),
                             name = item.productName,
-                            isChecked = item.purchased
+                            isChecked = item.purchased,
+                            productId = item.productId,
+                            quantity = item.quantity
                         )
                     }
                     val participants = when {
@@ -155,9 +157,8 @@ class ListViewModel(
                 // Agregar el producto a la lista
                 val addResult = listRepository.addItem(
                     listId = listId,
-                    productName = newProduct.name,
                     productId = newProduct.id,
-                    categoryId = newProduct.categoryId
+                    quantity = 1
                 )
 
                 _uiState.update { current ->
@@ -204,9 +205,8 @@ class ListViewModel(
 
             val result = listRepository.addItem(
                 listId = listId,
-                productName = product.name,
                 productId = product.id,
-                categoryId = product.categoryId
+                quantity = 1  // Cantidad por defecto
             )
 
             _uiState.update { current ->
@@ -319,84 +319,13 @@ class ListViewModel(
         }
     }
 
-    // Agregar un nuevo item (mantenido para compatibilidad)
-    fun addItem(name: String) {
-        val listId = _uiState.value.listId ?: return
-
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            val result = listRepository.addItem(
-                listId = listId,
-                productName = name
-            )
-
-            _uiState.update { current ->
-                if (result.isSuccess) {
-                    val newItem = result.getOrNull()!!
-                    val newListItem = ListItemData(
-                        id = newItem.id.toString(),
-                        name = newItem.productName,
-                        isChecked = newItem.purchased
-                    )
-                    val updatedItems = current.items + newListItem
-                    current.copy(
-                        items = updatedItems,
-                        totalCount = updatedItems.size,
-                        completedCount = updatedItems.count { it.isChecked },
-                        isLoading = false,
-                        errorMessage = null
-                    )
-                } else {
-                    current.copy(
-                        isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al agregar el item."
-                    )
-                }
-            }
-        }
-    }
-
     // Editar un item existente
     fun editItem(itemId: String, newName: String, quantity: String, unit: String, brand: String, store: String) {
-        val listId = _uiState.value.listId ?: return
-        val itemIdLong = itemId.toLongOrNull() ?: return
-
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            // Convertir quantity de String a Int si es posible
-            val quantityInt = quantity.toIntOrNull()
-
-            val result = listRepository.updateItem(
-                listId = listId,
-                itemId = itemIdLong,
-                productName = newName,
-                quantity = quantityInt
+        // Mostrar mensaje de que la función no está disponible
+        _uiState.update { current ->
+            current.copy(
+                errorMessage = "La edición de productos aún no está disponible. Puedes eliminar el item y agregar uno nuevo."
             )
-
-            _uiState.update { current ->
-                if (result.isSuccess) {
-                    val updatedItem = result.getOrNull()!!
-                    val updatedItems = current.items.map { item ->
-                        if (item.id == itemId) {
-                            item.copy(name = updatedItem.productName)
-                        } else {
-                            item
-                        }
-                    }
-                    current.copy(
-                        items = updatedItems,
-                        isLoading = false,
-                        errorMessage = null
-                    )
-                } else {
-                    current.copy(
-                        isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al editar el item."
-                    )
-                }
-            }
         }
     }
 

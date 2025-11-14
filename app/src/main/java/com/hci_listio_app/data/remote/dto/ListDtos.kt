@@ -46,12 +46,21 @@ data class UpdateListRequest(
     val name: String
 )
 
-// Request para crear un item (según la API real)
+data class ProductRef(
+    @SerializedName("id")
+    val id: Long
+)
+
+// Modificar CreateItemRequest
 data class CreateItemRequest(
-    val productName: String,
+    @SerializedName("product")
+    val product: ProductRef,
+    @SerializedName("quantity")
     val quantity: Int? = null,
-    val productId: Long? = null,
-    val categoryId: Long? = null
+    @SerializedName("unit")
+    val unit: String? = null,
+    @SerializedName("metadata")
+    val metadata: Map<String, Any>? = emptyMap()
 )
 
 // Request para actualizar un item (según la API real)
