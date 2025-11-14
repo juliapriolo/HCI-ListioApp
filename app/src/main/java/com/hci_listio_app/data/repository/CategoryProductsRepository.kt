@@ -25,6 +25,25 @@ class CategoryProductsRepository(
         }
     }
 
-    
+    suspend fun getProducts(token: String, categoryId: Long): Result<List<Product>> {
+        val responseResult = remoteDataSource.getProductsByCategory(token, categoryId)
+
+        return responseResult.map { list ->
+            list.map { response ->
+                Product(
+                    id = response.id,
+                    name = response.name,
+                    categoryId = response.category.id,
+                    categoryName = response.category.name,
+                    metadata = response.metadata,
+                    createdAt = response.createdAt,
+                    updatedAt = response.updatedAt
+                )
+            }
+        }
+    }
+
+
+
 
 }
