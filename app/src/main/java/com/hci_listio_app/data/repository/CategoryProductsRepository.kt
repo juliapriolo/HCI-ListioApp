@@ -42,6 +42,9 @@ class CategoryProductsRepository(
             }
         }
     }
+    suspend fun deleteProduct(token: String, id: Long): Result<Unit> {
+        return remoteDataSource.deleteProduct(token, id)
+    }
 
 
 

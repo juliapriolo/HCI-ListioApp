@@ -90,4 +90,31 @@ class CategoryProductsViewModel(
             )
         }
     }
+    fun deleteProduct(id: Long) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            val result = repository.deleteProduct(token, id)
+
+            result.fold(
+                onSuccess = {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            products = it.products.filter { p -> p.id != id }
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message ?: "Error al eliminar producto"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
 }

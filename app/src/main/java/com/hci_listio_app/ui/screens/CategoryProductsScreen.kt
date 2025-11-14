@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,6 +21,7 @@ import com.hci_listio_app.data.AuthRepositoryProvider
 import com.hci_listio_app.ui.Components.AddProductDialog
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.Components.ProductItem
+import com.hci_listio_app.ui.Components.ConfirmDeleteDialog
 import com.hci_listio_app.ui.viewmodels.CategoryProductsViewModel
 import com.hci_listio_app.ui.viewmodels.CategoryProductsViewModelFactory
 
@@ -32,14 +32,10 @@ fun CategoryProductsScreen(
     categoryName: String,
     categoryId: Long? = null
 ) {
-    // ------------------------------
-    // 1️⃣ OBTENER TOKEN DEL USUARIO
-    // ------------------------------
+    // 🔐 Token del usuario
     val token = AuthRepositoryProvider.instance.authToken.value ?: ""
 
-    // ------------------------------
-    // 2️⃣ CREAR EL VIEWMODEL CON FACTORY
-    // ------------------------------
+    // 🧠 ViewModel
     val viewModel: CategoryProductsViewModel = viewModel(
         factory = CategoryProductsViewModelFactory(
             repository = CategoryProductsRepository(ProductRemoteDataSource()),
@@ -50,10 +46,12 @@ fun CategoryProductsScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    // ------------------------------
-    // 3️⃣ CONTROLAR EL DIÁLOGO PARA AGREGAR PRODUCTOS
-    // ------------------------------
+    // ➕ Diálogo agregar producto
     var showAddDialog by remember { mutableStateOf(false) }
+
+    // ❌ Diálogo eliminar producto
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var productToDelete by remember { mutableStateOf<Long?>(null) }
 
     Scaffold(
         topBar = {
@@ -71,7 +69,7 @@ fun CategoryProductsScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Estado vacío
+
             if (uiState.products.isEmpty()) {
                 Icon(
                     painter = painterResource(R.drawable.empty_list_icon),
@@ -79,14 +77,13 @@ fun CategoryProductsScreen(
                     tint = Color(0xFF6DCB5A),
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                Text(text = "Empieza a agregar productos a la categoría")
+                Text("Empieza a agregar productos a la categoría")
                 Text(
-                    text = "Tu categoría está vacía",
+                    "Tu categoría está vacía",
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             } else {
-                // Lista con productos
                 Text(
                     text = categoryName,
                     style = MaterialTheme.typography.titleMedium,
@@ -99,18 +96,20 @@ fun CategoryProductsScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     items(uiState.products) { product ->
-                        ProductItem(productName = product.name)
+                        ProductItem(
+                            productName = product.name,
+                            onDelete = {
+                                productToDelete = product.id
+                                showDeleteDialog = true
+                            }
+                        )
                     }
                 }
             }
 
-            // Mostrar errores
+            // Errores
             uiState.error?.let { error ->
-                Text(
-                    text = error,
-                    color = Color.Red,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                Text(error, color = Color.Red)
             }
 
             // Loading
@@ -129,9 +128,7 @@ fun CategoryProductsScreen(
         }
     }
 
-    // ------------------------------
-    // 4️⃣ DIÁLOGO PARA AGREGAR PRODUCTOS
-    // ------------------------------
+    // ➕ Diálogo agregar producto
     if (showAddDialog) {
         AddProductDialog(
             onDismiss = { showAddDialog = false },
@@ -142,6 +139,14 @@ fun CategoryProductsScreen(
         )
     }
 
-
+    // ❌ Diálogo eliminar producto
+    if (showDeleteDialog && productToDelete != null) {
+        ConfirmDeleteDialog(
+            onDismiss = { showDeleteDialog = false },
+            onConfirm = {
+                viewModel.deleteProduct(productToDelete!!)
+                showDeleteDialog = false
+            }
+        )
+    }
 }
-
