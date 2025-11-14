@@ -28,8 +28,8 @@ fun ListsTabs(
         Row(modifier = Modifier.padding(4.dp)) {
             tabs.forEachIndexed { index, title ->
                 val isSelected = index == selectedIndex
-                val bg = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                val txtColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                val bg = if (isSelected) androidx.compose.ui.graphics.Color(0xFF2E7D32) else MaterialTheme.colorScheme.surface
+                val txtColor = if (isSelected) androidx.compose.ui.graphics.Color.White else MaterialTheme.colorScheme.onSurface
                 Surface(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)

@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -79,7 +80,7 @@ fun CreateEntityDialog(
             error?.let { Text(text = it, color = Color.Red) }
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = onDismiss) { Text("Cancelar") }
+                TextButton(onClick = onDismiss, colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2E7D32))) { Text("Cancelar") }
                 Button(onClick = {
                     if (name.isBlank()) {
                         error = "El nombre no puede estar vacío"
@@ -102,8 +103,8 @@ fun CreateEntityDialog(
                             isLoading = false
                         }
                     }
-                }, enabled = !isLoading) {
-                    if (isLoading) CircularProgressIndicator(modifier = Modifier.padding(4.dp))
+                }, enabled = !isLoading, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32), contentColor = Color.White)) {
+                    if (isLoading) CircularProgressIndicator(modifier = Modifier.padding(4.dp), color = Color.White)
                     else Text("Guardar")
                 }
             }

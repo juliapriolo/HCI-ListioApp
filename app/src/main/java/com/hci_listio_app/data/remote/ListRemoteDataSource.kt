@@ -122,9 +122,24 @@ class ListRemoteDataSource(
     private fun mapError(error: Throwable): Throwable {
         return when (error) {
             is HttpException -> {
+                // try to extract error body for more context
+                val response = error.response()
+                val bodyMsg = try {
+                    response?.errorBody()?.string()?.takeIf { it.isNotBlank() }
+                } catch (_: Exception) {
+                    null
+                }
+
+                val requestPath = try {
+                    response?.raw()?.request?.url?.encodedPath
+                } catch (_: Exception) { null }
+
+                val default = getDefaultHttpErrorMessage(error.code())
+                val combined = listOfNotNull(default, bodyMsg, requestPath?.let { "path: $it" }).joinToString(" — ")
+
                 ApiException(
                     statusCode = error.code(),
-                    message = getDefaultHttpErrorMessage(error.code()),
+                    message = combined,
                     cause = error
                 )
             }

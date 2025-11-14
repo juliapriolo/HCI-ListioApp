@@ -28,11 +28,11 @@ fun SearchBar(
         value = query,
         onValueChange = onQueryChange,
         leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Buscar") },
-        placeholder = { Text(text = placeholder, color = Color(0xFF9DB2CE)) },
+        placeholder = { Text(text = placeholder, color = Color(0xFF7C9A7C)) },
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFF1F3F6)),
+            .background(Color(0xFFE8F5E9)),
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,

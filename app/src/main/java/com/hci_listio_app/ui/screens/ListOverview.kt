@@ -126,9 +126,13 @@ fun ListOverview(
                     if (result.isSuccess) {
                         val response = result.getOrNull() as? ShoppingListResponse
                         createdId = response?.id
+                    } else {
+                        // propagate failure so the dialog can catch and display the real message
+                        throw result.exceptionOrNull() ?: Exception("No se pudo crear. Intenta nuevamente.")
                     }
                 } catch (e: Exception) {
-                    createdId = null
+                    // Let the dialog show the exception message
+                    throw e
                 }
 
                 if (createdId != null) {
