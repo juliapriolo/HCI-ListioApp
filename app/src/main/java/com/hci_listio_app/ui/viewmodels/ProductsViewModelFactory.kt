@@ -9,9 +9,13 @@ class ProductsViewModelFactory(
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ProductsViewModel(
-            initializer = DefaultCategoriesInitializer(),
-            token = token
-        ) as T
+        if (modelClass.isAssignableFrom(ProductsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ProductsViewModel(
+                initializer = DefaultCategoriesInitializer(),
+                token = token
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${'$'}modelClass")
     }
 }

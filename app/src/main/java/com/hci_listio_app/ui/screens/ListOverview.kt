@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,6 +17,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.*
 import com.hci_listio_app.ui.viewmodels.ListOverviewViewModel
 import com.hci_listio_app.data.ListRepositoryProvider
@@ -59,7 +61,7 @@ fun ListOverview(
 
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
-        topBar = { ListHeader(username = "Usuario") }, // TODO: Obtener nombre del perfil
+        topBar = { ListioTopAppBar(title = stringResource(id = R.string.lists_title)) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog.value = true },
