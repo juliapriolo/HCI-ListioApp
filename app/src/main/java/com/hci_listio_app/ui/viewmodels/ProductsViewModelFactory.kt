@@ -15,10 +15,14 @@ class ProductsViewModelFactory(
         val repository = ProductRepository(remote)
         val initializer = DefaultCategoriesInitializer()
 
-        return ProductsViewModel(
-            initializer = initializer,
-            repository = repository,
-            token = token
-        ) as T
+        if (modelClass.isAssignableFrom(ProductsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ProductsViewModel(
+                repository = repository,
+                initializer = DefaultCategoriesInitializer(),
+                token = token
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${'$'}modelClass")
     }
 }
