@@ -49,9 +49,9 @@ fun BottomNavigationBar(navController: NavController) {
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
-            selected = currentRoute == Screen.Home.route,
-            onClick = { 
-                navController.navigate(Screen.Home.route) {
+            selected = currentRoute == Screen.ListOverview.route,
+            onClick = {
+                navController.navigate(Screen.ListOverview.route) {
                     launchSingleTop = true
                 }
             },

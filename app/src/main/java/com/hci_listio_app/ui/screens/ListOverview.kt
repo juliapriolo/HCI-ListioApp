@@ -27,6 +27,7 @@ import com.hci_listio_app.ui.Components.OverviewItem
 import com.hci_listio_app.ui.Components.SearchBar
 
 data class ListOverviewItem(
+    val id: String,
     val title: String,
     val isPrivate: Boolean = true,
     val completed: Int = 0,
@@ -39,7 +40,8 @@ fun ListOverview(
     username: String = "Pedro",
     lists: List<ListOverviewItem> = emptyList(),
     modifier: Modifier = Modifier,
-    onFabClick: () -> Unit = {}
+    onFabClick: () -> Unit = {},
+    onItemClick: (String) -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         ListHeader(username = username)
@@ -66,7 +68,10 @@ fun ListOverview(
             } else {
                 Column {
                     lists.forEach { item ->
-                        OverviewCard(item = OverviewItem(item.title, item.isPrivate, item.completed, item.total, item.members))
+                        OverviewCard(
+                            item = OverviewItem(item.id, item.title, item.isPrivate, item.completed, item.total, item.members),
+                            onClick = { onItemClick(item.id) }
+                        )
                     }
                 }
             }
@@ -89,9 +94,9 @@ fun ListOverviewEmptyPreview() {
 @Composable
 fun ListOverviewPopulatedPreview() {
     val items = listOf(
-        ListOverviewItem(title = "Compras Semanales", isPrivate = true, completed = 3, total = 9, members = listOf("Ana", "Miguel", "Luis", "Carla")),
-        ListOverviewItem(title = "Compras Cumpleaños", isPrivate = false, completed = 0, total = 20, members = listOf("Sofia", "Pablo")),
-        ListOverviewItem(title = "Lista viaje fin de semana", isPrivate = true, completed = 0, total = 16, members = listOf("Marta"))
+        ListOverviewItem(id = "1", title = "Compras Semanales", isPrivate = true, completed = 3, total = 9, members = listOf("Ana", "Miguel", "Luis", "Carla")),
+        ListOverviewItem(id = "2", title = "Compras Cumpleaños", isPrivate = false, completed = 0, total = 20, members = listOf("Sofia", "Pablo")),
+        ListOverviewItem(id = "3", title = "Lista viaje fin de semana", isPrivate = true, completed = 0, total = 16, members = listOf("Marta"))
     )
 
     ListOverview(username = "Pedro", lists = items)

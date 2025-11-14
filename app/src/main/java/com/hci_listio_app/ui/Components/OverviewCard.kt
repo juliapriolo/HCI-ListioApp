@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 data class OverviewItem(
+    val id: String = "",
     val title: String,
     val isPrivate: Boolean = true,
     val completed: Int = 0,
@@ -35,9 +36,14 @@ data class OverviewItem(
 )
 
 @Composable
-fun OverviewCard(item: OverviewItem, modifier: Modifier = Modifier) {
+fun OverviewCard(item: OverviewItem, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
+    val combinedModifier = if (onClick != null) modifier
+        .fillMaxWidth()
+        .clickable { onClick() }
+    else modifier.fillMaxWidth()
+
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = combinedModifier,
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -62,7 +68,7 @@ fun OverviewCard(item: OverviewItem, modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .size(36.dp)
                             .background(color = MaterialTheme.colorScheme.primaryContainer, shape = CircleShape)
-                            .clickable { },
+                            ,
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = initials.uppercase(), style = MaterialTheme.typography.bodySmall)

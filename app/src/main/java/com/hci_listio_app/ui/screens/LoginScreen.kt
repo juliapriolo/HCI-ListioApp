@@ -65,7 +65,8 @@ fun LoginScreen(
 
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) {
-            navController.navigate(Screen.Home.route) {
+            // Redirect user to the lists overview (home) after login
+            navController.navigate(Screen.ListOverview.route) {
                 popUpTo(Screen.Login.route) { inclusive = true }
             }
             viewModel.consumeLoginSuccess()
