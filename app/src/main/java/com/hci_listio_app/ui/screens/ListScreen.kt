@@ -23,7 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hci_listio_app.R
-import com.hci_listio_app.ui.Components.AddProductDialog
+import com.hci_listio_app.ui.Components.AddItemToListDialog
+import com.hci_listio_app.ui.Components.CreateProductDialog
 import com.hci_listio_app.ui.Components.EditItemDialog
 import com.hci_listio_app.ui.Components.ListItem
 import com.hci_listio_app.ui.Components.ListItemData
@@ -76,7 +77,8 @@ fun ListScreen(
     val displayedMembers = remember(shareDialogUsers) { shareDialogUsers.take(3) }
 
     // Estados locales para diálogos
-    var showAddDialog by remember { mutableStateOf(false) }
+    var showAddItemDialog by remember { mutableStateOf(false) }
+    var showCreateProductDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
     var showShareDialog by remember { mutableStateOf(false) }
     var itemToEdit by remember { mutableStateOf<ListItemData?>(null) }
@@ -105,7 +107,7 @@ fun ListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showAddDialog = true },
+                onClick = { showAddItemDialog = true },
                 containerColor = Color(0xFF6DCB5A),
                 contentColor = Color.White
             ) {
@@ -282,7 +284,7 @@ fun ListScreen(
                         // Botón agregar más productos al final
                         item {
                             Button(
-                                onClick = { showAddDialog = true },
+                                onClick = { showAddItemDialog = true },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
@@ -315,13 +317,32 @@ fun ListScreen(
         }
     }
 
-    // Diálogo para agregar producto
-    if (showAddDialog) {
-        AddProductDialog(
-            onDismiss = { showAddDialog = false },
-            onSave = { productName ->
-                viewModel.addItem(productName)
-                showAddDialog = false
+    // Diálogo para agregar item (con productos existentes o crear nuevo)
+    if (showAddItemDialog) {
+        AddItemToListDialog(
+            products = uiState.availableProducts,
+            isLoadingProducts = uiState.isLoadingProducts,
+            onDismiss = { showAddItemDialog = false },
+            onSelectProduct = { product ->
+                viewModel.addExistingProductToList(product)
+                showAddItemDialog = false
+            },
+            onCreateNewProduct = {
+                showAddItemDialog = false
+                showCreateProductDialog = true
+            }
+        )
+    }
+
+    // Diálogo para crear nuevo producto
+    if (showCreateProductDialog) {
+        CreateProductDialog(
+            categories = uiState.categories,
+            isLoading = uiState.isCreatingProduct,
+            onDismiss = { showCreateProductDialog = false },
+            onCreateProduct = { productName, categoryId ->
+                viewModel.createProductAndAddToList(productName, categoryId)
+                showCreateProductDialog = false
             }
         )
     }
