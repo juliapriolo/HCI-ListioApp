@@ -11,12 +11,15 @@ class ListRepository(
 ) {
 
     // Obtener todas las listas del usuario
-    suspend fun getLists(): Result<List<ShoppingListResponse>> {
+    suspend fun getLists(
+        page: Int? = null,
+        size: Int? = null
+    ): Result<List<ShoppingListResponse>> {
         val token = authRepository.authToken.value
         return if (token == null) {
             Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
         } else {
-            remoteDataSource.getLists(token)
+            remoteDataSource.getLists(token, page, size)
         }
     }
 
@@ -31,12 +34,16 @@ class ListRepository(
     }
 
     // Crear una nueva lista
-    suspend fun createList(name: String): Result<ShoppingListResponse> {
+    suspend fun createList(
+        name: String,
+        description: String? = null,
+        recurring: Boolean = false
+    ): Result<ShoppingListResponse> {
         val token = authRepository.authToken.value
         return if (token == null) {
             Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
         } else {
-            remoteDataSource.createList(token, name)
+            remoteDataSource.createList(token, name, description, recurring)
         }
     }
 

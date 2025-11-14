@@ -12,16 +12,33 @@ class ListRemoteDataSource(
 ) {
 
     // Obtener todas las listas
-    suspend fun getLists(token: String): Result<List<ShoppingListResponse>> =
-        safeApiCall { api.getLists(bearer(token)) }
+    suspend fun getLists(
+        token: String,
+        page: Int? = null,
+        size: Int? = null
+    ): Result<List<ShoppingListResponse>> =
+        safeApiCall {
+            val response = api.getLists(bearer(token), page, size)
+            response.content  // Extraer solo el array de listas
+        }
 
     // Obtener una lista específica
     suspend fun getList(token: String, listId: Long): Result<ShoppingListResponse> =
         safeApiCall { api.getList(bearer(token), listId) }
 
     // Crear una nueva lista
-    suspend fun createList(token: String, name: String): Result<ShoppingListResponse> =
-        safeApiCall { api.createList(bearer(token), CreateListRequest(name)) }
+    suspend fun createList(
+        token: String,
+        name: String,
+        description: String? = null,
+        recurring: Boolean = false
+    ): Result<ShoppingListResponse> =
+        safeApiCall {
+            api.createList(
+                bearer(token),
+                CreateListRequest(name, description, recurring)
+            )
+        }
 
     // Actualizar una lista
     suspend fun updateList(token: String, listId: Long, name: String): Result<ShoppingListResponse> =

@@ -26,7 +26,9 @@ data class ShoppingListItemResponse(
 
 // Request para crear una lista
 data class CreateListRequest(
-    val name: String
+    val name: String,
+    val description: String? = null,
+    val recurring: Boolean = false  // Agregar este campo
 )
 
 // Request para actualizar una lista
@@ -58,4 +60,15 @@ data class TogglePurchasedRequest(
 // Request para añadir usuario a lista
 data class AddUserToListRequest(
     val userId: Long
+)
+
+// Respuesta paginada de listas
+data class PaginatedListsResponse(
+    val content: List<ShoppingListResponse>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Int,
+    val totalPages: Int,
+    val isFirst: Boolean,
+    val isLast: Boolean
 )
