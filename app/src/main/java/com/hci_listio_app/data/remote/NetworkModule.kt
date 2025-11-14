@@ -9,6 +9,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import com.hci_listio_app.data.remote.api.ProductApiService
+import com.hci_listio_app.data.remote.api.CategoryApiService
+
 
 object NetworkModule {
 
@@ -29,7 +32,7 @@ object NetworkModule {
             .build()
     }
 
-    private val baseUrl: String by lazy {
+    val baseUrl: String by lazy {
         if (BuildConfig.API_BASE_URL.endsWith("/")) {
             BuildConfig.API_BASE_URL
         } else {
@@ -52,5 +55,15 @@ object NetworkModule {
     val listApiService: ListApiService by lazy {
         retrofit.create(ListApiService::class.java)
     }
+
+    val productApiService: ProductApiService by lazy {
+        retrofit.create(ProductApiService::class.java)
+    }
+
+    val categoryApiService: CategoryApiService by lazy {
+        retrofit.create(CategoryApiService::class.java)
+    }
+
+
 }
 

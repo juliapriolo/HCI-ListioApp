@@ -14,19 +14,25 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hci_listio_app.R
+import com.hci_listio_app.data.AuthRepositoryProvider
 import com.hci_listio_app.ui.Components.AddCategoriaCard
 import com.hci_listio_app.ui.Components.BottomNavigationBar
 import com.hci_listio_app.ui.Components.CategoriaCard
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.viewmodels.ProductsViewModel
-
+import com.hci_listio_app.ui.viewmodels.ProductsViewModelFactory
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductsScreen(
-    navController: NavController,
-    viewModel: ProductsViewModel = viewModel()
-) {
+fun ProductsScreen(navController: NavController) {
+
+    val token = AuthRepositoryProvider.instance.authToken.value ?: ""
+
+    val viewModel: ProductsViewModel = viewModel(
+        factory = ProductsViewModelFactory(token)
+    )
+
     val categorias by viewModel.categorias.collectAsState()
+
 
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
@@ -38,7 +44,7 @@ fun ProductsScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // Campo de búsqueda
+
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -55,24 +61,29 @@ fun ProductsScreen(
             )
 
             Spacer(Modifier.height(16.dp))
-            Text(stringResource(R.string.products_search_categories), style = MaterialTheme.typography.titleMedium)
+            Text(
+                stringResource(R.string.products_search_categories),
+                style = MaterialTheme.typography.titleMedium
+            )
             Spacer(Modifier.height(8.dp))
 
-            // Grid de categorías
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(4.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+
                 items(categorias) { categoria ->
                     CategoriaCard(categoria) {
-                        navController.navigate("category/${categoria.nombre}")
+                        navController.navigate(
+                            "category/${categoria.nombre}?categoryId=${categoria.id}"
+                        )
                     }
                 }
 
                 item {
-                    AddCategoriaCard(onClick = { /* TODO */ })
+                    AddCategoriaCard(onClick = { /* Próximamente */ })
                 }
             }
         }
