@@ -36,8 +36,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,6 +62,7 @@ import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.R
 import com.hci_listio_app.ui.viewmodels.EditProfileEvent
 import com.hci_listio_app.ui.viewmodels.EditProfileViewModel
+import com.hci_listio_app.ui.Components.showToast
 import kotlinx.coroutines.flow.collectLatest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,7 +73,7 @@ fun EditProfileScreen(
     navController: NavController,
     viewModel: EditProfileViewModel = viewModel()
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = com.hci_listio_app.ui.Components.rememberAppSnackbarHostState()
     val uiState by viewModel.uiState.collectAsState()
     val changesSavedMessage = stringResource(R.string.edit_profile_changes_saved)
 
@@ -101,7 +100,7 @@ fun EditProfileScreen(
         viewModel.events.collectLatest { event ->
             when (event) {
                 EditProfileEvent.Saved -> {
-                    snackbarHostState.showSnackbar(changesSavedMessage)
+                    snackbarHostState.showToast(changesSavedMessage)
                     navController.navigateUp()
                 }
             }
@@ -119,7 +118,7 @@ fun EditProfileScreen(
                 onBackClick = { navController.navigateUp() }
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { com.hci_listio_app.ui.Components.AppSnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         BoxWithConstraints(
             modifier = Modifier

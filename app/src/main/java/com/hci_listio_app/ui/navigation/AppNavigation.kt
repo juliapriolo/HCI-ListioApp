@@ -84,9 +84,12 @@ fun AppNavigation() {
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
             CategoryProductsScreen(navController = navController, categoryName = categoryName)
         }
-        composable(Screen.ShoppingList.route) { backStackEntry ->
-            val listName = backStackEntry.arguments?.getString("listName") ?: "Mi Lista"
-            ListScreen(navController = navController, listName = listName)
+        composable(
+            route = Screen.ShoppingList.route,
+            arguments = listOf(navArgument("listId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val listId = backStackEntry.arguments?.getLong("listId") ?: 1L
+            ListScreen(navController = navController, listId = listId)
         }
     }
 }

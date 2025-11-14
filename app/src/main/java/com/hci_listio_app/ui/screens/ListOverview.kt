@@ -16,6 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import com.hci_listio_app.ui.Components.AppSnackbarHost
+import com.hci_listio_app.ui.Components.rememberAppSnackbarHostState
+import kotlinx.coroutines.launch
+import com.hci_listio_app.ui.Components.CreateEntityDialog
+import com.hci_listio_app.data.ListRepositoryProvider
+import com.hci_listio_app.data.remote.dto.ShoppingListResponse
+import com.hci_listio_app.ui.Components.showToast
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,19 +54,21 @@ fun ListOverview(
     username: String = "Pedro",
     lists: List<ListOverviewItem> = emptyList(),
     modifier: Modifier = Modifier,
-    onFabClick: () -> Unit = {},
     onItemClick: (String) -> Unit = {}
 ) {
     val query = remember { mutableStateOf("") }
     val tabs = listOf("Personal", "Compartidas", "Historial")
     val selected = remember { mutableStateOf(0) }
+    val showCreateDialog = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = rememberAppSnackbarHostState()
 
     androidx.compose.material3.Scaffold(
         containerColor = Color(0xFFFAFAFA),
         topBar = { ListHeader(username = username) },
         floatingActionButton = {
             androidx.compose.material3.FloatingActionButton(
-                onClick = onFabClick,
+                onClick = { showCreateDialog.value = true },
                 containerColor = Color.White,
                 contentColor = Color(0xFF6DCB5A)
             ) {
@@ -66,6 +76,7 @@ fun ListOverview(
             }
         },
         bottomBar = { BottomNavigationBar(navController = navController) },
+        snackbarHost = { AppSnackbarHost(hostState = snackbarHostState) },
         modifier = modifier
     ) { padding ->
         Column(modifier = Modifier
@@ -97,6 +108,40 @@ fun ListOverview(
                 }
             }
         }
+    }
+
+    if (showCreateDialog.value) {
+        CreateEntityDialog(
+            title = "Crear lista",
+            nameLabel = "Nombre de la lista",
+            showDescription = true,
+            descriptionLabel = "Descripción",
+            onDismiss = { showCreateDialog.value = false },
+            onCreate = { name, description ->
+                // call repository to create list
+                var createdId: Long? = null
+                try {
+                    // Launch synchronous from coroutine scope inside dialog
+                    val result = ListRepositoryProvider.instance.createList(name)
+                    if (result.isSuccess) {
+                        val response = result.getOrNull() as? ShoppingListResponse
+                        createdId = response?.id
+                    }
+                } catch (e: Exception) {
+                    createdId = null
+                }
+
+                if (createdId != null) {
+                    // show snackbar feedback then navigate to created list detail
+                    coroutineScope.launch {
+                        snackbarHostState.showToast("Lista creada")
+                        navController.navigate(com.hci_listio_app.ui.navigation.Screen.ShoppingList.createRoute(createdId))
+                    }
+                }
+
+                createdId
+            }
+        )
     }
 }
 

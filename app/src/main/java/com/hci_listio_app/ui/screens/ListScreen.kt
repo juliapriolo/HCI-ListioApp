@@ -29,6 +29,7 @@ import com.hci_listio_app.ui.Components.EditItemDialog
 import com.hci_listio_app.ui.Components.ListItem
 import com.hci_listio_app.ui.Components.ListItemData
 import com.hci_listio_app.ui.Components.ListioTopAppBar
+import com.hci_listio_app.ui.Components.showToast
 import com.hci_listio_app.ui.viewmodels.ListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +41,7 @@ fun ListScreen(
     viewModel: ListViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = com.hci_listio_app.ui.Components.rememberAppSnackbarHostState()
 
     // Estados locales para diálogos
     var showAddDialog by remember { mutableStateOf(false) }
@@ -56,7 +57,7 @@ fun ListScreen(
     // Mostrar mensajes de error
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { error ->
-            snackbarHostState.showSnackbar(error)
+            snackbarHostState.showToast(error)
             viewModel.dismissError()
         }
     }
@@ -79,7 +80,7 @@ fun ListScreen(
                 Icon(Icons.Default.Add, contentDescription = "Agregar producto")
             }
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { com.hci_listio_app.ui.Components.AppSnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         Box(
             modifier = Modifier
