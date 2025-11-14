@@ -17,7 +17,6 @@ data class CategoryProductsUiState(
     val isLoading: Boolean = false,
     val error: String? = null
 )
-
 class CategoryProductsViewModel(
     private val repository: CategoryProductsRepository,
     private val token: String,
@@ -26,6 +25,37 @@ class CategoryProductsViewModel(
 
     private val _uiState = MutableStateFlow(CategoryProductsUiState())
     val uiState: StateFlow<CategoryProductsUiState> = _uiState.asStateFlow()
+
+    init {
+        loadProducts()   // 👈 cada vez que se crea el VM, trae del backend
+    }
+
+    fun loadProducts() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            val result = repository.getProducts(token, categoryId)
+
+            result.fold(
+                onSuccess = { products ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            products = products
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message ?: "Error al cargar productos"
+                        )
+                    }
+                }
+            )
+        }
+    }
 
     fun addProduct(productName: String) {
         viewModelScope.launch {
@@ -47,18 +77,17 @@ class CategoryProductsViewModel(
                             products = it.products + product
                         )
                     }
+                    loadProducts()
                 },
-
                 onFailure = { error ->
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = error.message ?: "Error desconocido"
+                            error = error.message ?: "Error al agregar producto"
                         )
                     }
                 }
             )
-
         }
     }
 }

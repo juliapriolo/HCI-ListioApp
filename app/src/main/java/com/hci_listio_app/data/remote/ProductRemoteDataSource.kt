@@ -18,4 +18,16 @@ class ProductRemoteDataSource(
         } catch (e: Exception) {
             Result.failure(e)
         }
+
+    suspend fun getProductsByCategory(
+        token: String,
+        categoryId: Long
+    ): Result<List<ProductResponse>> =
+        safeApiCall {
+            api.getProducts(
+                authorization = "Bearer $token",
+                categoryId = categoryId
+            ).data
+        }
+
 }
