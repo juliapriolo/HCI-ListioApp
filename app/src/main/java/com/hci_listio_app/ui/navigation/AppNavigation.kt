@@ -80,9 +80,20 @@ fun AppNavigation() {
         composable(Screen.ListOverview.route) {
             ListOverview(navController = navController)
         }
-        composable("category/{categoryName}") { backStackEntry ->
+        composable(
+            route = "category/{categoryName}?categoryId={categoryId}",
+            arguments = listOf(
+                navArgument("categoryName") { type = NavType.StringType },
+                navArgument("categoryId") { type = NavType.LongType; defaultValue = -1L }
+            )
+        ) { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
-            CategoryProductsScreen(navController = navController, categoryName = categoryName)
+            val categoryId = backStackEntry.arguments?.getLong("categoryId")?.takeIf { it >= 0 }
+            CategoryProductsScreen(
+                navController = navController,
+                categoryName = categoryName,
+                categoryId = categoryId
+            )
         }
         composable(
             route = Screen.ShoppingList.route,

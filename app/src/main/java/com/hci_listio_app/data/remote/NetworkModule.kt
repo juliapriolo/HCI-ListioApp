@@ -29,7 +29,7 @@ object NetworkModule {
             .build()
     }
 
-    private val baseUrl: String by lazy {
+    val baseUrl: String by lazy {
         if (BuildConfig.API_BASE_URL.endsWith("/")) {
             BuildConfig.API_BASE_URL
         } else {

@@ -65,9 +65,11 @@ fun ProductsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(categorias) { categoria ->
+
+                itemsIndexed(categorias) { idx, categoria ->
                     CategoriaCard(categoria) {
-                        navController.navigate("category/${categoria.nombre}")
+                        // Aquí asumimos que el id es el índice, pero si tienes un id real, úsalo
+                        navController.navigate("category/${categoria.nombre}?categoryId=$idx")
                     }
                 }
 
