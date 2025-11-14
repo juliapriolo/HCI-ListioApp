@@ -43,6 +43,37 @@ fun ListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = com.hci_listio_app.ui.Components.rememberAppSnackbarHostState()
+    val shareDialogUsers = remember(uiState.owner, uiState.sharedMembers) {
+        val seenIds = mutableSetOf<Long>()
+        val participants = mutableListOf<SharedUser>()
+
+        uiState.owner?.let { owner ->
+            if (seenIds.add(owner.id)) {
+                participants.add(
+                    SharedUser(
+                        id = owner.id,
+                        name = buildUserDisplayName(owner.name, owner.surname, owner.email),
+                        role = "Creador"
+                    )
+                )
+            }
+        }
+
+        uiState.sharedMembers.forEach { member ->
+            if (seenIds.add(member.id)) {
+                participants.add(
+                    SharedUser(
+                        id = member.id,
+                        name = buildUserDisplayName(member.name, member.surname, member.email),
+                        role = "Editor"
+                    )
+                )
+            }
+        }
+
+        participants.toList()
+    }
+    val displayedMembers = remember(shareDialogUsers) { shareDialogUsers.take(3) }
 
     // Estados locales para diálogos
     var showAddDialog by remember { mutableStateOf(false) }
@@ -110,38 +141,20 @@ fun ListScreen(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Avatar 1
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFF6DCB5A)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.perfilpredeterminado),
-                                    contentDescription = "Usuario 1",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
+                            if (displayedMembers.isEmpty()) {
+                                MemberAvatar(
+                                    description = "Sin integrantes",
+                                    modifier = Modifier.size(40.dp)
                                 )
-                            }
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            // Avatar 2
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFF6DCB5A)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.perfilpredeterminado),
-                                    contentDescription = "Usuario 2",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
+                            } else {
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    displayedMembers.forEach { member ->
+                                        MemberAvatar(
+                                            description = member.name,
+                                            modifier = Modifier.size(40.dp)
+                                        )
+                                    }
+                                }
                             }
 
                             Spacer(modifier = Modifier.width(8.dp))
@@ -336,18 +349,40 @@ fun ListScreen(
     // Diálogo para compartir lista
     if (showShareDialog) {
         ShareListDialog(
-            currentUsers = listOf(
-                SharedUser(1L, "Pedro M.", "Creador"),
-                SharedUser(2L, "Martina P.", "Editor")
-            ), // Esto debería venir del viewModel
+            currentUsers = shareDialogUsers,
             onDismiss = { showShareDialog = false },
             onShare = { email ->
-                // viewModel.shareListWithUser(email)
-                showShareDialog = false
+                viewModel.shareListWithUser(email)
             },
             onRemoveUser = { userId ->
-                // viewModel.removeUserFromList(userId)
+                viewModel.removeUserFromList(userId)
             }
+        )
+    }
+}
+
+private fun buildUserDisplayName(name: String, surname: String, fallback: String): String {
+    val parts = listOf(name.trim(), surname.trim()).filter { it.isNotEmpty() }
+    val fullName = parts.joinToString(" ")
+    return fullName.ifBlank { fallback.ifBlank { "Usuario" } }
+}
+
+@Composable
+private fun MemberAvatar(
+    description: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(Color(0xFF6DCB5A)),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.perfilpredeterminado),
+            contentDescription = description,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
     }
 }

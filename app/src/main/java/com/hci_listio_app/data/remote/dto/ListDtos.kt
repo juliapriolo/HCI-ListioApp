@@ -69,7 +69,8 @@ data class TogglePurchasedRequest(
 
 // Request para añadir usuario a lista
 data class AddUserToListRequest(
-    val userId: Long
+    val userId: Long? = null,
+    val email: String? = null
 )
 
 // Respuesta paginada de listas

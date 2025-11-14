@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hci_listio_app.data.ListRepository
 import com.hci_listio_app.data.ListRepositoryProvider
+import com.hci_listio_app.data.remote.dto.UserProfileResponse
 import com.hci_listio_app.ui.Components.ListItemData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,9 @@ data class ListUiState(
     val completedCount: Int = 0,
     val totalCount: Int = 0,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val owner: UserProfileResponse? = null,
+    val sharedMembers: List<UserProfileResponse> = emptyList()
 )
 
 class ListViewModel(
@@ -53,19 +56,31 @@ class ListViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null, listId = listId) }
 
-            val result = listRepository.getItems(listId)
+            val result = listRepository.getList(listId)
 
             _uiState.update { current ->
                 if (result.isSuccess) {
-                    val itemsData = result.getOrNull()!!
-                    val items = itemsData.map { item ->
+                    val listData = result.getOrNull()!!
+                    val items = listData.items.map { item ->
                         ListItemData(
                             id = item.id.toString(),
                             name = item.productName,
                             isChecked = item.purchased
                         )
                     }
+                    val participants = when {
+                        listData.users.isNotEmpty() -> listData.users
+                        listData.sharedWith.isNotEmpty() -> listData.sharedWith
+                        else -> emptyList()
+                    }
+                    val ownerProfile = listData.owner ?: participants.firstOrNull()
+                    val collaborators = ownerProfile?.let { ownerUser ->
+                        participants.filterNot { it.id == ownerUser.id }
+                    } ?: participants
                     current.copy(
+                        listName = listData.name,
+                        owner = ownerProfile,
+                        sharedMembers = collaborators,
                         items = items,
                         completedCount = items.count { it.isChecked },
                         totalCount = items.size,
@@ -76,6 +91,50 @@ class ListViewModel(
                     current.copy(
                         isLoading = false,
                         errorMessage = result.exceptionOrNull()?.message ?: "Error al cargar la lista."
+                    )
+                }
+            }
+        }
+    }
+
+    fun shareListWithUser(email: String) {
+        val listId = _uiState.value.listId ?: return
+        val trimmedEmail = email.trim()
+        if (trimmedEmail.isEmpty()) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val result = listRepository.shareListWithEmail(listId, trimmedEmail)
+
+            if (result.isSuccess) {
+                loadList(listId)
+            } else {
+                _uiState.update { current ->
+                    current.copy(
+                        isLoading = false,
+                        errorMessage = result.exceptionOrNull()?.message ?: "Error al compartir la lista."
+                    )
+                }
+            }
+        }
+    }
+
+    fun removeUserFromList(userId: Long) {
+        val listId = _uiState.value.listId ?: return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val result = listRepository.removeUserFromList(listId, userId)
+
+            if (result.isSuccess) {
+                loadList(listId)
+            } else {
+                _uiState.update { current ->
+                    current.copy(
+                        isLoading = false,
+                        errorMessage = result.exceptionOrNull()?.message ?: "Error al quitar el usuario."
                     )
                 }
             }

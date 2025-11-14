@@ -161,8 +161,19 @@ class ListRemoteDataSource(
         safeApiCall { api.deleteItem(bearer(token), listId, itemId) }
 
     // Añadir usuario a lista
-    suspend fun addUserToList(token: String, listId: Long, userId: Long): Result<Unit> =
-        safeApiCall { api.addUserToList(bearer(token), listId, AddUserToListRequest(userId)) }
+    suspend fun addUserToList(
+        token: String,
+        listId: Long,
+        userId: Long? = null,
+        email: String? = null
+    ): Result<Unit> =
+        safeApiCall {
+            api.addUserToList(
+                bearer(token),
+                listId,
+                AddUserToListRequest(userId = userId, email = email)
+            )
+        }
 
     // Remover usuario de lista
     suspend fun removeUserFromList(token: String, listId: Long, userId: Long): Result<Unit> =

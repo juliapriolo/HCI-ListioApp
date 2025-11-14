@@ -190,9 +190,6 @@ fun ListOverview(
                         snackbarHostState.showToast("Lista creada")
                         // Refrescar las listas en el overview para que la nueva aparezca inmediatamente
                         viewModel.loadLists()
-                        navController.navigate(
-                            com.hci_listio_app.ui.navigation.Screen.ShoppingList.createRoute(createdId)
-                        )
                     }
                 }
 

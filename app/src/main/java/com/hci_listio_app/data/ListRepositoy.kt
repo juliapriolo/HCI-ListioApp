@@ -137,13 +137,23 @@ class ListRepository(
         }
     }
 
-    // Añadir usuario a lista
+    // Añadir usuario a lista por ID (compatibilidad)
     suspend fun addUserToList(listId: Long, userId: Long): Result<Unit> {
         val token = authRepository.authToken.value
         return if (token == null) {
             Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
         } else {
-            remoteDataSource.addUserToList(token, listId, userId)
+            remoteDataSource.addUserToList(token, listId, userId = userId)
+        }
+    }
+
+    // Añadir usuario a lista por email
+    suspend fun shareListWithEmail(listId: Long, email: String): Result<Unit> {
+        val token = authRepository.authToken.value
+        return if (token == null) {
+            Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
+        } else {
+            remoteDataSource.addUserToList(token, listId, email = email)
         }
     }
 
