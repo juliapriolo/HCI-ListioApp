@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 data class ListOverviewUiState(
     val lists: List<ShoppingListResponse> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val favorites: Set<Long> = emptySet()
 )
 
 class ListOverviewViewModel(
@@ -54,5 +55,50 @@ class ListOverviewViewModel(
 
     fun dismissError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun toggleFavorite(listId: Long) {
+        _uiState.update { current ->
+            val next = current.favorites.toMutableSet()
+            if (!next.add(listId)) {
+                next.remove(listId)
+            }
+            current.copy(favorites = next)
+        }
+    }
+
+    fun renameList(listId: Long, newName: String, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            val result = listRepository.updateList(listId, newName)
+            if (result.isSuccess) {
+                val updatedList = result.getOrNull()
+                _uiState.update { current ->
+                    current.copy(
+                        lists = current.lists.map { if (it.id == listId) updatedList ?: it else it }
+                    )
+                }
+                onResult(true, null)
+            } else {
+                val message = result.exceptionOrNull()?.message ?: "No se pudo actualizar la lista."
+                _uiState.update { it.copy(errorMessage = message) }
+                onResult(false, message)
+            }
+        }
+    }
+
+    fun deleteList(listId: Long, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            val result = listRepository.deleteList(listId)
+            if (result.isSuccess) {
+                _uiState.update { current ->
+                    current.copy(lists = current.lists.filterNot { it.id == listId })
+                }
+                onResult(true, null)
+            } else {
+                val message = result.exceptionOrNull()?.message ?: "No se pudo eliminar la lista."
+                _uiState.update { it.copy(errorMessage = message) }
+                onResult(false, message)
+            }
+        }
     }
 }
