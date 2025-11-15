@@ -40,7 +40,6 @@ class ListViewModel(
     private val _uiState = MutableStateFlow(ListUiState())
     val uiState: StateFlow<ListUiState> = _uiState.asStateFlow()
 
-    // Propiedades de compatibilidad con la implementación anterior
     private val _items = MutableStateFlow<List<ListItemData>>(emptyList())
     val items: StateFlow<List<ListItemData>> = _items
 
@@ -60,193 +59,251 @@ class ListViewModel(
         }
     }
 
-    // Cargar items de la lista desde la API
     fun loadList(listId: Long) {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(isLoading = true, errorMessage = null, listId = listId)
-            }
+            try {
+                _uiState.update {
+                    it.copy(isLoading = true, errorMessage = null, listId = listId)
+                }
 
-            val listResult = listRepository.getList(listId)
+                val listResult = listRepository.getList(listId)
 
-            if (listResult.isFailure) {
+                if (listResult.isFailure) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = listResult.exceptionOrNull()?.message
+                                ?: "Error al cargar la lista."
+                        )
+                    }
+                    return@launch
+                }
+
+                val listData = listResult.getOrNull() ?: return@launch
+
+                val itemsResult = listRepository.getItems(listId)
+
+                val items = if (itemsResult.isSuccess) {
+                    itemsResult.getOrNull() ?: emptyList()
+                } else {
+                    emptyList()
+                }
+
+                val mappedItems = items.mapNotNull { item ->
+                    try {
+                        // Verificar que el producto no sea null
+                        val product = item.product ?: return@mapNotNull null
+
+                        ListItemData(
+                            id = item.id.toString(),
+                            name = product.name,
+                            isChecked = item.purchased,
+                            productId = product.id,
+                            quantity = item.quantity
+                        )
+                    } catch (e: Exception) {
+                        // Log error pero continuar con otros items
+                        null
+                    }
+                }
+
+                _uiState.update { current ->
+                    val participants = when {
+                        listData.users.isNotEmpty() -> listData.users
+                        listData.sharedWith.isNotEmpty() -> listData.sharedWith
+                        else -> emptyList()
+                    }
+
+                    val owner = listData.owner ?: participants.firstOrNull()
+                    val collaborators = owner?.let { own ->
+                        participants.filterNot { it.id == own.id }
+                    } ?: participants
+
+                    current.copy(
+                        listName = listData.name,
+                        owner = owner,
+                        sharedMembers = collaborators,
+                        items = mappedItems,
+                        completedCount = mappedItems.count { it.isChecked },
+                        totalCount = mappedItems.size,
+                        isLoading = false,
+                        errorMessage = null
+                    )
+                }
+
+                loadProductsAndCategories()
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = listResult.exceptionOrNull()?.message
-                            ?: "Error al cargar la lista."
+                        errorMessage = "Error inesperado: ${e.message}"
                     )
                 }
-                return@launch
             }
-
-            val listData = listResult.getOrNull()!!
-
-            val itemsResult = listRepository.getItems(listId)
-
-            val items = if (itemsResult.isSuccess) {
-                itemsResult.getOrNull()!!
-            } else {
-                emptyList()
-            }
-
-            // Convertimos DTO → ListItemData
-            val mappedItems = items.map { item ->
-                ListItemData(
-                    id = item.id.toString(),
-                    name = item.product!!.name,
-                    isChecked = item.purchased,
-                    productId = item.product.id,
-                    quantity = item.quantity
-                )
-            }
-
-            _uiState.update { current ->
-                val participants = when {
-                    listData.users.isNotEmpty() -> listData.users
-                    listData.sharedWith.isNotEmpty() -> listData.sharedWith
-                    else -> emptyList()
-                }
-
-                val owner = listData.owner ?: participants.firstOrNull()
-                val collaborators = owner?.let { own ->
-                    participants.filterNot { it.id == own.id }
-                } ?: participants
-
-                current.copy(
-                    listName = listData.name,
-                    owner = owner,
-                    sharedMembers = collaborators,
-                    items = mappedItems,
-                    completedCount = mappedItems.count { it.isChecked },
-                    totalCount = mappedItems.size,
-                    isLoading = false
-                )
-            }
-
-            loadProductsAndCategories()
         }
     }
 
-
-    // Cargar todos los productos disponibles del usuario
     fun loadProductsAndCategories() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoadingProducts = true) }
+            try {
+                _uiState.update { it.copy(isLoadingProducts = true) }
 
-            val token = com.hci_listio_app.data.AuthRepositoryProvider.instance.authToken.value ?: ""
+                val token = com.hci_listio_app.data.AuthRepositoryProvider.instance.authToken.value ?: ""
 
-            // Cargar productos
-            val productsResult = productsRepository.getAllProducts(token)
+                if (token.isEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            isLoadingProducts = false,
+                            errorMessage = "No hay token de autenticación"
+                        )
+                    }
+                    return@launch
+                }
 
-            // Cargar categorías
-            val categoriesResult = try {
-                val response = NetworkModule.categoryApiService.getCategories("Bearer $token")
-                Result.success(response.data)
+                val productsResult = productsRepository.getAllProducts(token)
+
+                val categoriesResult = try {
+                    val response = NetworkModule.categoryApiService.getCategories("Bearer $token")
+                    Result.success(response.data)
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
+
+                _uiState.update { current ->
+                    current.copy(
+                        availableProducts = productsResult.getOrNull() ?: emptyList(),
+                        categories = categoriesResult.getOrNull() ?: emptyList(),
+                        isLoadingProducts = false
+                    )
+                }
             } catch (e: Exception) {
-                Result.failure(e)
-            }
-
-            _uiState.update { current ->
-                current.copy(
-                    availableProducts = productsResult.getOrNull() ?: emptyList(),
-                    categories = categoriesResult.getOrNull() ?: emptyList(),
-                    isLoadingProducts = false
-                )
+                _uiState.update {
+                    it.copy(
+                        isLoadingProducts = false,
+                        errorMessage = "Error al cargar productos: ${e.message}"
+                    )
+                }
             }
         }
     }
 
-    // Crear un nuevo producto y agregarlo inmediatamente a la lista
     fun createProductAndAddToList(productName: String, categoryId: Long) {
-        val listId = _uiState.value.listId ?: return
+        val listId = _uiState.value.listId
+
+        if (listId == null) {
+            _uiState.update { it.copy(errorMessage = "ID de lista no disponible") }
+            return
+        }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isCreatingProduct = true, errorMessage = null) }
+            try {
+                _uiState.update { it.copy(isCreatingProduct = true, errorMessage = null) }
 
-            val token = com.hci_listio_app.data.AuthRepositoryProvider.instance.authToken.value ?: ""
+                val token = com.hci_listio_app.data.AuthRepositoryProvider.instance.authToken.value
 
-            // Crear el producto
-            val createResult = productsRepository.createProduct(token, productName, categoryId)
+                if (token.isNullOrEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            isCreatingProduct = false,
+                            errorMessage = "No hay token de autenticación"
+                        )
+                    }
+                    return@launch
+                }
 
-            if (createResult.isSuccess) {
-                val newProduct = createResult.getOrNull()!!
+                val createResult = productsRepository.createProduct(token, productName, categoryId)
 
-                // Agregar el producto a la lista
+                if (createResult.isFailure) {
+                    _uiState.update {
+                        it.copy(
+                            isCreatingProduct = false,
+                            errorMessage = createResult.exceptionOrNull()?.message
+                                ?: "Error al crear el producto"
+                        )
+                    }
+                    return@launch
+                }
+
+                val newProduct = createResult.getOrNull()
+
+                if (newProduct == null) {
+                    _uiState.update {
+                        it.copy(
+                            isCreatingProduct = false,
+                            errorMessage = "No se pudo crear el producto"
+                        )
+                    }
+                    return@launch
+                }
+
                 val addResult = listRepository.addItem(
                     listId = listId,
                     productId = newProduct.id,
                     quantity = 1
                 )
 
-                _uiState.update { current ->
-                    if (addResult.isSuccess) {
-                        val newItem = addResult.getOrNull()!!
-                        val newListItem = ListItemData(
-                            id = newItem.id.toString(),
-                            name = newItem.product!!.name,
-                            isChecked = newItem.purchased
-                        )
-                        val updatedItems = current.items + newListItem
-                        current.copy(
-                            items = updatedItems,
-                            totalCount = updatedItems.size,
-                            completedCount = updatedItems.count { it.isChecked },
-                            availableProducts = current.availableProducts + newProduct,
+                if (addResult.isFailure) {
+                    _uiState.update {
+                        it.copy(
                             isCreatingProduct = false,
-                            errorMessage = null
-                        )
-                    } else {
-                        current.copy(
-                            isCreatingProduct = false,
-                            errorMessage = addResult.exceptionOrNull()?.message ?: "Error al agregar el producto a la lista."
+                            errorMessage = addResult.exceptionOrNull()?.message
+                                ?: "Error al agregar el producto a la lista"
                         )
                     }
+                    return@launch
                 }
-            } else {
-                _uiState.update { current ->
-                    current.copy(
+
+                _uiState.update { it.copy(isCreatingProduct = false) }
+                loadList(listId)
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
                         isCreatingProduct = false,
-                        errorMessage = createResult.exceptionOrNull()?.message ?: "Error al crear el producto."
+                        errorMessage = "Error inesperado: ${e.message}"
                     )
                 }
             }
         }
     }
 
-    // Agregar un producto existente a la lista
     fun addExistingProductToList(product: Product) {
-        val listId = _uiState.value.listId ?: return
+        val listId = _uiState.value.listId
+
+        if (listId == null) {
+            _uiState.update { it.copy(errorMessage = "ID de lista no disponible") }
+            return
+        }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val result = listRepository.addItem(
-                listId = listId,
-                productId = product.id,
-                quantity = 1  // Cantidad por defecto
-            )
+                val result = listRepository.addItem(
+                    listId = listId,
+                    productId = product.id,
+                    quantity = 1
+                )
 
-            _uiState.update { current ->
-                if (result.isSuccess) {
-                    val newItem = result.getOrNull()!!
-                    val newListItem = ListItemData(
-                        id = newItem.id.toString(),
-                        name = newItem.product!!.name,
-                        isChecked = newItem.purchased
-                    )
-                    val updatedItems = current.items + newListItem
-                    current.copy(
-                        items = updatedItems,
-                        totalCount = updatedItems.size,
-                        completedCount = updatedItems.count { it.isChecked },
+                if (result.isFailure) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.exceptionOrNull()?.message
+                                ?: "Error al agregar el producto"
+                        )
+                    }
+                    return@launch
+                }
+
+                _uiState.update { it.copy(isLoading = false) }
+                loadList(listId)
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
                         isLoading = false,
-                        errorMessage = null
-                    )
-                } else {
-                    current.copy(
-                        isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al agregar el producto."
+                        errorMessage = "Error inesperado: ${e.message}"
                     )
                 }
             }
@@ -259,17 +316,27 @@ class ListViewModel(
         if (trimmedEmail.isEmpty()) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val result = listRepository.shareListWithEmail(listId, trimmedEmail)
+                val result = listRepository.shareListWithEmail(listId, trimmedEmail)
 
-            if (result.isSuccess) {
-                loadList(listId)
-            } else {
-                _uiState.update { current ->
-                    current.copy(
+                if (result.isSuccess) {
+                    loadList(listId)
+                } else {
+                    _uiState.update { current ->
+                        current.copy(
+                            isLoading = false,
+                            errorMessage = result.exceptionOrNull()?.message
+                                ?: "Error al compartir la lista"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
                         isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al compartir la lista."
+                        errorMessage = "Error inesperado: ${e.message}"
                     )
                 }
             }
@@ -280,142 +347,203 @@ class ListViewModel(
         val listId = _uiState.value.listId ?: return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val result = listRepository.removeUserFromList(listId, userId)
+                val result = listRepository.removeUserFromList(listId, userId)
 
-            if (result.isSuccess) {
-                loadList(listId)
-            } else {
-                _uiState.update { current ->
-                    current.copy(
+                if (result.isSuccess) {
+                    loadList(listId)
+                } else {
+                    _uiState.update { current ->
+                        current.copy(
+                            isLoading = false,
+                            errorMessage = result.exceptionOrNull()?.message
+                                ?: "Error al quitar el usuario"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
                         isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al quitar el usuario."
+                        errorMessage = "Error inesperado: ${e.message}"
                     )
                 }
             }
         }
     }
 
-    // Actualizar el estado de check de un item (usando PATCH para purchased)
     fun toggleItemCheck(itemId: String, isChecked: Boolean) {
         val listId = _uiState.value.listId ?: return
-        val itemIdLong = itemId.toLongOrNull() ?: return
+        val itemIdLong = itemId.toLongOrNull()
+
+        if (itemIdLong == null) {
+            _uiState.update { it.copy(errorMessage = "ID de item inválido") }
+            return
+        }
 
         viewModelScope.launch {
-            // Actualizar localmente primero (optimistic update)
-            _uiState.update { current ->
-                val updatedItems = current.items.map { item ->
-                    if (item.id == itemId) item.copy(isChecked = isChecked) else item
-                }
-                current.copy(
-                    items = updatedItems,
-                    completedCount = updatedItems.count { it.isChecked }
-                )
-            }
-
-            // Actualizar en la API usando togglePurchased
-            val result = listRepository.togglePurchased(
-                listId = listId,
-                itemId = itemIdLong,
-                purchased = isChecked
-            )
-
-            if (result.isFailure) {
-                // Revertir el cambio si falla
+            try {
                 _uiState.update { current ->
-                    val revertedItems = current.items.map { i ->
-                        if (i.id == itemId) i.copy(isChecked = !isChecked) else i
+                    val updatedItems = current.items.map { item ->
+                        if (item.id == itemId) item.copy(isChecked = isChecked) else item
                     }
                     current.copy(
-                        items = revertedItems,
-                        completedCount = revertedItems.count { it.isChecked },
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al actualizar el item."
+                        items = updatedItems,
+                        completedCount = updatedItems.count { it.isChecked }
                     )
+                }
+
+                val result = listRepository.togglePurchased(
+                    listId = listId,
+                    itemId = itemIdLong,
+                    purchased = isChecked
+                )
+
+                if (result.isFailure) {
+                    // Revertir cambio
+                    _uiState.update { current ->
+                        val revertedItems = current.items.map { i ->
+                            if (i.id == itemId) i.copy(isChecked = !isChecked) else i
+                        }
+                        current.copy(
+                            items = revertedItems,
+                            completedCount = revertedItems.count { it.isChecked },
+                            errorMessage = result.exceptionOrNull()?.message
+                                ?: "Error al actualizar el item"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessage = "Error inesperado: ${e.message}")
                 }
             }
         }
     }
 
-    // Editar un item existente
     fun editItem(itemId: String, quantity: String, unit: String) {
         val listId = _uiState.value.listId ?: return
-        val itemIdLong = itemId.toLongOrNull() ?: return
+        val itemIdLong = itemId.toLongOrNull()
+
+        if (itemIdLong == null) {
+            _uiState.update { it.copy(errorMessage = "ID de item inválido") }
+            return
+        }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val quantityInt = quantity.toIntOrNull() ?: 1
+                val quantityInt = quantity.toIntOrNull() ?: 1
 
-            val result = listRepository.updateItem(
-                listId = listId,
-                itemId = itemIdLong,
-                quantity = quantityInt,
-                unit = unit
-            )
+                val result = listRepository.updateItem(
+                    listId = listId,
+                    itemId = itemIdLong,
+                    quantity = quantityInt,
+                    unit = unit
+                )
 
-            _uiState.update { current ->
-                if (result.isSuccess) {
-                    val updatedItem = result.getOrNull()!!
-
-                    // Actualizar el item dentro de la lista actual
-                    val newItems = current.items.map { item ->
-                        if (item.id == itemId) {
-                            item.copy(
-                                quantity = updatedItem.quantity,
-                                name = updatedItem.product!!.name,
-                                isChecked = updatedItem.purchased
-                            )
-                        } else item
+                if (result.isFailure) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.exceptionOrNull()?.message
+                                ?: "Error al editar el item"
+                        )
                     }
+                    return@launch
+                }
 
-                    current.copy(
+                val updatedItem = result.getOrNull()
+
+                if (updatedItem == null || updatedItem.product == null) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Error al obtener el item actualizado"
+                        )
+                    }
+                    return@launch
+                }
+
+                val newItems = _uiState.value.items.map { item ->
+                    if (item.id == itemId) {
+                        item.copy(
+                            quantity = updatedItem.quantity,
+                            name = updatedItem.product.name,
+                            isChecked = updatedItem.purchased
+                        )
+                    } else item
+                }
+
+                _uiState.update {
+                    it.copy(
                         items = newItems,
                         isLoading = false,
                         errorMessage = null
                     )
-                } else {
-                    current.copy(
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
                         isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al editar el item."
+                        errorMessage = "Error inesperado: ${e.message}"
                     )
                 }
             }
         }
     }
 
-
-    // Eliminar un item
     fun deleteItem(itemId: String) {
         val listId = _uiState.value.listId ?: return
-        val itemIdLong = itemId.toLongOrNull() ?: return
+        val itemIdLong = itemId.toLongOrNull()
+
+        if (itemIdLong == null) {
+            _uiState.update { it.copy(errorMessage = "ID de item inválido") }
+            return
+        }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val result = listRepository.deleteItem(listId, itemIdLong)
+                val result = listRepository.deleteItem(listId, itemIdLong)
 
-            _uiState.update { current ->
-                if (result.isSuccess) {
-                    val updatedItems = current.items.filter { it.id != itemId }
-                    current.copy(
+                if (result.isFailure) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.exceptionOrNull()?.message
+                                ?: "Error al eliminar el item"
+                        )
+                    }
+                    return@launch
+                }
+
+                val updatedItems = _uiState.value.items.filter { it.id != itemId }
+
+                _uiState.update {
+                    it.copy(
                         items = updatedItems,
                         totalCount = updatedItems.size,
                         completedCount = updatedItems.count { it.isChecked },
                         isLoading = false,
                         errorMessage = null
                     )
-                } else {
-                    current.copy(
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
                         isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al eliminar el item."
+                        errorMessage = "Error inesperado: ${e.message}"
                     )
                 }
             }
         }
     }
 
-    // Limpiar mensaje de error
     fun dismissError() {
         _uiState.update { it.copy(errorMessage = null) }
     }

@@ -275,11 +275,8 @@ fun ListScreen(
                                     viewModel.toggleItemCheck(item.id, checked)
                                 },
                                 onEditClick = { selectedItem ->
-                                    viewModel.editItem(
-                                        itemId = selectedItem.id,
-                                        quantity = selectedItem.quantity?.toString() ?: "1",
-                                        unit = "kg",
-                                    )
+                                    itemToEdit = selectedItem
+                                    showEditDialog = true
                                 },
                                 onDeleteClick = { selectedItem ->
                                     viewModel.deleteItem(selectedItem.id)
@@ -336,16 +333,19 @@ fun ListScreen(
     if (showEditDialog && itemToEdit != null) {
         EditItemDialog(
             itemName = itemToEdit!!.name,
-            quantity = "",
-            unit = "24",
-            brand = "Paty",
-            store = "Supermercado Coto",
+            quantity = itemToEdit!!.quantity?.toString() ?: "1",
+            unit = "kg",
             onDismiss = {
                 showEditDialog = false
                 itemToEdit = null
             },
             onSave = { name, quantity, unit, brand, store ->
-                viewModel.editItem(itemToEdit!!.id, quantity, unit)
+                viewModel.editItem(
+                    itemId = itemToEdit!!.id,
+                    quantity = quantity,
+                    unit = unit
+                )
+
                 showEditDialog = false
                 itemToEdit = null
             }

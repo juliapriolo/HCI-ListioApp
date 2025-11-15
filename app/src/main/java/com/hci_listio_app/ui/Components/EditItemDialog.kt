@@ -128,52 +128,6 @@ fun EditItemDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Marca
-                Column {
-                    Text(
-                        text = "Marca:",
-                        fontSize = 14.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = brandInput,
-                        onValueChange = { brandInput = it },
-                        placeholder = { Text("Paty", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFE0E0E0),
-                            focusedBorderColor = Color(0xFF6DCB5A)
-                        )
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Comprar en
-                Column {
-                    Text(
-                        text = "Comprar en:",
-                        fontSize = 14.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = storeInput,
-                        onValueChange = { storeInput = it },
-                        placeholder = { Text("Supermercado Coto", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFE0E0E0),
-                            focusedBorderColor = Color(0xFF6DCB5A)
-                        )
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
                 // Botón Guardar
                 Button(
                     onClick = {
