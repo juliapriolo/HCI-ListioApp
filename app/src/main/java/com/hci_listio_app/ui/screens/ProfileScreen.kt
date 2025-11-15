@@ -100,9 +100,7 @@ fun ProfileScreen(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = stringResource(R.string.profile_title),
-                showBackButton = true,
-                onBackClick = { navController.navigate(Screen.Home.route) }
+                title = stringResource(R.string.profile_title)
             )
         },
         bottomBar = { BottomNavigationBar(navController = navController) }
