@@ -17,13 +17,17 @@ class ProductRemoteDataSource(
         }
 
     // 🔹 BUSCAR PRODUCTOS POR NOMBRE
-    suspend fun searchProductsByName(token: String, name: String): Result<List<ProductResponse>> =
+    suspend fun searchProductsByName(
+        token: String,
+        name: String
+    ): Result<List<ProductResponse>> =
         safeApiCall {
             api.getProducts(
                 authorization = "Bearer $token",
                 name = name
             ).data
         }
+
 
     // 🔹 OBTENER PRODUCTOS POR CATEGORÍA (LO QUE TE FALTABA)
     suspend fun getProductsByCategory(

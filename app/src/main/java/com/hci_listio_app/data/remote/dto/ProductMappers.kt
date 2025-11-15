@@ -1,6 +1,5 @@
 package com.hci_listio_app.data.remote.dto
 
-
 import com.hci_listio_app.data.model.Product
 
 fun ProductResponse.toDomain(): Product {
@@ -14,3 +13,4 @@ fun ProductResponse.toDomain(): Product {
         updatedAt = this.updatedAt
     )
 }
+

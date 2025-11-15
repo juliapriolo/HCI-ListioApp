@@ -15,8 +15,8 @@ class ProductRepository(
     }
 
     suspend fun searchProducts(token: String, name: String): Result<List<Product>> {
-        return remoteDataSource.searchProductsByName(token, name).map { list ->
-            list.map { it.toDomain() }
-        }
+        return remoteDataSource.searchProductsByName(token, name)
+            .map { list -> list.map { it.toDomain() } }
     }
+
 }

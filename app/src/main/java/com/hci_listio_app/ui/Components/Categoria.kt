@@ -22,8 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hci_listio_app.R
 
-data class Categoria(val id: Long, val nombre: String, val imagenRes: Int)
+data class Categoria(val id: Long, val nombre: String, val imagenRes: Int = R.drawable.ic_categoria_default)
 
 @Composable
 fun CategoriaCard(categoria: Categoria, onClick: () -> Unit) {
@@ -45,16 +46,16 @@ fun CategoriaCard(categoria: Categoria, onClick: () -> Unit) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0x66000000)), // Sombreado oscuro para legibilidad
-                contentAlignment = Alignment.Center // Centrar el contenido
+                    .background(Color(0x66000000)),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = categoria.nombre,
                     color = Color.White,
                     modifier = Modifier.padding(8.dp),
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center, // Centrar texto si es multilinea
-                    fontSize = 20.sp // Aumentar un poco el tamaño para visibilidad
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp
                 )
             }
         }
