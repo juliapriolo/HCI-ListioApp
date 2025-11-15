@@ -127,5 +127,14 @@ fun ProductsScreen(navController: NavController) {
         }
     }
 
-    // (Diálogos permanecen igual)
+    // Diálogo para crear nueva categoría
+    if (showAddCategory) {
+        AddCategoryDialog(
+            onDismiss = { showAddCategory = false },
+            onSave = { name ->
+                viewModel.createCategory(name)
+                showAddCategory = false
+            }
+        )
+    }
 }
