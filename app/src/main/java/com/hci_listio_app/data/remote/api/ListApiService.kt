@@ -38,6 +38,21 @@ interface ListApiService {
         @Path("id") listId: Long
     )
 
+    @POST("shopping-lists/{id}/share")
+    suspend fun addUserToList(
+        @Header("Authorization") authorization: String,
+        @Path("id") listId: Long,
+        @Body payload: AddUserToListRequest
+    )
+
+    @DELETE("shopping-lists/{id}/share/{user_id}")
+    suspend fun removeUserFromList(
+        @Header("Authorization") authorization: String,
+        @Path("id") listId: Long,
+        @Path("user_id") userId: Long
+    )
+
+    // ---------- Shopping List Items ----------
     @POST("shopping-lists/{id}/items")
     suspend fun addItem(
         @Header("Authorization") authorization: String,
@@ -57,7 +72,7 @@ interface ListApiService {
         @Query("pantry_id") pantryId: Long? = null,
         @Query("category_id") categoryId: Long? = null,
         @Query("search") search: String? = null
-    ): JsonElement
+    ): ShoppingListItemsResponse
 
     @PUT("shopping-lists/{id}/items/{item_id}")
     suspend fun updateItem(
@@ -80,19 +95,5 @@ interface ListApiService {
         @Header("Authorization") authorization: String,
         @Path("id") listId: Long,
         @Path("item_id") itemId: Long
-    )
-
-    @POST("shopping-lists/{id}/share")
-    suspend fun addUserToList(
-        @Header("Authorization") authorization: String,
-        @Path("id") listId: Long,
-        @Body payload: AddUserToListRequest
-    )
-
-    @DELETE("shopping-lists/{id}/share/{user_id}")
-    suspend fun removeUserFromList(
-        @Header("Authorization") authorization: String,
-        @Path("id") listId: Long,
-        @Path("user_id") userId: Long
     )
 }

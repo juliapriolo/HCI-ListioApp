@@ -27,7 +27,8 @@ data class ListItemData(
 fun ListItem(
     item: ListItemData,
     onCheckedChange: (Boolean) -> Unit,
-    onMoreClick: () -> Unit,
+    onEditClick: (ListItemData) -> Unit,
+    onDeleteClick: (ListItemData) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -87,16 +88,17 @@ fun ListItem(
                         text = { Text("Editar") },
                         onClick = {
                             showMenu = false
-                            onMoreClick()
+                            onEditClick(item)
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Eliminar") },
                         onClick = {
                             showMenu = false
-                            // TODO: Implement delete
+                            onDeleteClick(item)
                         }
                     )
+
                 }
             }
         }

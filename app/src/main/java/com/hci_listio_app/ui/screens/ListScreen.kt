@@ -274,32 +274,17 @@ fun ListScreen(
                                 onCheckedChange = { checked ->
                                     viewModel.toggleItemCheck(item.id, checked)
                                 },
-                                onMoreClick = {
-                                    itemToEdit = item
-                                    showEditDialog = true
+                                onEditClick = { selectedItem ->
+                                    viewModel.editItem(
+                                        itemId = selectedItem.id,
+                                        quantity = selectedItem.quantity?.toString() ?: "1",
+                                        unit = "kg",
+                                    )
+                                },
+                                onDeleteClick = { selectedItem ->
+                                    viewModel.deleteItem(selectedItem.id)
                                 }
                             )
-                        }
-
-                        // Botón agregar más productos al final
-                        item {
-                            Button(
-                                onClick = { showAddItemDialog = true },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF6DCB5A)
-                                ),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Agregar más productos")
-                            }
                         }
                     }
                 }
@@ -360,7 +345,7 @@ fun ListScreen(
                 itemToEdit = null
             },
             onSave = { name, quantity, unit, brand, store ->
-                viewModel.editItem(itemToEdit!!.id, name, quantity, unit, brand, store)
+                viewModel.editItem(itemToEdit!!.id, quantity, unit)
                 showEditDialog = false
                 itemToEdit = null
             }

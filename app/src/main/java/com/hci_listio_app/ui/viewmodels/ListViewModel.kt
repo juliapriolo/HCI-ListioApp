@@ -63,53 +63,71 @@ class ListViewModel(
     // Cargar items de la lista desde la API
     fun loadList(listId: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null, listId = listId) }
-
-            val result = listRepository.getList(listId)
-
-            _uiState.update { current ->
-                if (result.isSuccess) {
-                    val listData = result.getOrNull()!!
-                    val items = listData.items.map { item ->
-                        ListItemData(
-                            id = item.id.toString(),
-                            name = item.productName,
-                            isChecked = item.purchased,
-                            productId = item.productId,
-                            quantity = item.quantity
-                        )
-                    }
-                    val participants = when {
-                        listData.users.isNotEmpty() -> listData.users
-                        listData.sharedWith.isNotEmpty() -> listData.sharedWith
-                        else -> emptyList()
-                    }
-                    val ownerProfile = listData.owner ?: participants.firstOrNull()
-                    val collaborators = ownerProfile?.let { ownerUser ->
-                        participants.filterNot { it.id == ownerUser.id }
-                    } ?: participants
-                    current.copy(
-                        listName = listData.name,
-                        owner = ownerProfile,
-                        sharedMembers = collaborators,
-                        items = items,
-                        completedCount = items.count { it.isChecked },
-                        totalCount = items.size,
-                        isLoading = false,
-                        errorMessage = null
-                    )
-                } else {
-                    current.copy(
-                        isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al cargar la lista."
-                    )
-                }
+            _uiState.update {
+                it.copy(isLoading = true, errorMessage = null, listId = listId)
             }
 
-            // Cargar productos y categorías después de cargar la lista
+            val listResult = listRepository.getList(listId)
+
+            if (listResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = listResult.exceptionOrNull()?.message
+                            ?: "Error al cargar la lista."
+                    )
+                }
+                return@launch
+            }
+
+            val listData = listResult.getOrNull()!!
+
+            val itemsResult = listRepository.getItems(listId)
+
+            val items = if (itemsResult.isSuccess) {
+                itemsResult.getOrNull()!!
+            } else {
+                emptyList()
+            }
+
+            // Convertimos DTO → ListItemData
+            val mappedItems = items.map { item ->
+                ListItemData(
+                    id = item.id.toString(),
+                    name = item.product!!.name,
+                    isChecked = item.purchased,
+                    productId = item.product.id,
+                    quantity = item.quantity
+                )
+            }
+
+            _uiState.update { current ->
+                val participants = when {
+                    listData.users.isNotEmpty() -> listData.users
+                    listData.sharedWith.isNotEmpty() -> listData.sharedWith
+                    else -> emptyList()
+                }
+
+                val owner = listData.owner ?: participants.firstOrNull()
+                val collaborators = owner?.let { own ->
+                    participants.filterNot { it.id == own.id }
+                } ?: participants
+
+                current.copy(
+                    listName = listData.name,
+                    owner = owner,
+                    sharedMembers = collaborators,
+                    items = mappedItems,
+                    completedCount = mappedItems.count { it.isChecked },
+                    totalCount = mappedItems.size,
+                    isLoading = false
+                )
+            }
+
             loadProductsAndCategories()
         }
     }
+
 
     // Cargar todos los productos disponibles del usuario
     fun loadProductsAndCategories() {
@@ -166,7 +184,7 @@ class ListViewModel(
                         val newItem = addResult.getOrNull()!!
                         val newListItem = ListItemData(
                             id = newItem.id.toString(),
-                            name = newItem.productName,
+                            name = newItem.product!!.name,
                             isChecked = newItem.purchased
                         )
                         val updatedItems = current.items + newListItem
@@ -214,7 +232,7 @@ class ListViewModel(
                     val newItem = result.getOrNull()!!
                     val newListItem = ListItemData(
                         id = newItem.id.toString(),
-                        name = newItem.productName,
+                        name = newItem.product!!.name,
                         isChecked = newItem.purchased
                     )
                     val updatedItems = current.items + newListItem
@@ -320,14 +338,52 @@ class ListViewModel(
     }
 
     // Editar un item existente
-    fun editItem(itemId: String, newName: String, quantity: String, unit: String, brand: String, store: String) {
-        // Mostrar mensaje de que la función no está disponible
-        _uiState.update { current ->
-            current.copy(
-                errorMessage = "La edición de productos aún no está disponible. Puedes eliminar el item y agregar uno nuevo."
+    fun editItem(itemId: String, quantity: String, unit: String) {
+        val listId = _uiState.value.listId ?: return
+        val itemIdLong = itemId.toLongOrNull() ?: return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val quantityInt = quantity.toIntOrNull() ?: 1
+
+            val result = listRepository.updateItem(
+                listId = listId,
+                itemId = itemIdLong,
+                quantity = quantityInt,
+                unit = unit
             )
+
+            _uiState.update { current ->
+                if (result.isSuccess) {
+                    val updatedItem = result.getOrNull()!!
+
+                    // Actualizar el item dentro de la lista actual
+                    val newItems = current.items.map { item ->
+                        if (item.id == itemId) {
+                            item.copy(
+                                quantity = updatedItem.quantity,
+                                name = updatedItem.product!!.name,
+                                isChecked = updatedItem.purchased
+                            )
+                        } else item
+                    }
+
+                    current.copy(
+                        items = newItems,
+                        isLoading = false,
+                        errorMessage = null
+                    )
+                } else {
+                    current.copy(
+                        isLoading = false,
+                        errorMessage = result.exceptionOrNull()?.message ?: "Error al editar el item."
+                    )
+                }
+            }
         }
     }
+
 
     // Eliminar un item
     fun deleteItem(itemId: String) {

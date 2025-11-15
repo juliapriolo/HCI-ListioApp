@@ -95,7 +95,7 @@ class ListRemoteDataSource(
         listId: Long,
         productId: Long,
         quantity: Int? = 1,
-        unit: String = "kg"
+        unit: String? = "kg"
     ): Result<ShoppingListItemResponse> =
         safeApiCall {
             api.addItem(
@@ -117,12 +117,12 @@ class ListRemoteDataSource(
         purchased: Boolean? = null
     ): Result<List<ShoppingListItemResponse>> =
         safeApiCall {
-            val element = api.getItems(
-                bearer(token),
-                listId,
+            val response = api.getItems(
+                authorization = bearer(token),
+                listId = listId,
                 purchased = purchased
             )
-            parseItemsPayload(element)
+            response.data
         }
 
     // Actualizar item
@@ -130,17 +130,19 @@ class ListRemoteDataSource(
         token: String,
         listId: Long,
         itemId: Long,
-        productName: String,
-        quantity: Int? = null,
-        productId: Long? = null,
-        categoryId: Long? = null
+        quantity: Int? = 1,
+        unit: String? = "kg"
     ): Result<ShoppingListItemResponse> =
         safeApiCall {
             api.updateItem(
                 bearer(token),
                 listId,
                 itemId,
-                UpdateItemRequest(productName, quantity, productId, categoryId)
+                UpdateItemRequest(
+                    quantity,
+                    unit,
+                    metadata = emptyMap()
+                )
             )
         }
 
