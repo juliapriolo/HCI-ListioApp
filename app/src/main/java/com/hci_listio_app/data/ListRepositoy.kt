@@ -85,14 +85,24 @@ class ListRepository(
     // Obtener items de lista
     suspend fun getItems(
         listId: Long,
-        purchased: Boolean? = null
+        purchased: Boolean? = null,
+        categoryId: Long? = null,
+        search: String? = null,
+        sortBy: String? = null,
+        order: String? = null
     ): Result<List<ShoppingListItemResponse>> {
         val token = authRepository.authToken.value
-        return if (token == null) {
-            Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
-        } else {
-            remoteDataSource.getItems(token, listId, purchased)
-        }
+            ?: return Result.failure(Exception("No hay sesión activa."))
+
+        return remoteDataSource.getItems(
+            token = token,
+            listId = listId,
+            purchased = purchased,
+            categoryId = categoryId,
+            search = search,
+            sortBy = sortBy,
+            order = order
+        )
     }
 
     // Actualizar item
