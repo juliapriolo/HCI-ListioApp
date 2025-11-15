@@ -99,6 +99,19 @@
     <string name="products_title">Productos</string>
     <string name="products_search">Buscar producto por nombre</string>
     <string name="products_search_categories">Buscar por categorías:</string>
+    <string name="products_no_results">No se encontraron productos</string>
+    <string name="products_add_category">Agregar categoría</string>
+
+    <!-- Add Category Dialog -->
+    <string name="add_category_title">Nueva categoría</string>
+    <string name="add_category_name_label">Nombre de la categoría</string>
+    <string name="add_category_create">Crear</string>
+
+    <!-- Add Product Dialog -->
+    <string name="add_product_title">Agregar nuevo producto</string>
+    <string name="add_product_name_label">Nombre del producto</string>
+    <string name="add_product_brand_label">Marca (opcional)</string>
+    <string name="add_product_close_icon">Cerrar</string>
     
     <!-- Lists Overview -->
     <string name="lists_title">Listas</string>
@@ -106,6 +119,7 @@
     <!-- Category Products Screen -->
     <string name="category_products_empty">Empieza a agregar productos a la categoria</string>
     <string name="category_products_empty_subtitle">Tu categoria está vacía</string>
+    <string name="category_products_empty_instruction">Agrega tu primer producto presionando el icono +</string>
     <string name="category_products_add">Agregar productos</string>
     <string name="category_products_add_icon">Agregar productos</string>
     <string name="category_products_empty_icon">Empty list</string>

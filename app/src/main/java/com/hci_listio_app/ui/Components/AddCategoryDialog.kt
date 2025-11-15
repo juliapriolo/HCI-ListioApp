@@ -1,13 +1,15 @@
 package com.hci_listio_app.ui.Components
 
 
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import com.hci_listio_app.R
 
 @Composable
 fun AddCategoryDialog(
@@ -22,14 +24,14 @@ fun AddCategoryDialog(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                Text("Nueva Categoría", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.add_category_title), style = MaterialTheme.typography.titleMedium)
 
                 Spacer(Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Nombre de la categoría") },
+                    label = { Text(stringResource(R.string.add_category_name_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -41,7 +43,7 @@ fun AddCategoryDialog(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Crear")
+                    Text(stringResource(R.string.add_category_create))
                 }
             }
         }

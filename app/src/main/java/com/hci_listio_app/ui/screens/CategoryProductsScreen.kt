@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,7 +45,7 @@ fun CategoryProductsScreen(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = "Productos",
+                title = stringResource(R.string.products_title),
                 showBackButton = true,
                 onBackClick = { navController.popBackStack() }
             )
@@ -78,7 +79,7 @@ fun CategoryProductsScreen(
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = "Agregar",
+                        contentDescription = stringResource(R.string.category_products_add_icon),
                         tint = Color(0xFF6DCB5A) // verde del Figma
                     )
                 }
@@ -101,7 +102,7 @@ fun CategoryProductsScreen(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.empty_list_icon),
-                            contentDescription = "Vacío",
+                            contentDescription = stringResource(R.string.category_products_empty_icon),
                             tint = Color(0xFF6DCB5A),
                             modifier = Modifier.size(70.dp)
                         )
@@ -109,13 +110,13 @@ fun CategoryProductsScreen(
                         Spacer(Modifier.height(12.dp))
 
                         Text(
-                            "Tu categoría está vacía",
+                            text = stringResource(R.string.category_products_empty_subtitle),
                             color = Color.Gray,
                             style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            text = "Agrega tu primer producto presionando el icono +",
+                            text = stringResource(R.string.category_products_empty_instruction),
                             color = Color.Gray,
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
                             modifier = Modifier

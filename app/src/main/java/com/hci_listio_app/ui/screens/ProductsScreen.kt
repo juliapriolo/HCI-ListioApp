@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,7 +45,19 @@ fun ProductsScreen(navController: NavController) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { ListioTopAppBar(title = stringResource(R.string.products_title)) },
-        bottomBar = { BottomNavigationBar(navController) }
+        bottomBar = { BottomNavigationBar(navController) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showAddCategory = true },
+                containerColor = Color.White,
+                contentColor = Color(0xFF6DCB5A)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.products_add_category)
+                )
+            }
+        }
     ) { padding ->
         // Envolver el grid en un Box y usar Modifier.fillMaxSize() para permitir scroll completo
         Box(
@@ -95,9 +109,6 @@ fun ProductsScreen(navController: NavController) {
                             onDelete = if (categoria.isDefault) null else { c -> viewModel.deleteCategory(c) }
                         )
                     }
-                    item {
-                        AddCategoriaCard { showAddCategory = true }
-                    }
                 }
 
                 // ⭐ CON BUSQUEDA → mostrar productos encontrados
@@ -111,7 +122,7 @@ fun ProductsScreen(navController: NavController) {
                                     .padding(top = 64.dp)
                             ) {
                                 Text(
-                                    text = "No se encontraron productos",
+                                    text = stringResource(R.string.products_no_results),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = Color.Gray,
                                     modifier = Modifier.align(Alignment.Center)
