@@ -1,6 +1,7 @@
 package com.hci_listio_app.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
+import com.hci_listio_app.data.remote.dto.ProductResponse
 
 // Respuesta de lista
 data class ShoppingListResponse(
@@ -20,19 +21,24 @@ data class ShoppingListResponse(
     val users: List<UserProfileResponse> = emptyList()
 )
 
-// Respuesta de item de lista (según la API real)
+// Respuesta de item de lista
 data class ShoppingListItemResponse(
     val id: Long = 0L,
-    val productName: String = "",
-    val quantity: Int? = null,
+    val quantity: Int? = 1,
+    val unit: String? = "",
+    val metadata: Map<String, Any?>? = null,
     val purchased: Boolean = false,
-    val productId: Long? = null,
-    val categoryId: Long? = null,
-    val pantryId: Long? = null,
+    val lastPurchasedAt: String? = null,
     val createdAt: String? = null,
     val updatedAt: String? = null,
-    val lastPurchasedAt: String? = null
+    val product: ProductResponse? = null,
 )
+
+data class ShoppingListItemsResponse(
+    val data: List<ShoppingListItemResponse>,
+    val pagination: PaginationResponse
+)
+
 
 // Request para crear una lista
 data class CreateListRequest(
@@ -46,20 +52,24 @@ data class UpdateListRequest(
     val name: String
 )
 
-// Request para crear un item (según la API real)
-data class CreateItemRequest(
-    val productName: String,
-    val quantity: Int? = null,
-    val productId: Long? = null,
-    val categoryId: Long? = null
+data class ProductRef(
+    @SerializedName("id")
+    val id: Long
 )
 
-// Request para actualizar un item (según la API real)
+// Modificar CreateItemRequest
+data class CreateItemRequest(
+    val product: ProductRef,
+    val quantity: Int? = 1,
+    val unit: String? = "kg",
+    val metadata: Map<String, Any>? = emptyMap()
+)
+
+// Request para actualizar un item
 data class UpdateItemRequest(
-    val productName: String,
-    val quantity: Int? = null,
-    val productId: Long? = null,
-    val categoryId: Long? = null
+    val quantity: Int? = 1,
+    val unit: String? = "kg",
+    val metadata: Map<String, Any>? = emptyMap()
 )
 
 // Request para toggle purchased status

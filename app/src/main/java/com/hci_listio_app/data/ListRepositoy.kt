@@ -70,16 +70,15 @@ class ListRepository(
     // Agregar item a lista
     suspend fun addItem(
         listId: Long,
-        productName: String,
-        quantity: Int? = null,
-        productId: Long? = null,
-        categoryId: Long? = null
+        productId: Long,
+        quantity: Int? = 1,
+        unit: String? = "kg"
     ): Result<ShoppingListItemResponse> {
         val token = authRepository.authToken.value
         return if (token == null) {
             Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
         } else {
-            remoteDataSource.addItem(token, listId, productName, quantity, productId, categoryId)
+            remoteDataSource.addItem(token, listId, productId, quantity, unit)
         }
     }
 
@@ -100,16 +99,14 @@ class ListRepository(
     suspend fun updateItem(
         listId: Long,
         itemId: Long,
-        productName: String,
-        quantity: Int? = null,
-        productId: Long? = null,
-        categoryId: Long? = null
+        quantity: Int? = 1,
+        unit: String? = "kg"
     ): Result<ShoppingListItemResponse> {
         val token = authRepository.authToken.value
         return if (token == null) {
             Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
         } else {
-            remoteDataSource.updateItem(token, listId, itemId, productName, quantity, productId, categoryId)
+            remoteDataSource.updateItem(token, listId, itemId, quantity, unit)
         }
     }
 

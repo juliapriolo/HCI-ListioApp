@@ -1,6 +1,5 @@
 package com.hci_listio_app.ui.screens
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,7 +9,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,10 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
 import com.hci_listio_app.R
-import com.hci_listio_app.data.ListHistoryManager
-import com.hci_listio_app.ui.Components.AddProductDialog
+import com.hci_listio_app.ui.Components.AddItemToListDialog
+import com.hci_listio_app.ui.Components.CreateProductDialog
 import com.hci_listio_app.ui.Components.EditItemDialog
 import com.hci_listio_app.ui.Components.ListItem
 import com.hci_listio_app.ui.Components.ListItemData
@@ -43,15 +40,10 @@ fun ListScreen(
     navController: NavController,
     listId: Long = 1L,
     listName: String = "Mi Lista",
-    originTab: Int = -1,
     viewModel: ListViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = com.hci_listio_app.ui.Components.rememberAppSnackbarHostState()
-    val archivedIds by ListHistoryManager.archivedListIds.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-    val isArchived = uiState.listId?.let { archivedIds.contains(it) } ?: false
-    val showCompletedBanner = !isArchived && uiState.totalCount > 0 && uiState.completedCount == uiState.totalCount
     val shareDialogUsers = remember(uiState.owner, uiState.sharedMembers) {
         val seenIds = mutableSetOf<Long>()
         val participants = mutableListOf<SharedUser>()
@@ -85,22 +77,11 @@ fun ListScreen(
     val displayedMembers = remember(shareDialogUsers) { shareDialogUsers.take(3) }
 
     // Estados locales para diálogos
-    var showAddDialog by remember { mutableStateOf(false) }
+    var showAddItemDialog by remember { mutableStateOf(false) }
+    var showCreateProductDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
     var showShareDialog by remember { mutableStateOf(false) }
     var itemToEdit by remember { mutableStateOf<ListItemData?>(null) }
-
-    val navigateBack = remember(navController, originTab) {
-        {
-            if (originTab >= 0) {
-                navController.previousBackStackEntry?.savedStateHandle?.set("overviewTab", originTab)
-            }
-            navController.popBackStack()
-            Unit
-        }
-    }
-
-    BackHandler(onBack = navigateBack)
 
     // Cargar la lista cuando se monta el composable
     LaunchedEffect(listId) {
@@ -121,12 +102,12 @@ fun ListScreen(
             ListioTopAppBar(
                 title = uiState.listName.ifEmpty { listName },
                 showBackButton = true,
-                onBackClick = navigateBack
+                onBackClick = { navController.navigateUp() }
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showAddDialog = true },
+                onClick = { showAddItemDialog = true },
                 containerColor = Color(0xFF6DCB5A),
                 contentColor = Color.White
             ) {
@@ -143,21 +124,6 @@ fun ListScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (showCompletedBanner) {
-                    CompletedListBanner(
-                        onMoveToHistory = {
-                            uiState.listId?.let { listId ->
-                                ListHistoryManager.moveToHistory(listId)
-                                coroutineScope.launch {
-                                    snackbarHostState.showToast("Lista movida al historial")
-                                }
-                                navigateBack()
-                            }
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
- 
                 // Header con avatares y estado
                 Card(
                     modifier = Modifier
@@ -308,32 +274,14 @@ fun ListScreen(
                                 onCheckedChange = { checked ->
                                     viewModel.toggleItemCheck(item.id, checked)
                                 },
-                                onMoreClick = {
-                                    itemToEdit = item
+                                onEditClick = { selectedItem ->
+                                    itemToEdit = selectedItem
                                     showEditDialog = true
+                                },
+                                onDeleteClick = { selectedItem ->
+                                    viewModel.deleteItem(selectedItem.id)
                                 }
                             )
-                        }
-
-                        // Botón agregar más productos al final
-                        item {
-                            Button(
-                                onClick = { showAddDialog = true },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF6DCB5A)
-                                ),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Agregar más productos")
-                            }
                         }
                     }
                 }
@@ -351,35 +299,53 @@ fun ListScreen(
         }
     }
 
-    if (showAddDialog) {
-        AddProductDialog(
-            onDismiss = { showAddDialog = false },
-            onSave = { name, brand ->
-                // Si querés guardar la marca en metadata, queda así:
-                viewModel.addItem(
-                    name = name,
-                    brand = brand
-                )
-                showAddDialog = false
+    // Diálogo para agregar item (con productos existentes o crear nuevo)
+    if (showAddItemDialog) {
+        AddItemToListDialog(
+            products = uiState.availableProducts,
+            isLoadingProducts = uiState.isLoadingProducts,
+            onDismiss = { showAddItemDialog = false },
+            onSelectProduct = { product ->
+                viewModel.addExistingProductToList(product)
+                showAddItemDialog = false
+            },
+            onCreateNewProduct = {
+                showAddItemDialog = false
+                showCreateProductDialog = true
             }
         )
     }
 
+    // Diálogo para crear nuevo producto
+    if (showCreateProductDialog) {
+        CreateProductDialog(
+            categories = uiState.categories,
+            isLoading = uiState.isCreatingProduct,
+            onDismiss = { showCreateProductDialog = false },
+            onCreateProduct = { productName, categoryId ->
+                viewModel.createProductAndAddToList(productName, categoryId)
+                showCreateProductDialog = false
+            }
+        )
+    }
 
     // Diálogo para editar item
     if (showEditDialog && itemToEdit != null) {
         EditItemDialog(
             itemName = itemToEdit!!.name,
-            quantity = "",
-            unit = "24",
-            brand = "Paty",
-            store = "Supermercado Coto",
+            quantity = itemToEdit!!.quantity?.toString() ?: "1",
+            unit = "kg",
             onDismiss = {
                 showEditDialog = false
                 itemToEdit = null
             },
             onSave = { name, quantity, unit, brand, store ->
-                viewModel.editItem(itemToEdit!!.id, name, quantity, unit, brand, store)
+                viewModel.editItem(
+                    itemId = itemToEdit!!.id,
+                    quantity = quantity,
+                    unit = unit
+                )
+
                 showEditDialog = false
                 itemToEdit = null
             }
@@ -424,44 +390,5 @@ private fun MemberAvatar(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-    }
-}
-
-@Composable
-private fun CompletedListBanner(onMoveToHistory: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Lista completada",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF388E3C)
-                )
-                Text(
-                    text = "¿Mover al historial?",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF388E3C)
-                )
-            }
-            IconButton(onClick = onMoveToHistory) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Mover al historial",
-                    tint = Color(0xFF388E3C)
-                )
-            }
-        }
     }
 }

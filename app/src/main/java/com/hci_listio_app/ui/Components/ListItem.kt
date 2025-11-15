@@ -18,14 +18,17 @@ import androidx.compose.ui.unit.dp
 data class ListItemData(
     val id: String,
     val name: String,
-    val isChecked: Boolean = false
+    val isChecked: Boolean = false,
+    val productId: Long? = null,
+    val quantity: Int? = null,
 )
 
 @Composable
 fun ListItem(
     item: ListItemData,
     onCheckedChange: (Boolean) -> Unit,
-    onMoreClick: () -> Unit,
+    onEditClick: (ListItemData) -> Unit,
+    onDeleteClick: (ListItemData) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -85,16 +88,17 @@ fun ListItem(
                         text = { Text("Editar") },
                         onClick = {
                             showMenu = false
-                            onMoreClick()
+                            onEditClick(item)
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Eliminar") },
                         onClick = {
                             showMenu = false
-                            // TODO: Implement delete
+                            onDeleteClick(item)
                         }
                     )
+
                 }
             }
         }
