@@ -64,6 +64,25 @@ class ListOverviewViewModel(
         }
     }
 
+    fun createList(name: String, description: String?) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val result = listRepository.createList(name, description ?: "")
+            if (result.isSuccess) {
+                // Añade la nueva lista al estado actual para una actualización instantánea
+                result.getOrNull()?.let {
+                    _uiState.update { current ->
+                        current.copy(lists = current.lists + it, isLoading = false)
+                    }
+                }
+            } else {
+                _uiState.update { 
+                    it.copy(isLoading = false, errorMessage = result.exceptionOrNull()?.message ?: "Error al crear la lista.")
+                }
+            }
+        }
+    }
+
     fun dismissError() {
         _uiState.update { it.copy(errorMessage = null) }
     }

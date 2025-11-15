@@ -34,15 +34,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-data class Categoria(val id: Long, val nombre: String, val imagenRes: Int = R.drawable.ic_categoria_default)
-
+data class Categoria(
+    val id: Long,
+    val nombre: String,
+    val imagenRes: Int = R.drawable.ic_categoria_default,
+    val isDefault: Boolean = false
+)
 @Composable
 fun CategoriaCard(
     categoria: Categoria,
     onClick: () -> Unit,
-    onDelete: (() -> Unit)? = null
+    onDelete: ((Categoria) -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
+
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -58,6 +63,7 @@ fun CategoriaCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -72,6 +78,7 @@ fun CategoriaCard(
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp
                 )
+
                 if (onDelete != null) {
                     Box(
                         modifier = Modifier.align(Alignment.TopEnd)
@@ -79,12 +86,15 @@ fun CategoriaCard(
                         IconButton(onClick = { expanded = true }) {
                             Icon(Icons.Default.MoreVert, contentDescription = "Opciones", tint = Color.White)
                         }
-                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
                             DropdownMenuItem(
                                 text = { Text("Eliminar categoría", color = Color.Red) },
                                 onClick = {
                                     expanded = false
-                                    onDelete()
+                                    onDelete(categoria)
                                 }
                             )
                         }
@@ -94,6 +104,7 @@ fun CategoriaCard(
         }
     }
 }
+
 
 @Composable
 fun AddCategoriaCard(onClick: () -> Unit) {
@@ -112,8 +123,9 @@ fun AddCategoriaCard(onClick: () -> Unit) {
         ) {
             Text(
                 "Añadir\nNueva Categoría",
-                textAlign = TextAlign.Center,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
                 color = Color.White
             )
         }

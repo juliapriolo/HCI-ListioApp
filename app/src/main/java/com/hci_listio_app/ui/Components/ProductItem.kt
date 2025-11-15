@@ -1,6 +1,7 @@
 package com.hci_listio_app.ui.Components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,8 +29,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProductItem(
     productName: String,
-    onDelete: () -> Unit,
-    brand: Any?
+    brand: String?,
+    onDelete: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -45,8 +46,13 @@ fun ProductItem(
                 .padding(horizontal = 16.dp, vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val displayText = if (!brand.isNullOrBlank()) {
+                "$productName - Marca: $brand"
+            } else {
+                productName
+            }
             Text(
-                text = productName,
+                text = displayText,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyLarge
             )

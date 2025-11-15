@@ -52,10 +52,13 @@ class ProductsViewModel(
             _searchResults.value = emptyList()
             return
         }
-
         viewModelScope.launch {
             productRepo.searchProducts(token, query).fold(
-                onSuccess = { _searchResults.value = it },
+                onSuccess = { products ->
+                    // Filtrado local por nombre (case-insensitive)
+                    val filtered = products.filter { it.name.contains(query, ignoreCase = true) }
+                    _searchResults.value = filtered
+                },
                 onFailure = { _searchResults.value = emptyList() }
             )
         }

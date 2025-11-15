@@ -1,8 +1,10 @@
 package com.hci_listio_app.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -12,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.hci_listio_app.R
@@ -29,10 +33,9 @@ fun CategoryProductsScreen(
     categoryName: String,
     categoryId: Long
 ) {
-    // La Vista ya no se preocupa por el token. La fábrica se encarga de todo.
-    val viewModel: CategoryProductsViewModel = viewModel(
-        factory = CategoryProductsViewModelFactory(categoryId)
-    )
+
+    val viewModel: CategoryProductsViewModel =
+        viewModel(factory = CategoryProductsViewModelFactory(categoryId))
 
     val uiState by viewModel.uiState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
@@ -41,84 +44,99 @@ fun CategoryProductsScreen(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = categoryName,
+                title = "Productos",
                 showBackButton = true,
                 onBackClick = { navController.popBackStack() }
             )
         }
     ) { padding ->
-        if (uiState.products.isEmpty() && !uiState.isLoading) {
-            // Estado vacío
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+        ) {
+
+            // ⭐ Header con título + botón redondo de agregar
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.empty_list_icon),
-                    contentDescription = "Lista vacía",
-                    tint = Color(0xFF6DCB5A),
-                    modifier = Modifier.padding(bottom = 8.dp).size(64.dp)
-                )
                 Text(
-                    text = "Tu categoría está vacía",
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    text = categoryName,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
                 )
-                Text(
-                    text = "Empieza a agregar productos a la categoría", 
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Button(
+
+                IconButton(
                     onClick = { showDialog = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(Color(0xFFF2F2F2), CircleShape) // gris suave
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Text("Agregar productos", modifier = Modifier.padding(start = 4.dp))
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Agregar",
+                        tint = Color(0xFF6DCB5A) // verde del Figma
+                    )
                 }
+
             }
-        } else {
-            // Lista de productos
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                item {
-                     Text(
-                        text = categoryName,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp, top = 8.dp)
-                    )
-                }
-                items(uiState.products) { product ->
-                    ProductItem(
-                        productName = product.name,
-                        brand = product.metadata?.get("brand"),
-                        onDelete = { viewModel.deleteProduct(product.id) }
-                    )
-                }
-                item {
-                    Button(
-                        onClick = { showDialog = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
+
+            Spacer(Modifier.height(16.dp))
+
+            if (uiState.products.isEmpty() && !uiState.isLoading) {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Agregar más productos", color = Color.White)
-                        }
+                        Icon(
+                            painter = painterResource(R.drawable.empty_list_icon),
+                            contentDescription = "Vacío",
+                            tint = Color(0xFF6DCB5A),
+                            modifier = Modifier.size(70.dp)
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Text(
+                            "Tu categoría está vacía",
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            text = "Agrega tu primer producto presionando el icono +",
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                            modifier = Modifier
+                                .fillMaxWidth()   // 👈 Necesario para que textAlign funcione
+                                .padding(bottom = 16.dp),
+                            textAlign = TextAlign.Center
+                        )
+
+                    }
+                }  // 👈 ESTE CIERRE FALTABA
+
+            } else {
+
+
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(uiState.products) { product ->
+                        ProductItem(
+                            productName = product.name,
+                            brand = product.metadata?.get("brand") as? String,
+                            onDelete = { viewModel.deleteProduct(product.id) }
+                        )
                     }
                 }
             }
