@@ -23,11 +23,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hci_listio_app.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 data class Categoria(val id: Long, val nombre: String, val imagenRes: Int = R.drawable.ic_categoria_default)
 
 @Composable
-fun CategoriaCard(categoria: Categoria, onClick: () -> Unit) {
+fun CategoriaCard(
+    categoria: Categoria,
+    onClick: () -> Unit,
+    onDelete: (() -> Unit)? = null
+) {
+    var expanded by remember { mutableStateOf(false) }
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -57,6 +72,24 @@ fun CategoriaCard(categoria: Categoria, onClick: () -> Unit) {
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp
                 )
+                if (onDelete != null) {
+                    Box(
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    ) {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Opciones", tint = Color.White)
+                        }
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            DropdownMenuItem(
+                                text = { Text("Eliminar categoría", color = Color.Red) },
+                                onClick = {
+                                    expanded = false
+                                    onDelete()
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }

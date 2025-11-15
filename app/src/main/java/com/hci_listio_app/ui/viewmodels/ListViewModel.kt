@@ -182,15 +182,22 @@ class ListViewModel(
     }
 
     // Agregar un nuevo item
-    fun addItem(name: String) {
+    fun addItem(name: String, brand: String?) {
         val listId = _uiState.value.listId ?: return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
+            // Construimos metadata con valores opcionales
+            val metadata = mutableMapOf<String, Any>()
+            if (brand != null) metadata["brand"] = brand
+
             val result = listRepository.addItem(
                 listId = listId,
-                productName = name
+                productName = name,
+                quantity = null,
+                productId = null,
+                categoryId = null,
             )
 
             _uiState.update { current ->
@@ -218,6 +225,7 @@ class ListViewModel(
             }
         }
     }
+
 
     // Editar un item existente
     fun editItem(itemId: String, newName: String, quantity: String, unit: String, brand: String, store: String) {

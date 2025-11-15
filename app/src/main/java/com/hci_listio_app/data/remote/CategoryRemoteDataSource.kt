@@ -14,6 +14,9 @@ class CategoryRemoteDataSource(
     suspend fun createCategory(token: String, name: String): Result<CategoryResponse> =
         safeApi { api.createCategory("Bearer $token", CategoryCreateRequest(name)) }
 
+    suspend fun deleteCategory(token: String, id: Long): Result<Unit> =
+        safeApi { api.deleteCategory("Bearer $token", id) }
+
     private suspend fun <T> safeApi(block: suspend () -> T): Result<T> =
         try { Result.success(block()) }
         catch (e: Exception) { Result.failure(e) }

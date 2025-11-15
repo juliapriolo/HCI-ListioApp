@@ -1,11 +1,6 @@
 package com.hci_listio_app.ui.Components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -21,9 +16,10 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun AddProductDialog(
     onDismiss: () -> Unit,
-    onSave: (String) -> Unit
+    onSave: (name: String, brand: String?) -> Unit   // 👈 ahora devuelve nombre + marca
 ) {
     var productName by remember { mutableStateOf("") }
+    var productBrand by remember { mutableStateOf("") }  // 👈 nuevo campo marca
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -34,6 +30,7 @@ fun AddProductDialog(
             Column(
                 modifier = Modifier.padding(24.dp)
             ) {
+                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -45,37 +42,52 @@ fun AddProductDialog(
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.Gray)
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar",
+                            tint = Color.Gray
+                        )
                     }
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Nombre del Producto",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+
+                // Nombre
+                Text("Nombre del Producto", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(4.dp))
                 OutlinedTextField(
                     value = productName,
                     onValueChange = { productName = it },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Marca
+                Text("Marca (opcional)", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(4.dp))
+                OutlinedTextField(
+                    value = productBrand,
+                    onValueChange = { productBrand = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
+                )
+
                 Spacer(modifier = Modifier.height(24.dp))
+
+                // Botón Guardar
                 Button(
                     onClick = {
                         if (productName.isNotBlank()) {
-                            onSave(productName)
+                            onSave(productName, productBrand.ifBlank { null })
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                 ) {
-                    Text(
-                        text = "Guardar",
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    Text("Guardar", modifier = Modifier.padding(vertical = 8.dp))
                 }
             }
         }

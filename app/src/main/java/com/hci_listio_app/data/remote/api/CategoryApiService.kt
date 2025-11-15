@@ -15,4 +15,10 @@ interface CategoryApiService {
         @Header("Authorization") auth: String,
         @Body body: CategoryCreateRequest
     ): CategoryResponse
+
+    @DELETE("categories/{id}")
+    suspend fun deleteCategory(
+        @Header("Authorization") auth: String,
+        @Path("id") id: Long
+    )
 }

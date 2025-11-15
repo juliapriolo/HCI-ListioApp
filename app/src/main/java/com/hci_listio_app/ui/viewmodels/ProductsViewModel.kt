@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ProductsViewModel(
-    private val categoryRepo: CategoryRepository,
+    val categoryRepo: CategoryRepository,
     private val productRepo: ProductRepository,
     private val token: String
 ) : ViewModel() {

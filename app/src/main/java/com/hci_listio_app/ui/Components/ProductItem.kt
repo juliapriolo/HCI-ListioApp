@@ -28,7 +28,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProductItem(
     productName: String,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    brand: Any?
 ) {
     var expanded by remember { mutableStateOf(false) }
 

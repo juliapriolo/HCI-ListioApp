@@ -57,14 +57,15 @@ class CategoryProductsViewModel(
         }
     }
 
-    fun addProduct(productName: String) {
+    fun addProduct(name: String, brand: String?) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
+            val metadata = if (brand != null) mapOf("brand" to brand) else emptyMap()
             val request = ProductRequest(
-                name = productName,
-                category = CategoryRef(id = categoryId),
-                metadata = emptyMap()
+                name = name,
+                category = CategoryRef(categoryId),
+                metadata = metadata
             )
 
             val result = repository.addProduct(token, request)
@@ -77,7 +78,6 @@ class CategoryProductsViewModel(
                             products = it.products + product
                         )
                     }
-                    loadProducts()
                 },
                 onFailure = { error ->
                     _uiState.update {
@@ -90,6 +90,7 @@ class CategoryProductsViewModel(
             )
         }
     }
+    
     fun deleteProduct(id: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }

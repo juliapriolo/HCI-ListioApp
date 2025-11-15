@@ -351,16 +351,20 @@ fun ListScreen(
         }
     }
 
-    // Diálogo para agregar producto
     if (showAddDialog) {
         AddProductDialog(
             onDismiss = { showAddDialog = false },
-            onSave = { productName ->
-                viewModel.addItem(productName)
+            onSave = { name, brand ->
+                // Si querés guardar la marca en metadata, queda así:
+                viewModel.addItem(
+                    name = name,
+                    brand = brand
+                )
                 showAddDialog = false
             }
         )
     }
+
 
     // Diálogo para editar item
     if (showEditDialog && itemToEdit != null) {

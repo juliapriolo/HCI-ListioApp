@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -24,9 +25,12 @@ import com.hci_listio_app.data.AuthRepositoryProvider
 import com.hci_listio_app.ui.Components.*
 import com.hci_listio_app.ui.viewmodels.ProductsViewModel
 import com.hci_listio_app.ui.viewmodels.ProductsViewModelFactory
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
+
 fun ProductsScreen(navController: NavController) {
 
     val token = AuthRepositoryProvider.instance.authToken.value ?: ""
@@ -37,6 +41,11 @@ fun ProductsScreen(navController: NavController) {
 
     var searchQuery by remember { mutableStateOf("") }
     var showAddCategory by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var categoriaToDelete by remember { mutableStateOf<Categoria?>(null) }
+    var isDeleting by remember { mutableStateOf(false) }
+    var deleteError by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
@@ -86,11 +95,18 @@ fun ProductsScreen(navController: NavController) {
                 }
 
                 items(categorias) { categoria ->
-                    CategoriaCard(categoria) {
-                        navController.navigate(
-                            "category/${categoria.nombre}?categoryId=${categoria.id}"
-                        )
-                    }
+                    CategoriaCard(
+                        categoria = categoria,
+                        onClick = {
+                            navController.navigate(
+                                "category/${categoria.nombre}?categoryId=${categoria.id}"
+                            )
+                        },
+                        onDelete = {
+                            categoriaToDelete = categoria
+                            showDeleteDialog = true
+                        }
+                    )
                 }
 
                 item {
@@ -127,6 +143,52 @@ fun ProductsScreen(navController: NavController) {
                     }
                 }
             }
+        }
+    }
+
+    // Diálogo para eliminar categoría
+    if (showDeleteDialog && categoriaToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false; categoriaToDelete = null; deleteError = null },
+            title = { Text("Eliminar categoría") },
+            text = { Text("¿Estás seguro que deseas eliminar la categoría '${categoriaToDelete?.nombre}'?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        isDeleting = true
+                        deleteError = null
+                        coroutineScope.launch {
+                            try {
+                                val repo = viewModel.categoryRepo
+                                val result = repo.deleteCategory(token, categoriaToDelete!!.id)
+                                if (result.isSuccess) {
+                                    showDeleteDialog = false
+                                    categoriaToDelete = null
+                                    viewModel.loadCategories()
+                                } else {
+                                    deleteError = result.exceptionOrNull()?.message ?: "Error al eliminar"
+                                }
+                            } catch (e: Exception) {
+                                deleteError = e.message ?: "Error al eliminar"
+                            } finally {
+                                isDeleting = false
+                            }
+                        }
+                    },
+                    enabled = !isDeleting
+                ) {
+                    if (isDeleting) CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                    Text("Eliminar", color = Color.Red, modifier = Modifier.padding(start = 4.dp))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false; categoriaToDelete = null; deleteError = null }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+        deleteError?.let {
+            Text(it, color = Color.Red, modifier = Modifier.padding(16.dp))
         }
     }
 
