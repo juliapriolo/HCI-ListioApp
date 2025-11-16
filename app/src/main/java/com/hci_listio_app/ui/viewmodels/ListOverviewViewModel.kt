@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 data class ListOverviewUiState(
     val lists: List<ShoppingListResponse> = emptyList(),
@@ -112,7 +113,11 @@ class ListOverviewViewModel(
     }
 
     fun toggleFavorite(listId: Long) {
-        FavoritesManager.toggleFavorite(listId)
+        // Add a short delay to allow the icon scale animation to play before reordering the list.
+        viewModelScope.launch {
+            delay(220L) // match animation duration
+            FavoritesManager.toggleFavorite(listId)
+        }
     }
 
     fun renameList(listId: Long, newName: String, recurring: Boolean? = null, onResult: (Boolean, String?) -> Unit) {

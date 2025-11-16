@@ -30,6 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.draw.scale
@@ -67,8 +69,12 @@ fun OverviewCard(
     val optionsAvailable = onEdit != null || onDelete != null || onRestore != null
     val (menuExpanded, setMenuExpanded) = remember { mutableStateOf(false) }
 
+    // Local favorite state to animate the card when the user toggles favorite
+    var localFavorite by remember { mutableStateOf(item.isFavorite) }
+    LaunchedEffect(item.isFavorite) { localFavorite = item.isFavorite }
+    val cardScale by animateFloatAsState(targetValue = if (localFavorite) 1.02f else 1f, animationSpec = tween(durationMillis = 220))
     Card(
-        modifier = combinedModifier,
+        modifier = combinedModifier.scale(cardScale),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -78,10 +84,14 @@ fun OverviewCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = item.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { onToggleFavorite?.invoke() }, enabled = onToggleFavorite != null) {
-                        val icon = if (item.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
-                        val scale by animateFloatAsState(targetValue = if (item.isFavorite) 1.12f else 1f, animationSpec = tween(durationMillis = 220))
-                        Icon(imageVector = icon, contentDescription = "favorite", tint = if (item.isFavorite) Color(0xFF2E7D32) else Color.Gray, modifier = Modifier.scale(scale))
+                    IconButton(onClick = {
+                        // Toggle local state immediately to run the animation, then notify the ViewModel
+                        localFavorite = !localFavorite
+                        onToggleFavorite?.invoke()
+                    }, enabled = onToggleFavorite != null) {
+                        val icon = if (localFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
+                        val scale by animateFloatAsState(targetValue = if (localFavorite) 1.12f else 1f, animationSpec = tween(durationMillis = 220))
+                        Icon(imageVector = icon, contentDescription = "favorite", tint = if (localFavorite) Color(0xFF2E7D32) else Color.Gray, modifier = Modifier.scale(scale))
                     }
                     if (optionsAvailable) {
                         Box {
