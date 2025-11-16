@@ -35,6 +35,7 @@ fun ProductsScreen(navController: NavController) {
         viewModel(factory = ProductsViewModelFactory(token))
 
     val categorias by viewModel.categorias.collectAsState()
+    val categoriasOrdenadas = categorias.sortedBy { it.nombre.lowercase() }
     val searchResults by viewModel.searchResults.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
@@ -131,7 +132,7 @@ fun ProductsScreen(navController: NavController) {
                         }
 
                         // ==== CATEGORÍAS ====
-                        items(categorias) { categoria ->
+                        items(categoriasOrdenadas) { categoria ->
                             CategoriaCard(
                                 categoria = categoria,
                                 onClick = {
