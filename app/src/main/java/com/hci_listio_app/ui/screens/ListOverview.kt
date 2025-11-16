@@ -5,7 +5,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-// Note: animateItemPlacement removed for compatibility with current Compose version
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Alignment
@@ -24,7 +23,6 @@ import androidx.navigation.NavController
 import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.*
 import com.hci_listio_app.ui.viewmodels.ListOverviewViewModel
-import com.hci_listio_app.data.ListRepositoryProvider
 import kotlinx.coroutines.launch
 
 @Composable
@@ -141,7 +139,13 @@ fun ListOverview(
                     }
 
                 if (filteredLists.isEmpty() && !uiState.isLoading) {
-                    EmptyState(modifier = Modifier.fillMaxWidth())
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        EmptyState()
+                    }
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                         items(filteredLists, key = { it.id }) { list ->
