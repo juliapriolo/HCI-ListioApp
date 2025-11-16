@@ -18,6 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import com.hci_listio_app.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -47,6 +50,7 @@ fun CreateEntityDialog(
     var error by remember { mutableStateOf<String?>(null) }
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Dialog(onDismissRequest = onDismiss) {
         Column(
@@ -58,7 +62,7 @@ fun CreateEntityDialog(
         ) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(text = title, modifier = Modifier.weight(1f))
-                TextButton(onClick = onDismiss) { Icon(Icons.Default.Close, contentDescription = "Cerrar") }
+                TextButton(onClick = onDismiss) { Icon(Icons.Default.Close, contentDescription = stringResource(id = R.string.create_entity_close)) }
             }
 
             OutlinedTextField(
@@ -80,32 +84,32 @@ fun CreateEntityDialog(
             error?.let { Text(text = it, color = Color.Red) }
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = onDismiss, colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2E7D32))) { Text("Cancelar") }
-                Button(onClick = {
+                TextButton(onClick = onDismiss, colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2E7D32))) { Text(stringResource(id = R.string.common_cancel)) }
+                TextButton(onClick = {
                     if (name.isBlank()) {
-                        error = "El nombre no puede estar vacío"
-                        return@Button
-                    }
-                    isLoading = true
-                    // launch coroutine to create
-                    scope.launch {
-                        try {
-                            val createdId = onCreate(name.trim(), if (showDescription) description.trim() else null)
-                            if (createdId != null) {
-                                // success -> dismiss handled by caller (they will navigate)
-                                onDismiss()
-                            } else {
-                                error = "No se pudo crear. Intenta nuevamente."
+                        error = context.getString(R.string.error_name_required)
+                    } else {
+                        isLoading = true
+                        // launch coroutine to create
+                        scope.launch {
+                            try {
+                                val createdId = onCreate(name.trim(), if (showDescription) description.trim() else null)
+                                if (createdId != null) {
+                                    // success -> dismiss handled by caller (they will navigate)
+                                    onDismiss()
+                                } else {
+                                    error = context.getString(R.string.error_create_failed)
+                                }
+                            } catch (e: Exception) {
+                                error = e.message ?: context.getString(R.string.error_unknown)
+                            } finally {
+                                isLoading = false
                             }
-                        } catch (e: Exception) {
-                            error = e.message ?: "Error desconocido"
-                        } finally {
-                            isLoading = false
                         }
                     }
                 }, enabled = !isLoading, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32), contentColor = Color.White)) {
                     if (isLoading) CircularProgressIndicator(modifier = Modifier.padding(4.dp), color = Color.White)
-                    else Text("Guardar")
+                    else Text(stringResource(id = R.string.common_save))
                 }
             }
         }

@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 
 @Composable
 fun ProductItem(
@@ -62,7 +64,7 @@ fun ProductItem(
                 IconButton(onClick = { expanded = true }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Opciones",
+                        contentDescription = stringResource(id = R.string.list_options),
                         tint = Color.Gray
                     )
                 }
@@ -72,7 +74,7 @@ fun ProductItem(
                     onDismissRequest = { expanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Eliminar producto") },
+                        text = { Text(stringResource(id = R.string.confirm_delete_product_text)) },
                         onClick = {
                             expanded = false
                             onDelete()   // 👈 Ejecuta callback

@@ -19,10 +19,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -72,7 +72,7 @@ fun ConfigurationItem(
             modifier = Modifier.weight(1f)
         )
         Icon(
-            imageVector = Icons.Default.ArrowForward,
+            imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
             tint = Color.Gray
         )
@@ -207,7 +207,7 @@ fun ProfileScreen(
                                 onClick = { navController.navigate(Screen.EditProfile.route) }
                             )
 
-                            Divider(color = Color(0xFFE0E0E0))
+                            HorizontalDivider(color = Color(0xFFE0E0E0))
 
                             // Opción: Cambiar Idioma
                             ConfigurationItem(
@@ -215,7 +215,7 @@ fun ProfileScreen(
                                 onClick = { navController.navigate(Screen.Language.route) }
                             )
 
-                            Divider(color = Color(0xFFE0E0E0))
+                            HorizontalDivider(color = Color(0xFFE0E0E0))
 
                             // Opción: Cerrar sesión
                             ConfigurationItem(

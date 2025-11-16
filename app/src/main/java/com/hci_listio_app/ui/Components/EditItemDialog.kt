@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 import androidx.compose.ui.window.Dialog
 
 @Composable
@@ -50,7 +52,7 @@ fun EditItemDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Editar Item",
+                        text = stringResource(id = R.string.edit_item_title),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF303F4F)
@@ -61,7 +63,7 @@ fun EditItemDialog(
                     ) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Cerrar",
+                            contentDescription = stringResource(id = R.string.create_entity_close),
                             tint = Color(0xFF6DCB5A)
                         )
                     }
@@ -87,7 +89,7 @@ fun EditItemDialog(
                     // Cantidad
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Cantidad",
+                            text = stringResource(id = R.string.quantity_label),
                             fontSize = 14.sp,
                             color = Color.Gray,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -107,7 +109,7 @@ fun EditItemDialog(
                     // Unidades
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Unidades",
+                            text = stringResource(id = R.string.units_label),
                             fontSize = 14.sp,
                             color = Color.Gray,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -143,7 +145,7 @@ fun EditItemDialog(
                     )
                 ) {
                     Text(
-                        text = "Guardar",
+                        text = stringResource(id = R.string.common_save),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.White

@@ -18,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hci_listio_app.R
+ 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.IconButton
@@ -84,14 +86,14 @@ fun CategoriaCard(
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {
                         IconButton(onClick = { expanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Opciones", tint = Color.White)
+                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(id = R.string.list_options), tint = Color.White)
                         }
                         DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Eliminar categoría", color = Color.Red) },
+                                text = { Text(stringResource(id = R.string.delete_category_text), color = Color.Red) },
                                 onClick = {
                                     expanded = false
                                     onDelete(categoria)
@@ -122,7 +124,7 @@ fun AddCategoriaCard(onClick: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "Añadir\nNueva Categoría",
+                stringResource(id = R.string.add_category_text),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,

@@ -11,6 +11,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -28,7 +30,7 @@ fun CreateListScreen(
     Scaffold(
         topBar = {
             ListioTopAppBar(
-                title = "Crear lista",
+                title = stringResource(id = R.string.create_list),
                 showBackButton = true,
                 onBackClick = { navController.navigateUp() }
             )
@@ -41,12 +43,12 @@ fun CreateListScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(text = "Nombre de la lista", style = MaterialTheme.typography.titleMedium)
+            Text(text = stringResource(id = R.string.create_list_name), style = MaterialTheme.typography.titleMedium)
             OutlinedTextField(
                 value = listName,
                 onValueChange = { listName = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Ej: Compras Semanales") }
+                placeholder = { Text(stringResource(id = R.string.create_list_placeholder)) }
             )
 
             Button(onClick = {
@@ -54,11 +56,11 @@ fun CreateListScreen(
                 // Por ahora solo navegamos atrás.
                 navController.navigateUp()
             }) {
-                Text(text = "Crear")
+                Text(text = stringResource(id = R.string.common_save))
             }
 
             TextButton(onClick = { navController.navigateUp() }) {
-                Text(text = "Cancelar")
+                Text(text = stringResource(id = R.string.common_cancel))
             }
         }
     }

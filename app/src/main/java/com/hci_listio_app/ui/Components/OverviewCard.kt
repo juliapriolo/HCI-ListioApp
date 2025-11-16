@@ -24,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,23 +81,23 @@ fun OverviewCard(
                     if (optionsAvailable) {
                         Box {
                             IconButton(onClick = { setMenuExpanded(true) }) {
-                                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Más opciones")
+                                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = stringResource(id = R.string.list_options))
                             }
                             DropdownMenu(expanded = menuExpanded, onDismissRequest = { setMenuExpanded(false) }) {
                                 if (onEdit != null) {
-                                    DropdownMenuItem(text = { Text("Editar nombre") }, onClick = {
+                                    DropdownMenuItem(text = { Text(stringResource(id = R.string.options_edit_name)) }, onClick = {
                                         setMenuExpanded(false)
                                         onEdit()
                                     })
                                 }
                                 if (onRestore != null) {
-                                    DropdownMenuItem(text = { Text("Recuperar lista") }, onClick = {
+                                    DropdownMenuItem(text = { Text(stringResource(id = R.string.options_restore)) }, onClick = {
                                         setMenuExpanded(false)
                                         onRestore()
                                     })
                                 }
                                 if (onDelete != null) {
-                                    DropdownMenuItem(text = { Text("Eliminar lista", color = Color(0xFFD32F2F)) }, onClick = {
+                                    DropdownMenuItem(text = { Text(stringResource(id = R.string.options_delete), color = Color(0xFFD32F2F)) }, onClick = {
                                         setMenuExpanded(false)
                                         onDelete()
                                     })
@@ -105,9 +107,9 @@ fun OverviewCard(
                     }
                 }
                 Spacer(modifier = Modifier.size(6.dp))
-                Text(text = if (item.isPrivate) "Privada" else "Pública", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
+                Text(text = if (item.isPrivate) stringResource(id = R.string.list_private) else stringResource(id = R.string.list_public), color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
                 Spacer(modifier = Modifier.size(6.dp))
-                Text(text = "Lista ${item.completed}/${item.total} Completada", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                Text(text = stringResource(id = R.string.list_completed, item.completed, item.total), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {

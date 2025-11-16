@@ -5,6 +5,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 
 @Composable
 fun ConfirmDeleteDialog(
@@ -15,15 +17,15 @@ fun ConfirmDeleteDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Eliminar", color = Color.Red)
+                Text(stringResource(id = R.string.confirm_delete), color = Color.Red)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(id = R.string.common_cancel))
             }
         },
-        title = { Text("Eliminar producto") },
-        text = { Text("¿Seguro que querés eliminar este producto?") }
+        title = { Text(stringResource(id = R.string.confirm_delete_product_title)) },
+        text = { Text(stringResource(id = R.string.confirm_delete_product_text)) }
     )
 }

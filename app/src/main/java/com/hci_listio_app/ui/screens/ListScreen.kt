@@ -18,9 +18,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.compose.BackHandler
 import androidx.navigation.NavController
 import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.AddItemToListDialog
@@ -39,11 +42,13 @@ import com.hci_listio_app.ui.Components.SharedUser
 fun ListScreen(
     navController: NavController,
     listId: Long = 1L,
+    originTab: Int = -1,
     listName: String = "Mi Lista",
     viewModel: ListViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = com.hci_listio_app.ui.Components.rememberAppSnackbarHostState()
+    val context = LocalContext.current
     val shareDialogUsers = remember(uiState.owner, uiState.sharedMembers) {
         val seenIds = mutableSetOf<Long>()
         val participants = mutableListOf<SharedUser>()
@@ -96,13 +101,26 @@ fun ListScreen(
         }
     }
 
+    val navigateBack = remember(navController, originTab) {
+        {
+            if (originTab >= 0) {
+                navController.previousBackStackEntry?.savedStateHandle?.set("overviewTab", originTab)
+            }
+            // popBackStack() returns Boolean; ensure our lambda returns Unit
+            navController.popBackStack()
+            kotlin.Unit
+        }
+    }
+
+    BackHandler(onBack = navigateBack)
+
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
                 title = uiState.listName.ifEmpty { listName },
                 showBackButton = true,
-                onBackClick = { navController.navigateUp() }
+                onBackClick = navigateBack
             )
         },
         floatingActionButton = {
@@ -111,7 +129,7 @@ fun ListScreen(
                 containerColor = Color(0xFF6DCB5A),
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar producto")
+                Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.list_add_product))
             }
         },
         snackbarHost = { com.hci_listio_app.ui.Components.AppSnackbarHost(hostState = snackbarHostState) }
@@ -145,7 +163,7 @@ fun ListScreen(
                         ) {
                             if (displayedMembers.isEmpty()) {
                                 MemberAvatar(
-                                    description = "Sin integrantes",
+                                    description = stringResource(id = R.string.list_no_members),
                                     modifier = Modifier.size(40.dp)
                                 )
                             } else {
@@ -171,7 +189,7 @@ fun ListScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
-                                    contentDescription = "Añadir usuario",
+                                    contentDescription = stringResource(id = R.string.list_add_user),
                                     tint = Color.Gray
                                 )
                             }
@@ -182,7 +200,7 @@ fun ListScreen(
                             IconButton(onClick = { /* TODO: Filter options */ }) {
                                 Icon(
                                     imageVector = Icons.Default.FilterList,
-                                    contentDescription = "Opciones",
+                                    contentDescription = stringResource(id = R.string.list_options),
                                     tint = Color.Gray
                                 )
                             }
@@ -209,7 +227,7 @@ fun ListScreen(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Lista ${uiState.completedCount}/${uiState.totalCount} Completada",
+                            text = stringResource(id = R.string.list_completed, uiState.completedCount, uiState.totalCount),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )
@@ -224,7 +242,7 @@ fun ListScreen(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Todos",
+                            text = stringResource(id = R.string.list_all),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                             fontWeight = FontWeight.Medium
@@ -246,19 +264,19 @@ fun ListScreen(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.empty_list_icon),
-                            contentDescription = "Lista vacía",
+                            contentDescription = stringResource(id = R.string.list_empty_title),
                             tint = Color(0xFF6DCB5A),
                             modifier = Modifier.size(80.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Tu lista está vacía",
+                            text = stringResource(id = R.string.list_empty_title),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.Gray
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Empieza a agregar productos",
+                            text = stringResource(id = R.string.list_empty_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )

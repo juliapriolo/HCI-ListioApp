@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,11 +32,16 @@ fun ListOverview(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val query = remember { mutableStateOf("") }
-    val tabs = listOf("Personal", "Compartidas", "Historial")
+    val tabs = listOf(
+        stringResource(id = R.string.tab_personal),
+        stringResource(id = R.string.tab_shared),
+        stringResource(id = R.string.tab_history)
+    )
     val selected = remember { mutableStateOf(0) }
     val showCreateDialog = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = rememberAppSnackbarHostState()
+    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var listBeingEdited by remember { mutableStateOf<Pair<Long, String>?>(null) }
     var listBeingDeleted by remember { mutableStateOf<Pair<Long, String>?>(null) }
@@ -79,7 +85,7 @@ fun ListOverview(
                 containerColor = Color.White,
                 contentColor = Color(0xFF6DCB5A)
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar")
+                Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(id = R.string.create_list))
             }
         },
         bottomBar = { BottomNavigationBar(navController = navController) },
@@ -164,9 +170,9 @@ fun ListOverview(
                                 onRestore = if (isArchived) {
                                     {
                                         viewModel.restoreList(list.id)
-                                        coroutineScope.launch {
-                                            snackbarHostState.showToast("Lista recuperada")
-                                        }
+                                                coroutineScope.launch {
+                                                    snackbarHostState.showToast(context.getString(R.string.list_restored))
+                                                }
                                     }
                                 } else null,
                                 modifier = Modifier
@@ -193,18 +199,17 @@ fun ListOverview(
     // Diálogo para crear lista
     if (showCreateDialog.value) {
         CreateEntityDialog(
-            title = "Crear lista",
-            nameLabel = "Nombre de la lista",
-            showDescription = true,  //
-            descriptionLabel = "Descripción",
+            title = stringResource(id = R.string.create_list),
+            nameLabel = stringResource(id = R.string.create_list_name),
+            showDescription = true,
+            descriptionLabel = stringResource(id = R.string.create_list_description),
             onDismiss = { showCreateDialog.value = false },
-            onCreate = { name, description ->  //
+            onCreate = { name, description ->
                 var createdId: Long? = null
                 try {
-                    // Ahora pasá también description
                     val result = ListRepositoryProvider.instance.createList(
                         name,
-                        description ?: ""  // Pasar description o string vacío
+                        description ?: ""
                     )
                     if (result.isSuccess) {
                         val response = result.getOrNull()
@@ -218,8 +223,7 @@ fun ListOverview(
 
                 if (createdId != null) {
                     coroutineScope.launch {
-                        snackbarHostState.showToast("Lista creada")
-                        // Refrescar las listas en el overview para que la nueva aparezca inmediatamente
+                        snackbarHostState.showToast(context.getString(R.string.list_created))
                         viewModel.loadLists()
                     }
                 }
@@ -240,24 +244,24 @@ fun ListOverview(
                         viewModel.renameList(id, newName.trim()) { success, message ->
                             coroutineScope.launch {
                                 snackbarHostState.showToast(
-                                    if (success) "Lista actualizada" else message ?: "No se pudo actualizar la lista."
+                                    if (success) context.getString(R.string.list_updated) else message ?: context.getString(R.string.list_not_updated)
                                 )
                             }
                         }
                         listBeingEdited = null
                     }
-                }) { Text("Guardar") }
+                }) { Text(stringResource(id = R.string.common_save)) }
             },
             dismissButton = {
-                TextButton(onClick = { listBeingEdited = null }) { Text("Cancelar") }
+                TextButton(onClick = { listBeingEdited = null }) { Text(stringResource(id = R.string.common_cancel)) }
             },
-            title = { Text("Editar lista") },
+            title = { Text(stringResource(id = R.string.edit_list_title)) },
             text = {
                 OutlinedTextField(
                     value = newName,
                     onValueChange = { newName = it },
                     singleLine = true,
-                    label = { Text("Nombre") }
+                    label = { Text(stringResource(id = R.string.create_list_name)) }
                 )
             }
         )
@@ -273,9 +277,9 @@ fun ListOverview(
                     viewModel.deleteList(id, deletingHistory) { success, message ->
                         coroutineScope.launch {
                             val defaultMessage = if (deletingHistory) {
-                                if (success) "Lista eliminada" else "No se pudo eliminar la lista."
+                                if (success) context.getString(R.string.list_deleted) else context.getString(R.string.list_not_deleted)
                             } else {
-                                if (success) "Lista movida al historial" else "No se pudo mover la lista al historial."
+                                if (success) context.getString(R.string.list_moved_to_history) else context.getString(R.string.list_not_moved_to_history)
                             }
                             snackbarHostState.showToast(message ?: defaultMessage)
                         }
@@ -284,16 +288,16 @@ fun ListOverview(
                 }) {
                     val deletingHistory = selected.value == 2
                     Text(
-                        if (deletingHistory) "Eliminar" else "Mover al historial",
+                        if (deletingHistory) stringResource(id = R.string.confirm_delete) else stringResource(id = R.string.move_to_history),
                         color = if (deletingHistory) Color(0xFFD32F2F) else Color(0xFF6DCB5A)
                     )
                 }
             },
             dismissButton = {
-                TextButton(onClick = { listBeingDeleted = null }) { Text("Cancelar") }
+                TextButton(onClick = { listBeingDeleted = null }) { Text(stringResource(id = R.string.common_cancel)) }
             },
-            title = { Text("Eliminar lista") },
-            text = { Text("¿Seguro que deseas eliminar \"$name\"? Esta acción no se puede deshacer.") }
+            title = { Text(stringResource(id = R.string.delete_list_title)) },
+            text = { Text(stringResource(id = R.string.delete_list_confirmation, name)) }
         )
     }
 }

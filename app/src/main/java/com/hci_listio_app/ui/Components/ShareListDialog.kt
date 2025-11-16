@@ -17,7 +17,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -40,6 +42,7 @@ fun ShareListDialog(
     var email by remember { mutableStateOf("") }
     var selectedRole by remember { mutableStateOf("Editor") }
     var expandedRoleMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -61,7 +64,7 @@ fun ShareListDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Enviar a otros:",
+                        text = stringResource(id = R.string.share_list_title),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF303F4F)
@@ -72,7 +75,7 @@ fun ShareListDialog(
                     ) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Cerrar",
+                            contentDescription = stringResource(id = R.string.create_entity_close),
                             tint = Color(0xFF6DCB5A)
                         )
                     }
@@ -89,7 +92,7 @@ fun ShareListDialog(
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        placeholder = { Text("Email", color = Color.Gray) },
+                            placeholder = { Text(stringResource(id = R.string.login_email), color = Color.Gray) },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -127,11 +130,11 @@ fun ShareListDialog(
                             onDismissRequest = { expandedRoleMenu = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Editor") },
-                                onClick = {
-                                    selectedRole = "Editor"
-                                    expandedRoleMenu = false
-                                }
+                                text = { Text(stringResource(id = R.string.role_editor)) },
+                                    onClick = {
+                                        selectedRole = context.getString(R.string.role_editor)
+                                        expandedRoleMenu = false
+                                    }
                             )
                         }
                     }
@@ -142,7 +145,7 @@ fun ShareListDialog(
                 // Sección de integrantes
                 if (currentUsers.isNotEmpty()) {
                     Text(
-                        text = "Integrantes",
+                        text = stringResource(id = R.string.share_list_members_title),
                         fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(bottom = 12.dp)
@@ -185,7 +188,7 @@ fun ShareListDialog(
                     enabled = email.isNotBlank()
                 ) {
                     Text(
-                        text = "Enviar",
+                        text = stringResource(id = R.string.share_button_text),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.White
@@ -256,7 +259,7 @@ private fun SharedUserItem(
                 ) {
                     Icon(
                         Icons.Default.Close,
-                        contentDescription = "Eliminar",
+                        contentDescription = stringResource(id = R.string.options_delete),
                         tint = Color.Gray,
                         modifier = Modifier.size(18.dp)
                     )

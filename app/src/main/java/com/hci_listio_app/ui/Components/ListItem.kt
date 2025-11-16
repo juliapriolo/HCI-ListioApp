@@ -14,6 +14,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 
 data class ListItemData(
     val id: String,
@@ -75,7 +77,7 @@ fun ListItem(
                 IconButton(onClick = { showMenu = true }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Más opciones",
+                        contentDescription = stringResource(id = R.string.list_options),
                         tint = Color.Gray
                     )
                 }
@@ -85,14 +87,14 @@ fun ListItem(
                     onDismissRequest = { showMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Editar") },
+                        text = { Text(stringResource(id = R.string.options_edit_name)) },
                         onClick = {
                             showMenu = false
                             onEditClick(item)
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Eliminar") },
+                        text = { Text(stringResource(id = R.string.options_delete)) },
                         onClick = {
                             showMenu = false
                             onDeleteClick(item)

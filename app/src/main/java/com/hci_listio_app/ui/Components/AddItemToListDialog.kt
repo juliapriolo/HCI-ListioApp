@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 import com.hci_listio_app.data.model.Product
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +64,7 @@ fun AddItemToListDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Agregar Producto",
+                        text = stringResource(id = R.string.add_product_title),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF303F4F)
@@ -70,7 +72,7 @@ fun AddItemToListDialog(
                     IconButton(onClick = onDismiss) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Cerrar",
+                            contentDescription = stringResource(id = R.string.add_product_close),
                             tint = Color(0xFF6DCB5A)
                         )
                     }
@@ -83,7 +85,7 @@ fun AddItemToListDialog(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Buscar producto...") },
+                    placeholder = { Text(stringResource(id = R.string.search_products_placeholder)) },
                     leadingIcon = {
                         Icon(
                             Icons.Default.Search,
@@ -114,12 +116,12 @@ fun AddItemToListDialog(
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = "Crear",
+                        contentDescription = stringResource(id = R.string.create_new_product),
                         tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Crear nuevo producto",
+                        text = stringResource(id = R.string.create_new_product),
                         color = Color.White,
                         fontSize = 16.sp
                     )
@@ -127,7 +129,7 @@ fun AddItemToListDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Divider(color = Color(0xFFE0E0E0))
+                HorizontalDivider(color = Color(0xFFE0E0E0))
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -151,9 +153,9 @@ fun AddItemToListDialog(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = if (searchQuery.isBlank()) {
-                                    "No hay productos disponibles"
+                                    stringResource(id = R.string.no_products_available)
                                 } else {
-                                    "No se encontraron productos"
+                                    stringResource(id = R.string.no_products_found)
                                 },
                                 color = Color.Gray,
                                 fontSize = 16.sp
@@ -161,7 +163,7 @@ fun AddItemToListDialog(
                             if (searchQuery.isBlank()) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Crea tu primer producto",
+                                    text = stringResource(id = R.string.create_first_product),
                                     color = Color.Gray,
                                     fontSize = 14.sp
                                 )
@@ -170,7 +172,7 @@ fun AddItemToListDialog(
                     }
                 } else {
                     Text(
-                        text = "Selecciona un producto existente:",
+                        text = stringResource(id = R.string.select_existing_product_label),
                         fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(vertical = 8.dp)

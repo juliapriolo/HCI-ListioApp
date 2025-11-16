@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 import com.hci_listio_app.data.remote.dto.CategoryResponse
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,11 +60,11 @@ fun CreateProductDialog(
                         color = Color(0xFF303F4F)
                     )
                     IconButton(onClick = onDismiss) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = "Cerrar",
-                            tint = Color(0xFF6DCB5A)
-                        )
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = stringResource(id = R.string.create_entity_close),
+                                tint = Color(0xFF6DCB5A)
+                            )
                     }
                 }
 
