@@ -141,7 +141,7 @@
     <string name="list_restored">Lista recuperada</string>
     <string name="edit_list_title">Editar lista</string>
     <string name="delete_list_title">Eliminar lista</string>
-    <string name="delete_list_confirmation">¿Seguro que deseas eliminar \"%1$s\"? Esta acción no se puede deshacer.</string>
+    <string name="delete_list_confirmation">¿Seguro que deseas eliminar \"%1$s\"? Esta acción se puede deshacer.</string>
     <string name="confirm_delete">Eliminar</string>
     <string name="move_to_history">Mover al historial</string>
     <string name="list_deleted">Lista eliminada</string>
