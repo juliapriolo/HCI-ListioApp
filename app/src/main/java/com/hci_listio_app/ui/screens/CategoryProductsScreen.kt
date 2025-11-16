@@ -1,17 +1,15 @@
 package com.hci_listio_app.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,7 +41,6 @@ fun CategoryProductsScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
 
-    // Construir objeto Categoria para traducción si es default
     val categoriaForDisplay = remember(categoryId, categoryName) {
         Categoria(id = categoryId, nombre = categoryName)
     }
@@ -56,6 +53,19 @@ fun CategoryProductsScreen(
                 showBackButton = true,
                 onBackClick = { navController.popBackStack() }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showDialog = true },
+                containerColor = Color.White,
+                contentColor = Color(0xFF6DCB5A)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.category_products_add_icon),
+                    tint = Color(0xFF6DCB5A)
+                )
+            }
         }
     ) { padding ->
 
@@ -66,7 +76,6 @@ fun CategoryProductsScreen(
                 .padding(horizontal = 16.dp)
         ) {
 
-            // ⭐ Header con título + botón redondo de agregar
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -77,19 +86,6 @@ fun CategoryProductsScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
-
-                IconButton(
-                    onClick = { showDialog = true },
-                    modifier = Modifier
-                        .size(36.dp)
-                        .background(Color(0xFFF2F2F2), CircleShape) // gris suave
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = stringResource(R.string.category_products_add_icon),
-                        tint = Color(0xFF6DCB5A) // verde del Figma
-                    )
-                }
             }
 
             Spacer(Modifier.height(16.dp))
@@ -126,13 +122,13 @@ fun CategoryProductsScreen(
                             color = Color.Gray,
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
                             modifier = Modifier
-                                .fillMaxWidth()   // 👈 Necesario para que textAlign funcione
+                                .fillMaxWidth()
                                 .padding(bottom = 16.dp),
                             textAlign = TextAlign.Center
                         )
 
                     }
-                }  // 👈 ESTE CIERRE FALTABA
+                }
 
             } else {
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -46,7 +47,6 @@ fun ProductsScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     var showAddCategory by remember { mutableStateOf(false) }
 
-    // Inicializar categorías por defecto si no existen
     val initialized = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(token) {
@@ -54,7 +54,6 @@ fun ProductsScreen(navController: NavController) {
             scope.launch(Dispatchers.IO) {
                 try {
                     DefaultCategoriesInitializer().loadOrCreate(token)
-                    // Recargar categorías después de crear
                     viewModel.loadCategories()
                 } catch (_: Exception) {
                 }
@@ -62,6 +61,13 @@ fun ProductsScreen(navController: NavController) {
             }
         }
     }
+
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp
+    // Considerar tablet si el ancho es mayor a 720dp
+    val isTablet = screenWidthDp >= 720
+
+    val gridColumns = if (isTablet) 8 else 2
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -80,27 +86,24 @@ fun ProductsScreen(navController: NavController) {
             }
         }
     ) { padding ->
-        // Envolver el grid en un Box y usar Modifier.fillMaxSize() para permitir scroll completo
         Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
         ) {
             if (isLoading) {
-                // Indicador de carga centrado
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                    columns = GridCells.Fixed(gridColumns),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // 🔍 BUSCADOR
                     item(span = { GridItemSpan(2) }) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Spacer(modifier = Modifier.height(12.dp))
@@ -116,7 +119,6 @@ fun ProductsScreen(navController: NavController) {
                         }
                     }
 
-                    // ⭐ SIN BUSQUEDA → Mostrar categorías
                     if (searchQuery.isBlank()) {
                         item(span = { GridItemSpan(2) }) {
                             Text(
@@ -138,7 +140,6 @@ fun ProductsScreen(navController: NavController) {
                         }
                     }
 
-                    // ⭐ CON BUSQUEDA → mostrar productos encontrados
                     else {
                         val showNoResults = searchQuery.isNotBlank() && searchResults.isEmpty()
                         if (showNoResults) {
@@ -171,7 +172,6 @@ fun ProductsScreen(navController: NavController) {
             }
         }
 
-        // Diálogo para crear nueva categoría
         if (showAddCategory) {
             AddCategoryDialog(
                 onDismiss = { showAddCategory = false },
