@@ -438,7 +438,8 @@ class ListViewModel(
                         item.copy(
                             quantity = updatedItem.quantity,
                             name = updatedItem.product.name,
-                            isChecked = updatedItem.purchased
+                            isChecked = updatedItem.purchased,
+                            unit = updatedItem.unit
                         )
                     } else item
                 }
@@ -544,7 +545,8 @@ class ListViewModel(
                     name = item.product!!.name,
                     isChecked = item.purchased,
                     productId = item.product.id,
-                    quantity = item.quantity
+                    quantity = item.quantity,
+                    unit = item.unit
                 )
             }
 

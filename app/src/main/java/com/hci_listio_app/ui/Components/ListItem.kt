@@ -23,6 +23,7 @@ data class ListItemData(
     val isChecked: Boolean = false,
     val productId: Long? = null,
     val quantity: Int? = null,
+    val unit: String? = null,
 )
 
 @Composable

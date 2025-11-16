@@ -388,12 +388,12 @@ fun ListScreen(
         EditItemDialog(
             itemName = itemToEdit!!.name,
             quantity = itemToEdit!!.quantity?.toString() ?: "1",
-            unit = "kg",
+            unit = itemToEdit!!.unit ?: "kg",
             onDismiss = {
                 showEditDialog = false
                 itemToEdit = null
             },
-            onSave = { name, quantity, unit, brand, store ->
+            onSave = { name, quantity, unit ->
                 viewModel.editItem(
                     itemId = itemToEdit!!.id,
                     quantity = quantity,

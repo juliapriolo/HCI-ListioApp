@@ -21,16 +21,12 @@ fun EditItemDialog(
     itemName: String,
     quantity: String = "",
     unit: String = "",
-    brand: String = "",
-    store: String = "",
     onDismiss: () -> Unit,
-    onSave: (name: String, quantity: String, unit: String, brand: String, store: String) -> Unit
+    onSave: (name: String, quantity: String, unit: String) -> Unit
 ) {
     var nameInput by remember { mutableStateOf(itemName) }
     var quantityInput by remember { mutableStateOf(quantity) }
     var unitInput by remember { mutableStateOf(unit) }
-    var brandInput by remember { mutableStateOf(brand) }
-    var storeInput by remember { mutableStateOf(store) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -117,7 +113,6 @@ fun EditItemDialog(
                         OutlinedTextField(
                             value = unitInput,
                             onValueChange = { unitInput = it },
-                            placeholder = { Text("24", color = Color.Gray) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
@@ -133,7 +128,7 @@ fun EditItemDialog(
                 // Botón Guardar
                 Button(
                     onClick = {
-                        onSave(nameInput, quantityInput, unitInput, brandInput, storeInput)
+                        onSave(nameInput, quantityInput, unitInput)
                         onDismiss()
                     },
                     modifier = Modifier
