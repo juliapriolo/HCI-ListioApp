@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,85 +45,99 @@ fun ProductsScreen(navController: NavController) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { ListioTopAppBar(title = stringResource(R.string.products_title)) },
-        bottomBar = { BottomNavigationBar(navController) }
+        bottomBar = { BottomNavigationBar(navController) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showAddCategory = true },
+                containerColor = Color.White,
+                contentColor = Color(0xFF6DCB5A)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.products_add_category)
+                )
+            }
+        }
     ) { padding ->
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+        // Envolver el grid en un Box y usar Modifier.fillMaxSize() para permitir scroll completo
+        Box(
             modifier = Modifier
                 .padding(padding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxSize()
         ) {
-
-            // 🔍 BUSCADOR
-            item(span = { GridItemSpan(2) }) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    SearchBar(
-                        query = searchQuery,
-                        onQueryChange = {
-                            searchQuery = it
-                            viewModel.searchProducts(it)
-                        },
-                        placeholder = stringResource(R.string.products_search),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
-            // ⭐ SIN BUSQUEDA → Mostrar categorías
-            if (searchQuery.isBlank()) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // 🔍 BUSCADOR
                 item(span = { GridItemSpan(2) }) {
-                    Text(
-                        text = stringResource(R.string.products_search_categories),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SearchBar(
+                            query = searchQuery,
+                            onQueryChange = {
+                                searchQuery = it
+                                viewModel.searchProducts(it)
+                            },
+                            placeholder = stringResource(R.string.products_search),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
-                items(categorias) { categoria ->
-                    CategoriaCard(
-                        categoria = categoria,
-                        onClick = {
-                            navController.navigate(
-                                "category/${categoria.nombre}?categoryId=${categoria.id}"
-                            )
-                        },
-                        onDelete = if (categoria.isDefault) null else { c -> /* lógica de borrado */ }
-                    )
-                }
-                item {
-                    AddCategoriaCard { showAddCategory = true }
-                }
-            }
 
-            // ⭐ CON BUSQUEDA → mostrar productos encontrados
-            else {
-                val showNoResults = searchQuery.isNotBlank() && searchResults.isEmpty()
-                if (showNoResults) {
+                // ⭐ SIN BUSQUEDA → Mostrar categorías
+                if (searchQuery.isBlank()) {
                     item(span = { GridItemSpan(2) }) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 64.dp)
-                        ) {
-                            Text(
-                                text = "No se encontraron productos",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = Color.Gray,
-                                modifier = Modifier.align(Alignment.Center)
+                        Text(
+                            text = stringResource(R.string.products_search_categories),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                    items(categorias) { categoria ->
+                        CategoriaCard(
+                            categoria = categoria,
+                            onClick = {
+                                navController.navigate(
+                                    "category/${categoria.nombre}?categoryId=${categoria.id}"
+                                )
+                            },
+                            onDelete = if (categoria.isDefault) null else { c -> viewModel.deleteCategory(c) }
+                        )
+                    }
+                }
+
+                // ⭐ CON BUSQUEDA → mostrar productos encontrados
+                else {
+                    val showNoResults = searchQuery.isNotBlank() && searchResults.isEmpty()
+                    if (showNoResults) {
+                        item(span = { GridItemSpan(2) }) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 64.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.products_no_results),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color.Gray,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+                        }
+                    } else {
+                        items(searchResults, span = { GridItemSpan(2) }) { product ->
+                            val brand = product.metadata?.get("brand") as? String
+                            ProductItem(
+                                productName = product.name,
+                                brand = brand,
+                                onDelete = { /* lógica de borrado */ }
                             )
                         }
-                    }
-                } else {
-                    items(searchResults, span = { GridItemSpan(2) }) { product ->
-                        val brand = product.metadata?.get("brand") as? String
-                        ProductItem(
-                            productName = product.name,
-                            brand = brand,
-                            onDelete = { /* lógica de borrado */ }
-                        )
                     }
                 }
             }

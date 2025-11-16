@@ -242,7 +242,6 @@ private fun SharedUserItem(
             )
         }
 
-        // Rol o botón eliminar
         if (onRemove != null) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

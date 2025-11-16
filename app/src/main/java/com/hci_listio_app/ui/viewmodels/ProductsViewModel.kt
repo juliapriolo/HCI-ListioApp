@@ -16,6 +16,16 @@ class ProductsViewModel(
     private val productRepo: ProductRepository,
     private val token: String
 ) : ViewModel() {
+    fun deleteCategory(categoria: Categoria) {
+        viewModelScope.launch {
+            categoryRepo.deleteCategory(token, categoria.id).fold(
+                onSuccess = {
+                    _categorias.value = _categorias.value.filter { it.id != categoria.id }
+                },
+                onFailure = { }
+            )
+        }
+    }
 
     private val _categorias = MutableStateFlow<List<Categoria>>(emptyList())
     val categorias: StateFlow<List<Categoria>> = _categorias.asStateFlow()

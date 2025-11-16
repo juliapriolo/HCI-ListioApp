@@ -114,13 +114,27 @@ class ListRemoteDataSource(
     suspend fun getItems(
         token: String,
         listId: Long,
-        purchased: Boolean? = null
+        purchased: Boolean? = null,
+        page: Int? = null,
+        perPage: Int? = null,
+        sortBy: String? = null,
+        order: String? = null,
+        pantryId: Long? = null,
+        categoryId: Long? = null,
+        search: String? = null
     ): Result<List<ShoppingListItemResponse>> =
         safeApiCall {
             val response = api.getItems(
                 authorization = bearer(token),
                 listId = listId,
-                purchased = purchased
+                purchased = purchased,
+                page = page,
+                perPage = perPage,
+                sortBy = sortBy,
+                order = order,
+                pantryId = pantryId,
+                categoryId = categoryId,
+                search = search
             )
             response.data
         }

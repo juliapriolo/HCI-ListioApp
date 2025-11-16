@@ -10,6 +10,7 @@ import com.hci_listio_app.data.model.Product
 import com.hci_listio_app.data.repository.AllProductsRepository
 import com.hci_listio_app.data.remote.NetworkModule
 import com.hci_listio_app.data.remote.dto.CategoryResponse
+import com.hci_listio_app.ui.Components.ListItemsFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +30,8 @@ data class ListUiState(
     val availableProducts: List<Product> = emptyList(),
     val isLoadingProducts: Boolean = false,
     val categories: List<CategoryResponse> = emptyList(),
-    val isCreatingProduct: Boolean = false
+    val isCreatingProduct: Boolean = false,
+    val filter: ListItemsFilter = ListItemsFilter()
 )
 
 class ListViewModel(
@@ -61,85 +63,46 @@ class ListViewModel(
 
     fun loadList(listId: Long) {
         viewModelScope.launch {
-            try {
-                _uiState.update {
-                    it.copy(isLoading = true, errorMessage = null, listId = listId)
-                }
+            _uiState.update {
+                it.copy(isLoading = true, errorMessage = null, listId = listId)
+            }
 
-                val listResult = listRepository.getList(listId)
+            val listResult = listRepository.getList(listId)
 
-                if (listResult.isFailure) {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = listResult.exceptionOrNull()?.message
-                                ?: "Error al cargar la lista."
-                        )
-                    }
-                    return@launch
-                }
-
-                val listData = listResult.getOrNull() ?: return@launch
-
-                val itemsResult = listRepository.getItems(listId)
-
-                val items = if (itemsResult.isSuccess) {
-                    itemsResult.getOrNull() ?: emptyList()
-                } else {
-                    emptyList()
-                }
-
-                val mappedItems = items.mapNotNull { item ->
-                    try {
-                        // Verificar que el producto no sea null
-                        val product = item.product ?: return@mapNotNull null
-
-                        ListItemData(
-                            id = item.id.toString(),
-                            name = product.name,
-                            isChecked = item.purchased,
-                            productId = product.id,
-                            quantity = item.quantity
-                        )
-                    } catch (e: Exception) {
-                        // Log error pero continuar con otros items
-                        null
-                    }
-                }
-
-                _uiState.update { current ->
-                    val participants = when {
-                        listData.users.isNotEmpty() -> listData.users
-                        listData.sharedWith.isNotEmpty() -> listData.sharedWith
-                        else -> emptyList()
-                    }
-
-                    val owner = listData.owner ?: participants.firstOrNull()
-                    val collaborators = owner?.let { own ->
-                        participants.filterNot { it.id == own.id }
-                    } ?: participants
-
-                    current.copy(
-                        listName = listData.name,
-                        owner = owner,
-                        sharedMembers = collaborators,
-                        items = mappedItems,
-                        completedCount = mappedItems.count { it.isChecked },
-                        totalCount = mappedItems.size,
-                        isLoading = false,
-                        errorMessage = null
-                    )
-                }
-
-                loadProductsAndCategories()
-            } catch (e: Exception) {
+            if (listResult.isFailure) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Error inesperado: ${e.message}"
+                        errorMessage = listResult.exceptionOrNull()?.message
+                            ?: "Error al cargar la lista."
                     )
                 }
+                return@launch
             }
+
+            val listData = listResult.getOrNull()!!
+
+            _uiState.update { current ->
+                val participants = when {
+                    listData.users.isNotEmpty() -> listData.users
+                    listData.sharedWith.isNotEmpty() -> listData.sharedWith
+                    else -> emptyList()
+                }
+
+                val owner = listData.owner ?: participants.firstOrNull()
+                val collaborators = owner?.let { o ->
+                    participants.filterNot { it.id == o.id }
+                } ?: participants
+
+                current.copy(
+                    listName = listData.name,
+                    owner = owner,
+                    sharedMembers = collaborators,
+                    isLoading = false
+                )
+            }
+            loadItems(listId)
+            loadProductsAndCategories()
         }
     }
 
@@ -546,5 +509,54 @@ class ListViewModel(
 
     fun dismissError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun applyFilter(filter: ListItemsFilter) {
+        _uiState.update { it.copy(filter = filter) }
+
+        val listId = uiState.value.listId ?: return
+
+        viewModelScope.launch {
+            loadItems(listId)
+        }
+    }
+
+    private suspend fun loadItems(listId: Long) {
+        val filter = uiState.value.filter
+
+        val result = listRepository.getItems(
+            listId = listId,
+            purchased = filter.purchased,
+            categoryId = filter.categoryId,
+            search = filter.search,
+            sortBy = filter.sortBy,
+            order = filter.order
+        )
+
+        if (result.isSuccess) {
+            val items = result.getOrNull()!!
+
+            val mapped = items.map { item ->
+                ListItemData(
+                    id = item.id.toString(),
+                    name = item.product!!.name,
+                    isChecked = item.purchased,
+                    productId = item.product.id,
+                    quantity = item.quantity
+                )
+            }
+
+            _uiState.update {
+                it.copy(
+                    items = mapped,
+                    completedCount = mapped.count { i -> i.isChecked },
+                    totalCount = mapped.size
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(errorMessage = "Error al cargar items")
+            }
+        }
     }
 }

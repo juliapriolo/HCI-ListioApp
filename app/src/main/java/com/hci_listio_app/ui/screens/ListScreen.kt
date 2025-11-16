@@ -29,6 +29,7 @@ import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.AddItemToListDialog
 import com.hci_listio_app.ui.Components.CreateProductDialog
 import com.hci_listio_app.ui.Components.EditItemDialog
+import com.hci_listio_app.ui.Components.FilterListItemsDialog
 import com.hci_listio_app.ui.Components.ListItem
 import com.hci_listio_app.ui.Components.ListItemData
 import com.hci_listio_app.ui.Components.ListioTopAppBar
@@ -86,6 +87,7 @@ fun ListScreen(
     var showCreateProductDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
     var showShareDialog by remember { mutableStateOf(false) }
+    var showFilterDialog by remember { mutableStateOf(false) }
     var itemToEdit by remember { mutableStateOf<ListItemData?>(null) }
 
     // Cargar la lista cuando se monta el composable
@@ -177,9 +179,8 @@ fun ListScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.weight(1f))
 
-                            // Botón añadir usuario
                             IconButton(
                                 onClick = { showShareDialog = true },
                                 modifier = Modifier
@@ -234,12 +235,14 @@ fun ListScreen(
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = null,
-                            tint = Color.Gray,
-                            modifier = Modifier.size(20.dp)
-                        )
+                        IconButton(onClick = { showFilterDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.FilterList,
+                                contentDescription = null,
+                                tint = Color.Gray,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(id = R.string.list_all),
@@ -380,6 +383,18 @@ fun ListScreen(
             },
             onRemoveUser = { userId ->
                 viewModel.removeUserFromList(userId)
+            }
+        )
+    }
+
+    if (showFilterDialog) {
+        FilterListItemsDialog(
+            currentFilter = uiState.filter,
+            categories = uiState.categories.map { it.id to it.name },
+            onDismiss = { showFilterDialog = false },
+            onApplyFilter = { filter ->
+                viewModel.applyFilter(filter)
+                showFilterDialog = false
             }
         )
     }

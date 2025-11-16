@@ -11,9 +11,11 @@ import androidx.compose.ui.res.stringResource
 import com.hci_listio_app.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.hci_listio_app.R
 
 @Composable
 fun AddProductDialog(
@@ -38,7 +40,7 @@ fun AddProductDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(id = R.string.add_product_title),
+                        text = "Añadir Nuevo Producto",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
@@ -46,7 +48,7 @@ fun AddProductDialog(
                     IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(id = R.string.add_product_close),
+                            contentDescription = "Cerrar",
                             tint = Color.Gray
                         )
                     }
@@ -55,7 +57,7 @@ fun AddProductDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Nombre
-                Text(stringResource(id = R.string.product_name_label), color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                Text("Nombre del Producto", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(4.dp))
                 OutlinedTextField(
                     value = productName,
@@ -67,7 +69,7 @@ fun AddProductDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Marca
-                Text(stringResource(id = R.string.product_brand_label), color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                Text("Marca (opcional)", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(4.dp))
                 OutlinedTextField(
                     value = productBrand,
@@ -89,7 +91,7 @@ fun AddProductDialog(
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                 ) {
-                    Text(stringResource(id = R.string.common_save), modifier = Modifier.padding(vertical = 8.dp))
+                    Text("Guardar", modifier = Modifier.padding(vertical = 8.dp))
                 }
             }
         }
