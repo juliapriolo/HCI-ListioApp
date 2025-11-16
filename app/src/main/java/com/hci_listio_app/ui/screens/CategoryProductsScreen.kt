@@ -83,33 +83,16 @@ fun CategoryProductsScreen(
                 .padding(horizontal = 16.dp)
         ) {
 
-            // ⭐ Header con título + botón redondo de agregar
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = getCategoriaDisplayName(categoriaForDisplay),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
-                )
+            Spacer(Modifier.height(24.dp))
 
-                IconButton(
-                    onClick = { showDialog = true },
-                    modifier = Modifier
-                        .size(36.dp)
-                        .background(Color(0xFFF2F2F2), CircleShape) // gris suave
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = stringResource(R.string.category_products_add_icon),
-                        tint = Color(0xFF6DCB5A) // verde del Figma
-                    )
-                }
-            }
+            Text(
+                text = getCategoriaDisplayName(categoriaForDisplay),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
 
             Spacer(Modifier.height(16.dp))
+
 
             if (uiState.products.isEmpty() && !uiState.isLoading) {
 
