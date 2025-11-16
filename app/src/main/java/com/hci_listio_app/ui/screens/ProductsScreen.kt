@@ -1,15 +1,7 @@
 package com.hci_listio_app.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -20,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,7 +31,8 @@ import kotlinx.coroutines.launch
 fun ProductsScreen(navController: NavController) {
 
     val token = AuthRepositoryProvider.instance.authToken.value ?: ""
-    val viewModel: ProductsViewModel = viewModel(factory = ProductsViewModelFactory(token))
+    val viewModel: ProductsViewModel =
+        viewModel(factory = ProductsViewModelFactory(token))
 
     val categorias by viewModel.categorias.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
@@ -49,25 +43,28 @@ fun ProductsScreen(navController: NavController) {
 
     val initialized = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
     LaunchedEffect(token) {
         if (!initialized.value && token.isNotBlank()) {
             scope.launch(Dispatchers.IO) {
                 try {
                     DefaultCategoriesInitializer().loadOrCreate(token)
                     viewModel.loadCategories()
-                } catch (_: Exception) {
-                }
+                } catch (_: Exception) {}
                 initialized.value = true
             }
         }
     }
 
+    // ---- GRID COLUMNS SEGÚN ANCHO DE PANTALLA ----
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
-    // Considerar tablet si el ancho es mayor a 720dp
-    val isTablet = screenWidthDp >= 720
-
-    val gridColumns = if (isTablet) 8 else 2
+    // breakpoints aproximados: phone, tablet chica, tablet grande / iPad
+    val gridColumns = when {
+        screenWidthDp >= 840 -> 4  // tablet grande / iPad horizontal
+        screenWidthDp >= 600 -> 3  // tablet chica / iPad vertical
+        else -> 2                  // teléfono
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -86,16 +83,17 @@ fun ProductsScreen(navController: NavController) {
             }
         }
     ) { padding ->
+
         Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
         ) {
+
             if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
+
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(gridColumns),
                     modifier = Modifier
@@ -104,7 +102,9 @@ fun ProductsScreen(navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    item(span = { GridItemSpan(2) }) {
+
+                    // ==== SEARCH BAR ====
+                    item(span = { GridItemSpan(gridColumns) }) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Spacer(modifier = Modifier.height(12.dp))
                             SearchBar(
@@ -120,13 +120,17 @@ fun ProductsScreen(navController: NavController) {
                     }
 
                     if (searchQuery.isBlank()) {
-                        item(span = { GridItemSpan(2) }) {
+
+                        // ==== TÍTULO ====
+                        item(span = { GridItemSpan(gridColumns) }) {
                             Text(
                                 text = stringResource(R.string.products_search_categories),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
                         }
+
+                        // ==== CATEGORÍAS ====
                         items(categorias) { categoria ->
                             CategoriaCard(
                                 categoria = categoria,
@@ -138,12 +142,16 @@ fun ProductsScreen(navController: NavController) {
                                 onDelete = { c -> viewModel.deleteCategory(c) }
                             )
                         }
-                    }
 
-                    else {
-                        val showNoResults = searchQuery.isNotBlank() && searchResults.isEmpty()
+                    } else {
+
+                        val showNoResults =
+                            searchQuery.isNotBlank() && searchResults.isEmpty()
+
                         if (showNoResults) {
-                            item(span = { GridItemSpan(2) }) {
+
+                            // ==== SIN RESULTADOS ====
+                            item(span = { GridItemSpan(gridColumns) }) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -158,12 +166,14 @@ fun ProductsScreen(navController: NavController) {
                                 }
                             }
                         } else {
-                            items(searchResults, span = { GridItemSpan(2) }) { product ->
+
+                            // ==== RESULTADOS ====
+                            items(searchResults, span = { GridItemSpan(gridColumns) }) { product ->
                                 val brand = product.metadata?.get("brand") as? String
                                 ProductItem(
                                     productName = product.name,
                                     brand = brand,
-                                    onDelete = { /* lógica de borrado */ }
+                                    onDelete = { /* implementar */ }
                                 )
                             }
                         }
