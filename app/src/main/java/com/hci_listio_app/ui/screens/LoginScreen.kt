@@ -51,7 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.hci_listio_app.R
-import com.hci_listio_app.ui.Components.ListioTopAppBar
+import com.hci_listio_app.ui.Components.ListioTopAppBarWithLogo
 import com.hci_listio_app.ui.navigation.Screen
 import com.hci_listio_app.ui.viewmodels.LoginViewModel
 
@@ -88,9 +88,7 @@ fun LoginScreen(
     Scaffold(
         containerColor = Color.White,
         topBar = {
-            ListioTopAppBar(
-                title = stringResource(R.string.login_title)
-            )
+            ListioTopAppBarWithLogo()
         }
     ) { padding ->
         BoxWithConstraints(
