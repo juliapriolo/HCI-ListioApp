@@ -1,7 +1,9 @@
 package com.hci_listio_app.ui.viewmodels
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hci_listio_app.R
 import com.hci_listio_app.data.model.Product
 import com.hci_listio_app.data.remote.dto.CategoryRef
 import com.hci_listio_app.data.remote.dto.ProductRequest
@@ -18,6 +20,7 @@ data class CategoryProductsUiState(
     val error: String? = null
 )
 class CategoryProductsViewModel(
+    private val application: Application,
     private val repository: CategoryProductsRepository,
     private val token: String,
     private val categoryId: Long
@@ -49,7 +52,7 @@ class CategoryProductsViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = error.message ?: "Error al cargar productos"
+                            error = error.message ?: application.getString(R.string.category_products_error_load)
                         )
                     }
                 }
@@ -83,7 +86,7 @@ class CategoryProductsViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = error.message ?: "Error al agregar producto"
+                            error = error.message ?: application.getString(R.string.category_products_error_add)
                         )
                     }
                 }
@@ -110,7 +113,7 @@ class CategoryProductsViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = error.message ?: "Error al eliminar producto"
+                            error = error.message ?: application.getString(R.string.category_products_error_delete)
                         )
                     }
                 }

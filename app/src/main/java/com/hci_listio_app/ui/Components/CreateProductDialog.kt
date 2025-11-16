@@ -33,6 +33,10 @@ fun CreateProductDialog(
     var selectedCategory by remember { mutableStateOf<CategoryResponse?>(null) }
     var expandedCategoryMenu by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    
+    // Obtener strings traducidos en el contexto @Composable
+    val errorNameRequired = stringResource(R.string.create_product_error_name_required)
+    val errorCategoryRequired = stringResource(R.string.create_product_error_category_required)
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -54,7 +58,7 @@ fun CreateProductDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Crear Producto",
+                        text = stringResource(R.string.create_product_title),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF303F4F)
@@ -72,7 +76,7 @@ fun CreateProductDialog(
 
                 // Product name field
                 Text(
-                    text = "Nombre del producto",
+                    text = stringResource(R.string.add_product_name_label),
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -89,14 +93,14 @@ fun CreateProductDialog(
                         unfocusedBorderColor = Color(0xFFE0E0E0),
                         focusedBorderColor = Color(0xFF6DCB5A)
                     ),
-                    placeholder = { Text("Ej: Leche Descremada") }
+                    placeholder = { Text(stringResource(R.string.create_product_placeholder_example)) }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Category selector
                 Text(
-                    text = "Categoría",
+                    text = stringResource(R.string.create_product_category_label),
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -117,13 +121,13 @@ fun CreateProductDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = selectedCategory?.name ?: "Selecciona una categoría",
+                                text = selectedCategory?.name ?: stringResource(R.string.create_product_select_category),
                                 modifier = Modifier.weight(1f),
                                 color = if (selectedCategory != null) Color(0xFF303F4F) else Color.Gray
                             )
                             Icon(
                                 Icons.Default.ArrowDropDown,
-                                contentDescription = "Expandir",
+                                contentDescription = stringResource(R.string.create_product_expand_icon),
                                 tint = Color.Gray
                             )
                         }
@@ -164,10 +168,10 @@ fun CreateProductDialog(
                     onClick = {
                         when {
                             productName.isBlank() -> {
-                                errorMessage = "Ingresa el nombre del producto"
+                                errorMessage = errorNameRequired
                             }
                             selectedCategory == null -> {
-                                errorMessage = "Selecciona una categoría"
+                                errorMessage = errorCategoryRequired
                             }
                             else -> {
                                 onCreateProduct(productName, selectedCategory!!.id)
@@ -191,7 +195,7 @@ fun CreateProductDialog(
                         )
                     } else {
                         Text(
-                            text = "Crear Producto",
+                            text = stringResource(R.string.create_product_button),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.White

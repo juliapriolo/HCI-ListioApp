@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.navigation.Screen
 import com.hci_listio_app.ui.viewmodels.VerifyAccountViewModel
@@ -32,9 +35,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun VerifyAccountScreen(
     navController: NavController,
     email: String = "",
-    password: String = "",
-    viewModel: VerifyAccountViewModel = viewModel()
+    password: String = ""
 ) {
+    val context = LocalContext.current
+    val viewModel: VerifyAccountViewModel = viewModel(
+        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return VerifyAccountViewModel(
+                    application = context.applicationContext as android.app.Application
+                ) as T
+            }
+        }
+    )
     val uiState by viewModel.uiState.collectAsState()
 
     // Inicializar el ViewModel con email si está disponible
@@ -66,7 +79,7 @@ fun VerifyAccountScreen(
         containerColor = Color.White,
         topBar = {
             ListioTopAppBar(
-                title = "Verificar cuenta",
+                title = stringResource(R.string.verify_account_title),
                 showBackButton = true,
                 onBackClick = { navController.navigateUp() }
             )
@@ -99,7 +112,7 @@ fun VerifyAccountScreen(
                 ) {
                     // Title
                     Text(
-                        text = "Verificar cuenta",
+                        text = stringResource(R.string.verify_account_title),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF303F4F),
@@ -108,7 +121,11 @@ fun VerifyAccountScreen(
 
                     // Description
                     Text(
-                        text = "Ingresá el código de verificación que enviamos a ${uiState.email.ifEmpty { "tu email" }}",
+                        text = if (uiState.email.isNotEmpty()) {
+                            stringResource(R.string.verify_account_description, uiState.email)
+                        } else {
+                            stringResource(R.string.verify_account_description_default)
+                        },
                         fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(bottom = 24.dp)
@@ -118,11 +135,11 @@ fun VerifyAccountScreen(
                     OutlinedTextField(
                         value = uiState.code,
                         onValueChange = viewModel::onCodeChange,
-                        placeholder = { Text("Código de verificación") },
+                        placeholder = { Text(stringResource(R.string.verify_account_code)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Email,
-                                contentDescription = "Icono de código",
+                                contentDescription = stringResource(R.string.verify_account_code_icon),
                                 tint = Color.Gray
                             )
                         },
@@ -153,7 +170,7 @@ fun VerifyAccountScreen(
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6DCB5A))
                     ) {
-                        Text("Verificar cuenta", color = Color.White, fontSize = 16.sp)
+                        Text(stringResource(R.string.verify_account_button), color = Color.White, fontSize = 16.sp)
                     }
 
                     // Reenviar código Button
@@ -179,7 +196,7 @@ fun VerifyAccountScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                         }
                         Text(
-                            "Reenviar código",
+                            stringResource(R.string.verify_account_resend),
                             color = if (uiState.canResendCode) Color(0xFF6DCB5A) else Color.Gray,
                             fontSize = 14.sp
                         )
@@ -200,7 +217,7 @@ fun VerifyAccountScreen(
                     // Success Message (si se reenvió el código)
                     if (!uiState.canResendCode && !uiState.isResendingCode && uiState.errorMessage == null) {
                         Text(
-                            text = "Código reenviado. Revisá tu email.",
+                            text = stringResource(R.string.verify_account_code_resent),
                             color = Color(0xFF6DCB5A),
                             fontSize = 14.sp,
                             modifier = Modifier

@@ -275,6 +275,7 @@ fun SignUpScreen(
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(R.string.signup_login),
                             fontSize = 14.sp,
@@ -283,6 +284,7 @@ fun SignUpScreen(
                             textDecoration = TextDecoration.Underline,
                             modifier = Modifier.clickable { navController.navigate(Screen.Login.route) }
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
                 }
             }

@@ -65,6 +65,10 @@
     <string name="verify_account_resend">Reenviar código</string>
     <string name="verify_account_code_resent">Código reenviado. Revisá tu email.</string>
     <string name="verify_account_code_icon">Icono de código</string>
+    <string name="verify_account_error_code_required">Ingresá el código de verificación.</string>
+    <string name="verify_account_error_email_unavailable">Email no disponible para reenviar código.</string>
+    <string name="verify_account_error_resend_failed">Error al reenviar código.</string>
+    <string name="verify_account_error_verification_failed">Error al verificar la cuenta.</string>
     
     <!-- Profile Screen -->
     <string name="profile_title">Configuración</string>
@@ -112,6 +116,21 @@
     <string name="add_product_name_label">Nombre del producto</string>
     <string name="add_product_brand_label">Marca (opcional)</string>
     <string name="add_product_close_icon">Cerrar</string>
+    
+    <!-- Create Product Dialog -->
+    <string name="create_product_title">Crear Producto</string>
+    <string name="create_product_button">Crear Producto</string>
+    <string name="create_product_category_label">Categoría</string>
+    <string name="create_product_select_category">Selecciona una categoría</string>
+    <string name="create_product_expand_icon">Expandir</string>
+    <string name="create_product_placeholder_example">Ej: Leche Descremada</string>
+    <string name="create_product_error_name_required">Ingresa el nombre del producto</string>
+    <string name="create_product_error_category_required">Selecciona una categoría</string>
+    
+    <!-- Category Products Errors -->
+    <string name="category_products_error_load">Error al cargar productos</string>
+    <string name="category_products_error_add">Error al agregar producto</string>
+    <string name="category_products_error_delete">Error al eliminar producto</string>
     
     <!-- Lists Overview -->
     <string name="lists_title">Listas</string>
