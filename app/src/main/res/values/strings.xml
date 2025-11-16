@@ -174,6 +174,10 @@
     <string name="create_first_list">¡Empieza a crear tu lista!</string>
     <string name="first_list_location">Tu lista aparecerá en esta sección</string>
 
+    <string name="category_products_add_first">Agrega tu primer producto presionando el icono +</string>
+    <string name="category_products_add_category">Agregar nueva categoría</string>
+    <string name="category_products_add_product">Agregar nuevo producto</string>
+    <string name="category_products_no_products">No se encontraron productos</string>
     <!-- Category Products Screen -->
     <string name="category_products_empty">Empieza a agregar productos a la categoria</string>
     <string name="category_products_empty_subtitle">Tu categoria está vacía</string>
@@ -181,7 +185,11 @@
     <string name="category_products_add">Agregar productos</string>
     <string name="category_products_add_icon">Agregar productos</string>
     <string name="category_products_empty_icon">Empty list</string>
-    
+    <string name="category_products_menu_delete">Eliminar</string>
+    <string name="category_products_menu_delete_confirm">¿Seguro que quieres eliminar el producto?</string>
+    <string name="confirm_delete_category_title">Eliminar categoría</string>
+    <string name="confirm_delete_category_text">¿Seguro que quieres eliminar esta categoría? Esta acción no se puede deshacer.</string>
+
     <!-- List Screen -->
     <string name="list_completed">Lista %1$d/%2$d Completada</string>
     <string name="list_all">Todos</string>
@@ -193,7 +201,7 @@
     <string name="list_description_title">Descripción</string>
     <string name="list_recurring_label">Recurrente</string>
     <string name="filters">Filtros</string>
-    
+
     <!-- Home Screen -->
     <string name="home_title">Inicio</string>
     <string name="home_view_list">Ver mi lista</string>
@@ -205,4 +213,18 @@
     <string name="common_loading">Cargando…</string>
     <string name="common_error">Error</string>
     <string name="common_success">Éxito</string>
+
+    <!-- Default Category Names -->
+    <string name="category_name_bebidas">Bebidas</string>
+    <string name="category_name_carnes">Carnes y pescados</string>
+    <string name="category_name_lacteos">Lácteos</string>
+    <string name="category_name_limpieza">Limpieza y Hogar</string>
+    <string name="category_name_verduleria">Verdulería</string>
+    <string name="category_name_cuidadopersonal">Cuidado personal</string>
+    <string name="category_name_mascotas">Mascotas</string>
+    <string name="category_name_panaderia">Panadería</string>
+    <string name="category_name_snacks">Snacks</string>
+    <string name="category_name_congelados">Congelados</string>
+    <string name="category_name_despensa">Despensa</string>
+    <string name="category_name_bebes">Bebés</string>
 </resources>

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -16,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,8 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.hci_listio_app.R
 
 @Composable
@@ -35,6 +37,7 @@ fun ProductItem(
     onDelete: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showConfirm by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -74,14 +77,35 @@ fun ProductItem(
                     onDismissRequest = { expanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text(stringResource(id = R.string.confirm_delete_product_text)) },
+                        text = { Text(stringResource(id = R.string.category_products_menu_delete), color = Color.Red) },
                         onClick = {
                             expanded = false
-                            onDelete()
+                            showConfirm = true
                         }
                     )
                 }
             }
         }
+    }
+
+    if (showConfirm) {
+        AlertDialog(
+            onDismissRequest = { showConfirm = false },
+            title = { Text(stringResource(id = R.string.category_products_menu_delete), color = Color.Red) },
+            text = { Text(stringResource(id = R.string.category_products_menu_delete_confirm)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showConfirm = false
+                    onDelete()
+                }) {
+                    Text(stringResource(id = R.string.confirm_delete), color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirm = false }) {
+                    Text(stringResource(id = R.string.common_cancel))
+                }
+            }
+        )
     }
 }

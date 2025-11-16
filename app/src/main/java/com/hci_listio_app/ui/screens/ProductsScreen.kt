@@ -28,6 +28,9 @@ import com.hci_listio_app.data.AuthRepositoryProvider
 import com.hci_listio_app.ui.Components.*
 import com.hci_listio_app.ui.viewmodels.ProductsViewModel
 import com.hci_listio_app.ui.viewmodels.ProductsViewModelFactory
+import com.hci_listio_app.data.repository.DefaultCategoriesInitializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +44,22 @@ fun ProductsScreen(navController: NavController) {
 
     var searchQuery by remember { mutableStateOf("") }
     var showAddCategory by remember { mutableStateOf(false) }
+
+    // Inicializar categorías por defecto si no existen
+    val initialized = remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(token) {
+        if (!initialized.value && token.isNotBlank()) {
+            scope.launch(Dispatchers.IO) {
+                try {
+                    DefaultCategoriesInitializer().loadOrCreate(token)
+                    // Recargar categorías después de crear
+                    viewModel.loadCategories()
+                } catch (_: Exception) {}
+                initialized.value = true
+            }
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -106,7 +125,7 @@ fun ProductsScreen(navController: NavController) {
                                     "category/${categoria.nombre}?categoryId=${categoria.id}"
                                 )
                             },
-                            onDelete = if (categoria.isDefault) null else { c -> viewModel.deleteCategory(c) }
+                            onDelete = { c -> viewModel.deleteCategory(c) }
                         )
                     }
                 }

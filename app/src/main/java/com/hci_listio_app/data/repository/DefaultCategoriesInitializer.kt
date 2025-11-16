@@ -12,7 +12,14 @@ class DefaultCategoriesInitializer {
         "Carnes y pescados" to R.drawable.carnes,
         "Lácteos" to R.drawable.lacteos,
         "Limpieza y Hogar" to R.drawable.limpieza,
-        "Verdulería" to R.drawable.verduleria
+        "Verdulería" to R.drawable.verduleria,
+        "Cuidado personal" to R.drawable.cuidadopersonal,
+        "Mascotas" to R.drawable.mascotas,
+        "Panadería" to R.drawable.panaderia,
+        "Snacks" to R.drawable.snacks,
+        "Congelados" to R.drawable.congelados,
+        "Despensa" to R.drawable.despensa,
+        "Bebés" to R.drawable.bebes
     )
 
     suspend fun loadOrCreate(token: String): List<Categoria> {

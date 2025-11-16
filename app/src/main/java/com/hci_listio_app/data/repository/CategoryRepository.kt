@@ -29,7 +29,14 @@ class CategoryRepository(
         DefaultCategory("Carnes y pescados", R.drawable.carnes),
         DefaultCategory("L\u00E1cteos", R.drawable.lacteos),
         DefaultCategory("Limpieza y Hogar", R.drawable.limpieza),
-        DefaultCategory("Verduler\u00EDa", R.drawable.verduleria)
+        DefaultCategory("Verduler\u00EDa", R.drawable.verduleria),
+        DefaultCategory("Cuidado personal", R.drawable.cuidadopersonal),
+        DefaultCategory("Mascotas", R.drawable.mascotas),
+        DefaultCategory("Panadería", R.drawable.panaderia),
+        DefaultCategory("Snacks", R.drawable.snacks),
+        DefaultCategory("Congelados", R.drawable.congelados),
+        DefaultCategory("Despensa", R.drawable.despensa),
+        DefaultCategory("Bebés", R.drawable.bebes)
     )
     private val defaultImagesByName = defaultCategories.associate { it.normalizedName to it.imageRes }
 
@@ -39,9 +46,6 @@ class CategoryRepository(
             ?: return Result.failure(
                 remoteResult.exceptionOrNull() ?: IllegalStateException("Unknown error fetching categories")
             )
-
-        val ensureDefaults = ensureDefaultCategories(token, apiCategories)
-        ensureDefaults.onFailure { return Result.failure(it) }
 
         val mapped = apiCategories
             .map(::mapToCategoria)

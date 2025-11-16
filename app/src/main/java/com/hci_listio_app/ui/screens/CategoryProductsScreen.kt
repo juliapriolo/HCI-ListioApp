@@ -24,6 +24,8 @@ import com.hci_listio_app.R
 import com.hci_listio_app.ui.Components.AddProductDialog
 import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.Components.ProductItem
+import com.hci_listio_app.ui.Components.Categoria
+import com.hci_listio_app.ui.Components.getCategoriaDisplayName
 import com.hci_listio_app.ui.viewmodels.CategoryProductsViewModel
 import com.hci_listio_app.ui.viewmodels.CategoryProductsViewModelFactory
 
@@ -40,6 +42,11 @@ fun CategoryProductsScreen(
 
     val uiState by viewModel.uiState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+
+    // Construir objeto Categoria para traducción si es default
+    val categoriaForDisplay = remember(categoryId, categoryName) {
+        Categoria(id = categoryId, nombre = categoryName)
+    }
 
     Scaffold(
         containerColor = Color(0xFFFAFAFA),
@@ -65,7 +72,7 @@ fun CategoryProductsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = categoryName,
+                    text = getCategoriaDisplayName(categoriaForDisplay),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -83,7 +90,6 @@ fun CategoryProductsScreen(
                         tint = Color(0xFF6DCB5A) // verde del Figma
                     )
                 }
-
             }
 
             Spacer(Modifier.height(16.dp))
