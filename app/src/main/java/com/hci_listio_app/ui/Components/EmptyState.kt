@@ -14,14 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hci_listio_app.R
 
 @Composable
 fun EmptyState(
-    title: String = "Todavía no hay listas...",
-    CTA: String = "¡Empieza a crear tu lista!",
-    subtitle: String = "Tu lista aparecerá en esta sección",
+    title: String = stringResource(id = R.string.no_lists_yet),
+    CTA: String = stringResource(id = R.string.create_first_list),
+    subtitle: String = stringResource(id = R.string.first_list_location),
     illustrationRes: Int = R.drawable.empty_list_icon,
     modifier: Modifier = Modifier
 ) {
