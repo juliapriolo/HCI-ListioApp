@@ -169,6 +169,7 @@
     <string name="share_button_text">Enviar</string>
     <string name="delete_category_text">Eliminar categoría</string>
     <string name="add_category_text">Añadir\nNueva Categoría</string>
+    <string name="search_bar_lists">Buscar lista por nombre</string>
 
     <!-- Category Products Screen -->
     <string name="category_products_empty">Empieza a agregar productos a la categoria</string>
