@@ -16,6 +16,8 @@ class ProductsViewModel(
     private val productRepo: ProductRepository,
     private val token: String
 ) : ViewModel() {
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     fun deleteCategory(categoria: Categoria) {
         viewModelScope.launch {
             categoryRepo.deleteCategory(token, categoria.id).fold(
@@ -39,10 +41,12 @@ class ProductsViewModel(
 
     fun loadCategories() {
         viewModelScope.launch {
+            _isLoading.value = true
             categoryRepo.getCategories(token).fold(
                 onSuccess = { _categorias.value = it },
                 onFailure = { }
             )
+            _isLoading.value = false
         }
     }
 

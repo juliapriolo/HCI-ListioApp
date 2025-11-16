@@ -41,6 +41,7 @@ fun ProductsScreen(navController: NavController) {
 
     val categorias by viewModel.categorias.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
     var showAddCategory by remember { mutableStateOf(false) }
@@ -55,7 +56,8 @@ fun ProductsScreen(navController: NavController) {
                     DefaultCategoriesInitializer().loadOrCreate(token)
                     // Recargar categorías después de crear
                     viewModel.loadCategories()
-                } catch (_: Exception) {}
+                } catch (_: Exception) {
+                }
                 initialized.value = true
             }
         }
@@ -84,93 +86,100 @@ fun ProductsScreen(navController: NavController) {
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // 🔍 BUSCADOR
-                item(span = { GridItemSpan(2) }) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        SearchBar(
-                            query = searchQuery,
-                            onQueryChange = {
-                                searchQuery = it
-                                viewModel.searchProducts(it)
-                            },
-                            placeholder = stringResource(R.string.products_search),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-
-                // ⭐ SIN BUSQUEDA → Mostrar categorías
-                if (searchQuery.isBlank()) {
+            if (isLoading) {
+                // Indicador de carga centrado
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // 🔍 BUSCADOR
                     item(span = { GridItemSpan(2) }) {
-                        Text(
-                            text = stringResource(R.string.products_search_categories),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SearchBar(
+                                query = searchQuery,
+                                onQueryChange = {
+                                    searchQuery = it
+                                    viewModel.searchProducts(it)
+                                },
+                                placeholder = stringResource(R.string.products_search),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
-                    items(categorias) { categoria ->
-                        CategoriaCard(
-                            categoria = categoria,
-                            onClick = {
-                                navController.navigate(
-                                    "category/${categoria.nombre}?categoryId=${categoria.id}"
-                                )
-                            },
-                            onDelete = { c -> viewModel.deleteCategory(c) }
-                        )
-                    }
-                }
 
-                // ⭐ CON BUSQUEDA → mostrar productos encontrados
-                else {
-                    val showNoResults = searchQuery.isNotBlank() && searchResults.isEmpty()
-                    if (showNoResults) {
+                    // ⭐ SIN BUSQUEDA → Mostrar categorías
+                    if (searchQuery.isBlank()) {
                         item(span = { GridItemSpan(2) }) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 64.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.products_no_results),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = Color.Gray,
-                                    modifier = Modifier.align(Alignment.Center)
+                            Text(
+                                text = stringResource(R.string.products_search_categories),
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                        items(categorias) { categoria ->
+                            CategoriaCard(
+                                categoria = categoria,
+                                onClick = {
+                                    navController.navigate(
+                                        "category/${categoria.nombre}?categoryId=${categoria.id}"
+                                    )
+                                },
+                                onDelete = { c -> viewModel.deleteCategory(c) }
+                            )
+                        }
+                    }
+
+                    // ⭐ CON BUSQUEDA → mostrar productos encontrados
+                    else {
+                        val showNoResults = searchQuery.isNotBlank() && searchResults.isEmpty()
+                        if (showNoResults) {
+                            item(span = { GridItemSpan(2) }) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 64.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.products_no_results),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color.Gray,
+                                        modifier = Modifier.align(Alignment.Center)
+                                    )
+                                }
+                            }
+                        } else {
+                            items(searchResults, span = { GridItemSpan(2) }) { product ->
+                                val brand = product.metadata?.get("brand") as? String
+                                ProductItem(
+                                    productName = product.name,
+                                    brand = brand,
+                                    onDelete = { /* lógica de borrado */ }
                                 )
                             }
-                        }
-                    } else {
-                        items(searchResults, span = { GridItemSpan(2) }) { product ->
-                            val brand = product.metadata?.get("brand") as? String
-                            ProductItem(
-                                productName = product.name,
-                                brand = brand,
-                                onDelete = { /* lógica de borrado */ }
-                            )
                         }
                     }
                 }
             }
         }
-    }
 
-    // Diálogo para crear nueva categoría
-    if (showAddCategory) {
-        AddCategoryDialog(
-            onDismiss = { showAddCategory = false },
-            onSave = { name ->
-                viewModel.createCategory(name)
-                showAddCategory = false
-            }
-        )
+        // Diálogo para crear nueva categoría
+        if (showAddCategory) {
+            AddCategoryDialog(
+                onDismiss = { showAddCategory = false },
+                onSave = { name ->
+                    viewModel.createCategory(name)
+                    showAddCategory = false
+                }
+            )
+        }
     }
 }
