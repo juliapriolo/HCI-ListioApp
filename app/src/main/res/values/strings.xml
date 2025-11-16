@@ -144,7 +144,6 @@
     <string name="list_empty_subtitle">Empieza a agregar productos</string>
     <string name="list_no_members">Sin integrantes</string>
     <string name="create_list_placeholder">Ej: Compras Semanales</string>
-    <string name="add_product_title">Añadir Nuevo Producto</string>
     <string name="add_product_close">Cerrar</string>
     <string name="product_name_label">Nombre del Producto</string>
     <string name="product_brand_label">Marca (opcional)</string>

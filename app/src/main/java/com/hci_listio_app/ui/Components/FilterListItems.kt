@@ -233,7 +233,7 @@ fun FilterListItemsDialog(
                                 }
                             )
 
-                            Divider(color = Color(0xFFE0E0E0))
+                            HorizontalDivider(color = Color(0xFFE0E0E0))
 
                             categories.forEach { (id, name) ->
                                 DropdownMenuItem(
@@ -314,7 +314,7 @@ fun FilterListItemsDialog(
                                     expandedSortMenu = false
                                 }
                             )
-                            Divider()
+                            HorizontalDivider()
                             DropdownMenuItem(
                                 text = { Text("Nombre") },
                                 onClick = {
