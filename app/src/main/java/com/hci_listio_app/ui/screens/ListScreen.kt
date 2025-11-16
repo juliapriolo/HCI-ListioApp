@@ -173,14 +173,14 @@ fun ListScreen(
                         ) {
                             if (displayedMembers.isEmpty()) {
                                 MemberAvatar(
-                                    description = stringResource(id = R.string.list_no_members),
+                                    name = stringResource(id = R.string.list_no_members),
                                     modifier = Modifier.size(40.dp)
                                 )
                             } else {
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     displayedMembers.forEach { member ->
                                         MemberAvatar(
-                                            description = member.name,
+                                            name = member.name,
                                             modifier = Modifier.size(40.dp)
                                         )
                                     }
@@ -441,20 +441,24 @@ private fun buildUserDisplayName(name: String, surname: String, fallback: String
 
 @Composable
 private fun MemberAvatar(
-    description: String,
+    name: String,
     modifier: Modifier = Modifier
 ) {
+    val initials = name.split(' ')
+        .mapNotNull { it.firstOrNull()?.toString() }
+        .joinToString("")
+
     Box(
         modifier = modifier
             .clip(CircleShape)
             .background(Color(0xFF6DCB5A)),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.perfilpredeterminado),
-            contentDescription = description,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+        Text(
+            text = initials.uppercase(),
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White,
+            fontWeight = FontWeight.Bold
         )
     }
 }

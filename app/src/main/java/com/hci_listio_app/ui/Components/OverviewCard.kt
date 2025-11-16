@@ -69,7 +69,6 @@ fun OverviewCard(
     val optionsAvailable = onEdit != null || onDelete != null || onRestore != null
     val (menuExpanded, setMenuExpanded) = remember { mutableStateOf(false) }
 
-    // Local favorite state to animate the card when the user toggles favorite
     var localFavorite by remember { mutableStateOf(item.isFavorite) }
     LaunchedEffect(item.isFavorite) { localFavorite = item.isFavorite }
     val cardScale by animateFloatAsState(targetValue = if (localFavorite) 1.02f else 1f, animationSpec = tween(durationMillis = 220))
