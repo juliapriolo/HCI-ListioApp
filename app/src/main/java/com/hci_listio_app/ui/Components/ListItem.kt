@@ -31,6 +31,7 @@ fun ListItem(
     onCheckedChange: (Boolean) -> Unit,
     onEditClick: (ListItemData) -> Unit,
     onDeleteClick: (ListItemData) -> Unit,
+    isEditable: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -86,13 +87,15 @@ fun ListItem(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(id = R.string.options_edit_name)) },
-                        onClick = {
-                            showMenu = false
-                            onEditClick(item)
+                        if (isEditable) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(id = R.string.options_edit_name)) },
+                                onClick = {
+                                    showMenu = false
+                                    onEditClick(item)
+                                }
+                            )
                         }
-                    )
                     DropdownMenuItem(
                         text = { Text(stringResource(id = R.string.options_delete)) },
                         onClick = {

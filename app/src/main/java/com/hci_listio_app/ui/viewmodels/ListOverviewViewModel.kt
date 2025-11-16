@@ -3,6 +3,7 @@ package com.hci_listio_app.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hci_listio_app.data.ListHistoryManager
+import com.hci_listio_app.data.FavoritesManager
 import com.hci_listio_app.data.ListRepository
 import com.hci_listio_app.data.ListRepositoryProvider
 import com.hci_listio_app.data.remote.dto.ShoppingListResponse
@@ -30,12 +31,24 @@ class ListOverviewViewModel(
     init {
         loadLists()
         observeHistoryChanges()
+        observeFavoritesChanges()
     }
 
     private fun observeHistoryChanges() {
         viewModelScope.launch {
             ListHistoryManager.archivedListIds.collect { archived ->
                 _uiState.update { it.copy(archivedListIds = archived) }
+            }
+        }
+    }
+
+    private fun observeFavoritesChanges() {
+        viewModelScope.launch {
+            FavoritesManager.favorites.collect { favs ->
+                _uiState.update { current ->
+                    val (favLists, otherLists) = current.lists.partition { it.id in favs }
+                    current.copy(favorites = favs, lists = favLists + otherLists)
+                }
             }
         }
     }
@@ -49,8 +62,10 @@ class ListOverviewViewModel(
             _uiState.update { current ->
                 if (result.isSuccess) {
                     val lists = result.getOrNull() ?: emptyList()
+                    val favs = FavoritesManager.favorites.value
+                    val (favLists, otherLists) = lists.partition { it.id in favs }
                     current.copy(
-                        lists = lists,
+                        lists = favLists + otherLists,
                         isLoading = false,
                         errorMessage = null
                     )
@@ -64,22 +79,31 @@ class ListOverviewViewModel(
         }
     }
 
-    fun createList(name: String, description: String?) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val result = listRepository.createList(name, description ?: "")
-            if (result.isSuccess) {
-                // Añade la nueva lista al estado actual para una actualización instantánea
-                result.getOrNull()?.let {
-                    _uiState.update { current ->
-                        current.copy(lists = current.lists + it, isLoading = false)
-                    }
+    suspend fun createList(name: String, description: String?, recurring: Boolean = false): Long? {
+        _uiState.update { it.copy(isLoading = true) }
+        val result = listRepository.createList(name, description ?: "", recurring)
+        return if (result.isSuccess) {
+            val created = result.getOrNull()
+            created?.let {
+                // If the user checked the favorite toggle during creation, ensure the new list is added to favorites
+                // Note: `recurring` parameter is used as the favorite flag in the UI.
+                if (recurring) {
+                    FavoritesManager.addFavorite(it.id)
                 }
-            } else {
-                _uiState.update { 
-                    it.copy(isLoading = false, errorMessage = result.exceptionOrNull()?.message ?: "Error al crear la lista.")
+
+                _uiState.update { current ->
+                    val combined = current.lists + it
+                    val favs = current.favorites
+                    val (favLists, otherLists) = combined.partition { it.id in favs }
+                    current.copy(lists = favLists + otherLists, isLoading = false)
                 }
+                created.id
             }
+        } else {
+            _uiState.update {
+                it.copy(isLoading = false, errorMessage = result.exceptionOrNull()?.message ?: "Error al crear la lista.")
+            }
+            null
         }
     }
 
@@ -88,24 +112,19 @@ class ListOverviewViewModel(
     }
 
     fun toggleFavorite(listId: Long) {
-        _uiState.update { current ->
-            val next = current.favorites.toMutableSet()
-            if (!next.add(listId)) {
-                next.remove(listId)
-            }
-            current.copy(favorites = next)
-        }
+        FavoritesManager.toggleFavorite(listId)
     }
 
-    fun renameList(listId: Long, newName: String, onResult: (Boolean, String?) -> Unit) {
+    fun renameList(listId: Long, newName: String, recurring: Boolean? = null, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
-            val result = listRepository.updateList(listId, newName)
+            val result = listRepository.updateList(listId, newName, recurring)
             if (result.isSuccess) {
                 val updatedList = result.getOrNull()
                 _uiState.update { current ->
-                    current.copy(
-                        lists = current.lists.map { if (it.id == listId) updatedList ?: it else it }
-                    )
+                    val updated = current.lists.map { if (it.id == listId) updatedList ?: it else it }
+                    val favs = current.favorites
+                    val (favLists, otherLists) = updated.partition { it.id in favs }
+                    current.copy(lists = favLists + otherLists)
                 }
                 onResult(true, null)
             } else {

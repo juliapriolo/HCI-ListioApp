@@ -5,6 +5,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+// Note: animateItemPlacement removed for compatibility with current Compose version
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -140,8 +143,8 @@ fun ListOverview(
                 if (filteredLists.isEmpty() && !uiState.isLoading) {
                     EmptyState(modifier = Modifier.fillMaxWidth())
                 } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        filteredLists.forEach { list ->
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        items(filteredLists, key = { it.id }) { list ->
                             val sharedMembers = if (list.users.isNotEmpty()) list.users else list.sharedWith
                             val isShared = sharedMembers.isNotEmpty()
                             val isArchived = archivedIds.contains(list.id)
@@ -203,31 +206,15 @@ fun ListOverview(
             nameLabel = stringResource(id = R.string.create_list_name),
             showDescription = true,
             descriptionLabel = stringResource(id = R.string.create_list_description),
+            showRecurring = true,
             onDismiss = { showCreateDialog.value = false },
-            onCreate = { name, description ->
-                var createdId: Long? = null
-                try {
-                    val result = ListRepositoryProvider.instance.createList(
-                        name,
-                        description ?: ""
-                    )
-                    if (result.isSuccess) {
-                        val response = result.getOrNull()
-                        createdId = response?.id
-                    } else {
-                        throw result.exceptionOrNull() ?: Exception("No se pudo crear. Intenta nuevamente.")
-                    }
-                } catch (e: Exception) {
-                    throw e
-                }
-
+            onCreate = { name, description, recurring ->
+                val createdId = viewModel.createList(name, description ?: "", recurring)
                 if (createdId != null) {
                     coroutineScope.launch {
                         snackbarHostState.showToast(context.getString(R.string.list_created))
-                        viewModel.loadLists()
                     }
                 }
-
                 createdId
             }
         )
@@ -235,13 +222,16 @@ fun ListOverview(
 
     if (listBeingEdited != null) {
         val (id, originalName) = listBeingEdited!!
+        val existing = uiState.lists.find { it.id == id }
+        val existingRecurring = existing?.recurring ?: false
         var newName by remember(listBeingEdited) { mutableStateOf(originalName) }
+        var recurring by remember(listBeingEdited) { mutableStateOf(existingRecurring) }
         AlertDialog(
             onDismissRequest = { listBeingEdited = null },
             confirmButton = {
                 TextButton(onClick = {
                     if (newName.isNotBlank()) {
-                        viewModel.renameList(id, newName.trim()) { success, message ->
+                        viewModel.renameList(id, newName.trim(), recurring) { success, message ->
                             coroutineScope.launch {
                                 snackbarHostState.showToast(
                                     if (success) context.getString(R.string.list_updated) else message ?: context.getString(R.string.list_not_updated)
@@ -257,12 +247,19 @@ fun ListOverview(
             },
             title = { Text(stringResource(id = R.string.edit_list_title)) },
             text = {
-                OutlinedTextField(
-                    value = newName,
-                    onValueChange = { newName = it },
-                    singleLine = true,
-                    label = { Text(stringResource(id = R.string.create_list_name)) }
-                )
+                Column {
+                    OutlinedTextField(
+                        value = newName,
+                        onValueChange = { newName = it },
+                        singleLine = true,
+                        label = { Text(stringResource(id = R.string.create_list_name)) }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = stringResource(id = R.string.list_recurring_label), modifier = Modifier.weight(1f))
+                        Switch(checked = recurring, onCheckedChange = { recurring = it })
+                    }
+                }
             }
         )
     }

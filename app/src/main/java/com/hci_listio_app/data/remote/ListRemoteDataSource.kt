@@ -81,9 +81,9 @@ class ListRemoteDataSource(
             )
         }
 
-    // Actualizar una lista
-    suspend fun updateList(token: String, listId: Long, name: String): Result<ShoppingListResponse> =
-        safeApiCall { api.updateList(bearer(token), listId, UpdateListRequest(name)) }
+    // Actualizar una lista (nombre y opción recurrente)
+    suspend fun updateList(token: String, listId: Long, name: String, recurring: Boolean? = null): Result<ShoppingListResponse> =
+        safeApiCall { api.updateList(bearer(token), listId, UpdateListRequest(name, recurring)) }
 
     // Eliminar una lista
     suspend fun deleteList(token: String, listId: Long): Result<Unit> =

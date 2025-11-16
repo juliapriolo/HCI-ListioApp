@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 data class ListUiState(
     val listId: Long? = null,
     val listName: String = "",
+    val description: String? = null,
     val items: List<ListItemData> = emptyList(),
     val completedCount: Int = 0,
     val totalCount: Int = 0,
@@ -96,6 +97,7 @@ class ListViewModel(
 
                 current.copy(
                     listName = listData.name,
+                    description = listData.description,
                     owner = owner,
                     sharedMembers = collaborators,
                     isLoading = false

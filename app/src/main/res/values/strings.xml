@@ -134,6 +134,7 @@
     <string name="tab_personal">Personal</string>
     <string name="tab_shared">Compartidas</string>
     <string name="tab_history">Historial</string>
+    <string name="list_favorite_label">Favorito</string>
     <string name="options_edit_name">Editar nombre</string>
     <string name="options_restore">Recuperar lista</string>
     <string name="options_delete">Eliminar lista</string>
@@ -185,6 +186,8 @@
     <string name="list_add_user">Añadir usuario</string>
     <string name="list_options">Opciones</string>
     <string name="list_user">Usuario %1$d</string>
+    <string name="list_description_title">Descripción</string>
+    <string name="list_recurring_label">Recurrente</string>
     
     <!-- Home Screen -->
     <string name="home_title">Inicio</string>

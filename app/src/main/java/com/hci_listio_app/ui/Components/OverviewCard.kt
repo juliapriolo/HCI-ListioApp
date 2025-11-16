@@ -27,8 +27,12 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
 import com.hci_listio_app.R
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,7 +80,8 @@ fun OverviewCard(
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { onToggleFavorite?.invoke() }, enabled = onToggleFavorite != null) {
                         val icon = if (item.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
-                        Icon(imageVector = icon, contentDescription = "favorite", tint = if (item.isFavorite) Color(0xFF2E7D32) else Color.Gray)
+                        val scale by animateFloatAsState(targetValue = if (item.isFavorite) 1.12f else 1f, animationSpec = tween(durationMillis = 220))
+                        Icon(imageVector = icon, contentDescription = "favorite", tint = if (item.isFavorite) Color(0xFF2E7D32) else Color.Gray, modifier = Modifier.scale(scale))
                     }
                     if (optionsAvailable) {
                         Box {

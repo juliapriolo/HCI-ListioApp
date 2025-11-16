@@ -49,7 +49,8 @@ data class CreateListRequest(
 
 // Request para actualizar una lista
 data class UpdateListRequest(
-    val name: String
+    val name: String,
+    val recurring: Boolean? = null
 )
 
 data class ProductRef(

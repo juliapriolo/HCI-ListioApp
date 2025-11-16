@@ -36,6 +36,8 @@ import com.hci_listio_app.ui.Components.ListioTopAppBar
 import com.hci_listio_app.ui.Components.showToast
 import com.hci_listio_app.ui.viewmodels.ListViewModel
 import com.hci_listio_app.ui.Components.ShareListDialog
+import com.hci_listio_app.data.ListHistoryManager
+import androidx.compose.runtime.collectAsState
 import com.hci_listio_app.ui.Components.SharedUser
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,6 +97,10 @@ fun ListScreen(
         viewModel.loadList(listId)
     }
 
+    // Observe archived lists to determine if this list is in history
+    val archivedIds by ListHistoryManager.archivedListIds.collectAsState(initial = emptySet<Long>())
+    val isArchived = archivedIds.contains(listId)
+
     // Mostrar mensajes de error
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { error ->
@@ -126,12 +132,14 @@ fun ListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddItemDialog = true },
-                containerColor = Color(0xFF6DCB5A),
-                contentColor = Color.White
-            ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.list_add_product))
+            if (!isArchived) {
+                FloatingActionButton(
+                    onClick = { showAddItemDialog = true },
+                    containerColor = Color(0xFF6DCB5A),
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.list_add_product))
+                }
             }
         },
         snackbarHost = { com.hci_listio_app.ui.Components.AppSnackbarHost(hostState = snackbarHostState) }
@@ -181,35 +189,66 @@ fun ListScreen(
 
                             Spacer(modifier = Modifier.weight(1f))
 
-                            IconButton(
-                                onClick = { showShareDialog = true },
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFFE0E0E0))
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = stringResource(id = R.string.list_add_user),
-                                    tint = Color.Gray
-                                )
-                            }
+                            // Botones a la derecha: filtro y compartir
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(onClick = { /* TODO: Filter options */ }, modifier = Modifier.size(40.dp)) {
+                                    Icon(
+                                        imageVector = Icons.Default.FilterList,
+                                        contentDescription = stringResource(id = R.string.list_options),
+                                        tint = Color.Gray
+                                    )
+                                }
 
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            // Botón filtro
-                            IconButton(onClick = { /* TODO: Filter options */ }) {
-                                Icon(
-                                    imageVector = Icons.Default.FilterList,
-                                    contentDescription = stringResource(id = R.string.list_options),
-                                    tint = Color.Gray
-                                )
+                                IconButton(
+                                    onClick = { showShareDialog = true },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFE0E0E0))
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = stringResource(id = R.string.list_add_user),
+                                        tint = Color.Gray
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
+
+                // Mostrar descripción de la lista si existe
+                uiState.description?.let { desc ->
+                    if (desc.isNotBlank()) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = stringResource(id = R.string.list_description_title),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Gray
+                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = desc,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color(0xFF303F4F)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
 
                 // Estado de la lista y filtro
                 Row(
@@ -302,6 +341,8 @@ fun ListScreen(
                                 onDeleteClick = { selectedItem ->
                                     viewModel.deleteItem(selectedItem.id)
                                 }
+                                ,
+                                isEditable = !isArchived
                             )
                         }
                     }

@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import com.hci_listio_app.data.LanguagePreferences
 import com.hci_listio_app.data.ListHistoryManager
+import com.hci_listio_app.data.FavoritesManager
 import com.hci_listio_app.ui.navigation.AppNavigation
 import com.hci_listio_app.ui.theme.HCIListioAppTheme
 import com.hci_listio_app.utils.LocaleHelper
@@ -55,6 +56,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         ListHistoryManager.initialize(applicationContext)
+        FavoritesManager.initialize(applicationContext)
 
         // Se elimina enableEdgeToEdge() para resolver el fallo de inicio (pantalla negra).
         setContent {
