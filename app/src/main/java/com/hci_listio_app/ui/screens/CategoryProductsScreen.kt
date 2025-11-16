@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,8 +38,12 @@ fun CategoryProductsScreen(
     categoryId: Long
 ) {
 
+    val context = LocalContext.current
     val viewModel: CategoryProductsViewModel =
-        viewModel(factory = CategoryProductsViewModelFactory(categoryId))
+        viewModel(factory = CategoryProductsViewModelFactory(
+            application = context.applicationContext as android.app.Application,
+            categoryId = categoryId
+        ))
 
     val uiState by viewModel.uiState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
@@ -52,7 +57,7 @@ fun CategoryProductsScreen(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = stringResource(R.string.products_title),
+                title = getCategoriaDisplayName(categoriaForDisplay),
                 showBackButton = true,
                 onBackClick = { navController.popBackStack() }
             )

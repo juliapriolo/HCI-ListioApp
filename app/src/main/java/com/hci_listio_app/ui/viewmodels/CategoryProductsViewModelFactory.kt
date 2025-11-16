@@ -1,5 +1,6 @@
 package com.hci_listio_app.ui.viewmodels
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.hci_listio_app.data.AuthRepositoryProvider
@@ -7,6 +8,7 @@ import com.hci_listio_app.data.remote.ProductRemoteDataSource
 import com.hci_listio_app.data.repository.CategoryProductsRepository
 
 class CategoryProductsViewModelFactory(
+    private val application: Application,
     private val categoryId: Long
 ) : ViewModelProvider.Factory {
 
@@ -22,6 +24,7 @@ class CategoryProductsViewModelFactory(
             val token = AuthRepositoryProvider.instance.authToken.value ?: ""
 
             return CategoryProductsViewModel(
+                application = application,
                 repository = repository,
                 token = token,
                 categoryId = categoryId

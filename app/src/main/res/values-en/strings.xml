@@ -111,6 +111,7 @@
     <!-- Category Products Screen -->
     <string name="category_products_empty">Start adding products to the category</string>
     <string name="category_products_empty_subtitle">Your category is empty</string>
+    <string name="category_products_empty_instruction">Add your first product by pressing the + icon</string>
     <string name="category_products_add">Add products</string>
     <string name="category_products_add_icon">Add products</string>
     <string name="category_products_empty_icon">Empty list</string>
@@ -162,6 +163,25 @@
     <string name="create_list_placeholder">Eg: Weekly Shopping</string>
     <string name="add_product_title">Add New Product</string>
     <string name="add_product_close">Close</string>
+    <string name="add_product_name_label">Product name</string>
+    <string name="add_product_brand_label">Brand (optional)</string>
+    <string name="add_product_close_icon">Close</string>
+    
+    <!-- Create Product Dialog -->
+    <string name="create_product_title">Create Product</string>
+    <string name="create_product_button">Create Product</string>
+    <string name="create_product_category_label">Category</string>
+    <string name="create_product_select_category">Select a category</string>
+    <string name="create_product_expand_icon">Expand</string>
+    <string name="create_product_placeholder_example">Eg: Skim Milk</string>
+    <string name="create_product_error_name_required">Enter the product name</string>
+    <string name="create_product_error_category_required">Select a category</string>
+    
+    <!-- Category Products Errors -->
+    <string name="category_products_error_load">Error loading products</string>
+    <string name="category_products_error_add">Error adding product</string>
+    <string name="category_products_error_delete">Error deleting product</string>
+    
     <string name="product_name_label">Product name</string>
     <string name="product_brand_label">Brand (optional)</string>
     <string name="confirm_delete_product_title">Delete product</string>
