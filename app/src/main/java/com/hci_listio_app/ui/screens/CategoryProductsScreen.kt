@@ -56,7 +56,7 @@ fun CategoryProductsScreen(
         containerColor = Color(0xFFFAFAFA),
         topBar = {
             ListioTopAppBar(
-                title = getCategoriaDisplayName(categoriaForDisplay),
+                title = stringResource(R.string.products_title),
                 showBackButton = true,
                 onBackClick = { navController.popBackStack() }
             )

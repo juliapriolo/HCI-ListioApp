@@ -137,7 +137,9 @@
     <string name="list_restored">List restored</string>
     <string name="edit_list_title">Edit list</string>
     <string name="delete_list_title">Delete list</string>
-    <string name="delete_list_confirmation">Are you sure you want to delete \"%1$s\"? This action can be undone.</string>
+    <string name="mov_to_history">Move to history</string>
+    <string name="delete_list_confirmation">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="move_to_history_confirmation">Are you sure you want to move \"%1$s\ to the history"? This action can be undone.</string>
     <string name="confirm_delete">Delete</string>
     <string name="move_to_history">Move to history</string>
     <string name="list_deleted">List deleted</string>
