@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -198,6 +200,7 @@ fun LoginScreen(
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.login_forgot_password_click),
                         fontSize = 14.sp,
@@ -206,6 +209,7 @@ fun LoginScreen(
                         textDecoration = TextDecoration.Underline,
                         modifier = Modifier.clickable { navController.navigate(Screen.ForgotPassword.route) }
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                 }
                 Button(
                     onClick = { viewModel.onSubmit() },
@@ -234,6 +238,7 @@ fun LoginScreen(
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.login_signup),
                         fontSize = 14.sp,
@@ -242,6 +247,7 @@ fun LoginScreen(
                         textDecoration = TextDecoration.Underline,
                         modifier = Modifier.clickable { navController.navigate(Screen.SignUp.route) }
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                 }
 
                 uiState.errorMessage?.let { error ->
