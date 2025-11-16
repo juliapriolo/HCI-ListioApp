@@ -48,12 +48,35 @@ class ListRepository(
     }
 
     // Actualizar una lista
-    suspend fun updateList(listId: Long, name: String, recurring: Boolean? = null): Result<ShoppingListResponse> {
+    suspend fun updateList(
+        listId: Long,
+        name: String,
+        recurring: Boolean? = null,
+    ): Result<ShoppingListResponse> {
         val token = authRepository.authToken.value
         return if (token == null) {
             Result.failure(Exception("No hay sesión activa. Por favor, inicia sesión."))
         } else {
             remoteDataSource.updateList(token, listId, name, recurring)
+        }
+    }
+
+    suspend fun toggleFavorite(listId: Long, isFavorite: Boolean): Result<ShoppingListResponse> {
+        val token = authRepository.authToken.value
+        return if (token == null) {
+            Result.failure(Exception("No hay sesión activa."))
+        } else {
+            // Primero obtener la lista para no perder datos
+            val listResult = getList(listId)
+            if (listResult.isFailure) return Result.failure(listResult.exceptionOrNull()!!)
+
+            val currentList = listResult.getOrNull()!!
+            remoteDataSource.updateList(
+                token,
+                listId,
+                currentList.name,
+                recurring = isFavorite,
+            )
         }
     }
 

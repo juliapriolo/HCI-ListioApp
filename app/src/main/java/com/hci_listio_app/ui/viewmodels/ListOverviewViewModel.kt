@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 
 data class ListOverviewUiState(
     val lists: List<ShoppingListResponse> = emptyList(),
@@ -33,6 +34,7 @@ class ListOverviewViewModel(
         loadLists()
         observeHistoryChanges()
         observeFavoritesChanges()
+        syncFavoritesFromApi()
     }
 
     private fun observeHistoryChanges() {
@@ -49,6 +51,29 @@ class ListOverviewViewModel(
                 _uiState.update { current ->
                     val (favLists, otherLists) = current.lists.partition { it.id in favs }
                     current.copy(favorites = favs, lists = favLists + otherLists)
+                }
+            }
+        }
+    }
+
+    private fun syncFavoritesFromApi() {
+        viewModelScope.launch {
+            _uiState.first { it.lists.isNotEmpty() }
+
+            val apiRecurringIds = _uiState.value.lists
+                .filter { it.recurring == true }
+                .map { it.id }
+                .toSet()
+
+            val localFavs = FavoritesManager.favorites.value
+
+            if (apiRecurringIds != localFavs) {
+                apiRecurringIds.forEach { FavoritesManager.addFavorite(it) }
+
+                localFavs.forEach { localId ->
+                    if (localId !in apiRecurringIds) {
+                        FavoritesManager.removeFavorite(localId)
+                    }
                 }
             }
         }
@@ -80,14 +105,13 @@ class ListOverviewViewModel(
         }
     }
 
+    // ListOverviewViewModel.kt
     suspend fun createList(name: String, description: String?, recurring: Boolean = false): Long? {
         _uiState.update { it.copy(isLoading = true) }
         val result = listRepository.createList(name, description ?: "", recurring)
         return if (result.isSuccess) {
             val created = result.getOrNull()
             created?.let {
-                // If the user checked the favorite toggle during creation, ensure the new list is added to favorites
-                // Note: `recurring` parameter is used as the favorite flag in the UI.
                 if (recurring) {
                     FavoritesManager.addFavorite(it.id)
                 }
@@ -95,7 +119,7 @@ class ListOverviewViewModel(
                 _uiState.update { current ->
                     val combined = current.lists + it
                     val favs = current.favorites
-                    val (favLists, otherLists) = combined.partition { it.id in favs }
+                    val (favLists, otherLists) = combined.partition { list -> list.id in favs }
                     current.copy(lists = favLists + otherLists, isLoading = false)
                 }
                 created.id
@@ -113,10 +137,32 @@ class ListOverviewViewModel(
     }
 
     fun toggleFavorite(listId: Long) {
-        // Add a short delay to allow the icon scale animation to play before reordering the list.
         viewModelScope.launch {
-            delay(220L) // match animation duration
+            val wasFavorite = FavoritesManager.isFavorite(listId)
             FavoritesManager.toggleFavorite(listId)
+
+            delay(220L)
+
+            val result = listRepository.toggleFavorite(listId, !wasFavorite)
+
+            if (result.isFailure) {
+                FavoritesManager.toggleFavorite(listId)
+                _uiState.update {
+                    it.copy(errorMessage = "Error al guardar favorito en el servidor")
+                }
+            } else {
+                val updatedList = result.getOrNull()
+                if (updatedList != null) {
+                    _uiState.update { current ->
+                        val updatedLists = current.lists.map { list ->
+                            if (list.id == listId) updatedList else list
+                        }
+                        val favs = FavoritesManager.favorites.value
+                        val (favLists, otherLists) = updatedLists.partition { it.id in favs }
+                        current.copy(lists = favLists + otherLists)
+                    }
+                }
+            }
         }
     }
 
