@@ -135,8 +135,8 @@ fun ListScreen(
             if (!isArchived) {
                 FloatingActionButton(
                     onClick = { showAddItemDialog = true },
-                    containerColor = Color(0xFF6DCB5A),
-                    contentColor = Color.White
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF6DCB5A)
                 ) {
                     Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.list_add_product))
                 }
@@ -189,16 +189,8 @@ fun ListScreen(
 
                             Spacer(modifier = Modifier.weight(1f))
 
-                            // Botones a la derecha: filtro y compartir
+                            // Botones a la derecha: compartir
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                IconButton(onClick = { /* TODO: Filter options */ }, modifier = Modifier.size(40.dp)) {
-                                    Icon(
-                                        imageVector = Icons.Default.FilterList,
-                                        contentDescription = stringResource(id = R.string.list_options),
-                                        tint = Color.Gray
-                                    )
-                                }
-
                                 IconButton(
                                     onClick = { showShareDialog = true },
                                     modifier = Modifier
@@ -284,7 +276,7 @@ fun ListScreen(
                         }
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = stringResource(id = R.string.list_all),
+                            text = "Filtros",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                             fontWeight = FontWeight.Medium
