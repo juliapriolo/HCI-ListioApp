@@ -84,7 +84,6 @@ fun OverviewCard(
                     Text(text = item.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = {
-                        // Toggle local state immediately to run the animation, then notify the ViewModel
                         localFavorite = !localFavorite
                         onToggleFavorite?.invoke()
                     }, enabled = onToggleFavorite != null) {
@@ -99,7 +98,7 @@ fun OverviewCard(
                             }
                             DropdownMenu(expanded = menuExpanded, onDismissRequest = { setMenuExpanded(false) }) {
                                 if (onEdit != null) {
-                                    DropdownMenuItem(text = { Text(stringResource(id = R.string.options_edit_name)) }, onClick = {
+                                    DropdownMenuItem(text = { Text(stringResource(id = R.string.edit_list_title)) }, onClick = {
                                         setMenuExpanded(false)
                                         onEdit()
                                     })

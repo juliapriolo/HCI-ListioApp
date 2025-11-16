@@ -81,12 +81,14 @@ fun ListOverview(
         containerColor = Color(0xFFFAFAFA),
         topBar = { ListioTopAppBar(title = stringResource(id = R.string.lists_title)) },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showCreateDialog.value = true },
-                containerColor = Color.White,
-                contentColor = Color(0xFF6DCB5A)
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(id = R.string.create_list))
+            if (selected.value != 2) { // si esta en la pestaña de historial no deja agregar productos
+                FloatingActionButton(
+                    onClick = { showCreateDialog.value = true },
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF6DCB5A)
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(id = R.string.create_list))
+                }
             }
         },
         bottomBar = { BottomNavigationBar(navController = navController) },
@@ -260,7 +262,7 @@ fun ListOverview(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = stringResource(id = R.string.list_recurring_label), modifier = Modifier.weight(1f))
+                        Text(text = stringResource(id = R.string.list_favorite_label), modifier = Modifier.weight(1f))
                         Switch(checked = recurring, onCheckedChange = { recurring = it })
                     }
                 }
@@ -297,8 +299,22 @@ fun ListOverview(
             dismissButton = {
                 TextButton(onClick = { listBeingDeleted = null }) { Text(stringResource(id = R.string.common_cancel)) }
             },
-            title = { Text(stringResource(id = R.string.delete_list_title)) },
-            text = { Text(stringResource(id = R.string.delete_list_confirmation, name)) }
+            title = {
+                Text(
+                    if (selected.value == 2)
+                        stringResource(id = R.string.delete_list_title)
+                    else
+                        stringResource(id = R.string.move_to_history)
+                )
+            },
+            text = {
+                Text(
+                    if (selected.value == 2)
+                        stringResource(id = R.string.delete_list_confirmation, name)
+                    else
+                        stringResource(id = R.string.move_to_history_confirmation, name)
+                )
+            }
         )
     }
 }
