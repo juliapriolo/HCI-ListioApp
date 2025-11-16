@@ -112,7 +112,7 @@ fun CategoriaCard(
     if (showConfirm) {
         AlertDialog(
             onDismissRequest = { showConfirm = false },
-            title = { Text(stringResource(id = R.string.confirm_delete_category_title), color = Color.Red) },
+            title = { Text(stringResource(id = R.string.confirm_delete_category_title), color = Color.Black) },
             text = { Text(stringResource(id = R.string.confirm_delete_category_text)) },
             confirmButton = {
                 TextButton(onClick = {

@@ -91,7 +91,7 @@ fun ProductItem(
     if (showConfirm) {
         AlertDialog(
             onDismissRequest = { showConfirm = false },
-            title = { Text(stringResource(id = R.string.category_products_menu_delete), color = Color.Red) },
+            title = { Text(stringResource(id = R.string.category_products_menu_delete), color = Color.Black) },
             text = { Text(stringResource(id = R.string.category_products_menu_delete_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
