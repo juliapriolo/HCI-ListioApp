@@ -173,6 +173,7 @@
     <string name="share_button_text">Send</string>
     <string name="delete_category_text">Delete category</string>
     <string name="add_category_text">Add\nNew Category</string>
+    <string name="filters">Filters</string>
     
     <!-- Home Screen -->
     <string name="home_title">Home</string>

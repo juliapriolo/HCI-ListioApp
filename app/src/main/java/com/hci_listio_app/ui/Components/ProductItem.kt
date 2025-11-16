@@ -77,7 +77,7 @@ fun ProductItem(
                         text = { Text(stringResource(id = R.string.confirm_delete_product_text)) },
                         onClick = {
                             expanded = false
-                            onDelete()   // 👈 Ejecuta callback
+                            onDelete()
                         }
                     )
                 }

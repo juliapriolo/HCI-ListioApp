@@ -188,6 +188,7 @@
     <string name="list_user">Usuario %1$d</string>
     <string name="list_description_title">Descripción</string>
     <string name="list_recurring_label">Recurrente</string>
+    <string name="filters">Filtros</string>
     
     <!-- Home Screen -->
     <string name="home_title">Inicio</string>

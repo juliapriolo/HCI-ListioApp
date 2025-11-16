@@ -90,7 +90,7 @@ fun ListItem(
                 ) {
                         if (isEditable) {
                             DropdownMenuItem(
-                                text = { Text(stringResource(id = R.string.options_edit_name)) },
+                                text = { Text(stringResource(id = R.string.edit_item_title)) },
                                 onClick = {
                                     showMenu = false
                                     onEditClick(item)
@@ -98,7 +98,7 @@ fun ListItem(
                             )
                         }
                     DropdownMenuItem(
-                        text = { Text(stringResource(id = R.string.options_delete)) },
+                        text = { Text(stringResource(id = R.string.confirm_delete), color = Color(0xFFD32F2F)) },
                         onClick = {
                             showMenu = false
                             onDeleteClick(item)

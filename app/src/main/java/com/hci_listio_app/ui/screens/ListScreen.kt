@@ -276,7 +276,7 @@ fun ListScreen(
                         }
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Filtros",
+                            text = stringResource(id = R.string.filters),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray,
                             fontWeight = FontWeight.Medium

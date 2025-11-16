@@ -101,43 +101,6 @@ fun ShareListDialog(
                         ),
                         singleLine = true
                     )
-
-                    // Selector de rol
-                    Box {
-                        OutlinedButton(
-                            onClick = { expandedRoleMenu = true },
-                            modifier = Modifier.width(100.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Color(0xFF303F4F)
-                            ),
-                            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
-                        ) {
-                            Text(
-                                text = selectedRole,
-                                fontSize = 14.sp,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Icon(
-                                painter = painterResource(id = android.R.drawable.arrow_down_float),
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-
-                        DropdownMenu(
-                            expanded = expandedRoleMenu,
-                            onDismissRequest = { expandedRoleMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(id = R.string.role_editor)) },
-                                    onClick = {
-                                        selectedRole = context.getString(R.string.role_editor)
-                                        expandedRoleMenu = false
-                                    }
-                            )
-                        }
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
