@@ -65,6 +65,10 @@
     <string name="verify_account_resend">Reenviar código</string>
     <string name="verify_account_code_resent">Código reenviado. Revisá tu email.</string>
     <string name="verify_account_code_icon">Icono de código</string>
+    <string name="verify_account_error_code_required">Ingresá el código de verificación.</string>
+    <string name="verify_account_error_email_unavailable">Email no disponible para reenviar código.</string>
+    <string name="verify_account_error_resend_failed">Error al reenviar código.</string>
+    <string name="verify_account_error_verification_failed">Error al verificar la cuenta.</string>
     
     <!-- Profile Screen -->
     <string name="profile_title">Configuración</string>

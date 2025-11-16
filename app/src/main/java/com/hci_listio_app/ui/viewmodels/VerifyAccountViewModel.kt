@@ -1,7 +1,9 @@
 package com.hci_listio_app.ui.viewmodels
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hci_listio_app.R
 import com.hci_listio_app.data.AuthRepository
 import com.hci_listio_app.data.AuthRepositoryProvider
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +23,7 @@ data class VerifyAccountUiState(
 )
 
 class VerifyAccountViewModel(
+    private val application: Application,
     private val authRepository: AuthRepository = AuthRepositoryProvider.instance
 ) : ViewModel() {
 
@@ -39,7 +42,7 @@ class VerifyAccountViewModel(
         val email = uiState.value.email
         if (email.isEmpty()) {
             _uiState.update {
-                it.copy(errorMessage = "Email no disponible para reenviar código.")
+                it.copy(errorMessage = application.getString(R.string.verify_account_error_email_unavailable))
             }
             return
         }
@@ -61,7 +64,7 @@ class VerifyAccountViewModel(
                 } else {
                     current.copy(
                         isResendingCode = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Error al reenviar código."
+                        errorMessage = result.exceptionOrNull()?.message ?: application.getString(R.string.verify_account_error_resend_failed)
                     )
                 }
             }
@@ -73,7 +76,7 @@ class VerifyAccountViewModel(
 
         if (code.isEmpty()) {
             _uiState.update {
-                it.copy(errorMessage = "Ingresá el código de verificación.")
+                it.copy(errorMessage = application.getString(R.string.verify_account_error_code_required))
             }
             return
         }
@@ -96,7 +99,7 @@ class VerifyAccountViewModel(
                 } else {
                     current.copy(
                         isLoading = false,
-                        errorMessage = verifyResult.exceptionOrNull()?.message ?: "Error al verificar la cuenta."
+                        errorMessage = verifyResult.exceptionOrNull()?.message ?: application.getString(R.string.verify_account_error_verification_failed)
                     )
                 }
             }
