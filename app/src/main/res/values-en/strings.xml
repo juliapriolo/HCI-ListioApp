@@ -161,7 +161,7 @@
     <string name="edit_item_title">Edit Item</string>
     <string name="quantity_label">Quantity</string>
     <string name="units_label">Units</string>
-    <string name="search_products_placeholder">Search product...</string>
+    <string name="search_products_placeholder">Search product…</string>
     <string name="create_new_product">Create new product</string>
     <string name="no_products_available">No products available</string>
     <string name="no_products_found">No products found</string>
@@ -175,6 +175,9 @@
     <string name="add_category_text">Add\nNew Category</string>
     <string name="filters">Filters</string>
     <string name="search_bar_lists">Search list by name</string>
+    <string name="no_lists_yet">There are no lists yet…</string>
+    <string name="create_first_list">¡Start crating your list!</string>
+    <string name="first_list_location">Your list will appear in this section</string>
     
     <!-- Home Screen -->
     <string name="home_title">Home</string>
