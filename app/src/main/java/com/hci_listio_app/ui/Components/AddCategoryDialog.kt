@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.graphics.Color
 import com.hci_listio_app.R
 
 @Composable
@@ -41,7 +42,8 @@ fun AddCategoryDialog(
                     onClick = {
                         if (name.isNotBlank()) onSave(name)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32), contentColor = Color.White)
                 ) {
                     Text(stringResource(R.string.add_category_create))
                 }
