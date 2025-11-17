@@ -12,16 +12,13 @@ class AllProductsRepository(
 
     suspend fun getAllProducts(token: String): Result<List<Product>> {
         return try {
-            // Primero obtener todas las categorías
             val categoriesResult = NetworkModule.categoryApiService.getCategories("Bearer $token")
 
             val allProducts = mutableListOf<Product>()
 
-            // Para cada categoría, obtener sus productos
             categoriesResult.data.forEach { category ->
                 val productsResult = remoteDataSource.getProductsByCategory(token, category.id)
                 productsResult.getOrNull()?.let { productResponses ->
-                    // Mapear ProductResponse a Product
                     val products = productResponses.map { response ->
                         Product(
                             id = response.id,

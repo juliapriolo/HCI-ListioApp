@@ -84,7 +84,6 @@ fun ListScreen(
     }
     val displayedMembers = remember(shareDialogUsers) { shareDialogUsers.take(3) }
 
-    // Estados locales para diálogos
     var showAddItemDialog by remember { mutableStateOf(false) }
     var showCreateProductDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
@@ -92,16 +91,13 @@ fun ListScreen(
     var showFilterDialog by remember { mutableStateOf(false) }
     var itemToEdit by remember { mutableStateOf<ListItemData?>(null) }
 
-    // Cargar la lista cuando se monta el composable
     LaunchedEffect(listId) {
         viewModel.loadList(listId)
     }
 
-    // Observe archived lists to determine if this list is in history
     val archivedIds by ListHistoryManager.archivedListIds.collectAsState(initial = emptySet<Long>())
     val isArchived = archivedIds.contains(listId)
 
-    // Mostrar mensajes de error
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { error ->
             snackbarHostState.showToast(error)
@@ -114,7 +110,6 @@ fun ListScreen(
             if (originTab >= 0) {
                 navController.previousBackStackEntry?.savedStateHandle?.set("overviewTab", originTab)
             }
-            // popBackStack() returns Boolean; ensure our lambda returns Unit
             navController.popBackStack()
             kotlin.Unit
         }
@@ -152,7 +147,6 @@ fun ListScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Header con avatares y estado
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -166,7 +160,6 @@ fun ListScreen(
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        // Avatares de usuarios
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
@@ -189,7 +182,6 @@ fun ListScreen(
 
                             Spacer(modifier = Modifier.weight(1f))
 
-                            // Botones a la derecha: compartir
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                                 IconButton(
                                     onClick = { showShareDialog = true },
@@ -211,7 +203,6 @@ fun ListScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Mostrar descripción de la lista si existe
                 uiState.description?.let { desc ->
                     if (desc.isNotBlank()) {
                         Card(
@@ -242,7 +233,6 @@ fun ListScreen(
                     }
                 }
 
-                // Estado de la lista y filtro
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -286,9 +276,7 @@ fun ListScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Lista de items
                 if (uiState.items.isEmpty() && !uiState.isLoading) {
-                    // Estado vacío
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -341,7 +329,6 @@ fun ListScreen(
                 }
             }
 
-            // Indicador de carga
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -353,7 +340,6 @@ fun ListScreen(
         }
     }
 
-    // Diálogo para agregar item (con productos existentes o crear nuevo)
     if (showAddItemDialog) {
         AddItemToListDialog(
             products = uiState.availableProducts,
@@ -370,7 +356,6 @@ fun ListScreen(
         )
     }
 
-    // Diálogo para crear nuevo producto
     if (showCreateProductDialog) {
         CreateProductDialog(
             categories = uiState.categories,
@@ -383,7 +368,6 @@ fun ListScreen(
         )
     }
 
-    // Diálogo para editar item
     if (showEditDialog && itemToEdit != null) {
         EditItemDialog(
             itemName = itemToEdit!!.name,
@@ -406,7 +390,6 @@ fun ListScreen(
         )
     }
 
-    // Diálogo para compartir lista
     if (showShareDialog) {
         ShareListDialog(
             currentUsers = shareDialogUsers,

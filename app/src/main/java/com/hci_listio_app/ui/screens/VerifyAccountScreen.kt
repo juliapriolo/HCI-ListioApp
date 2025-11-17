@@ -50,18 +50,14 @@ fun VerifyAccountScreen(
     )
     val uiState by viewModel.uiState.collectAsState()
 
-    // Inicializar el ViewModel con email si está disponible
     LaunchedEffect(email) {
         if (email.isNotEmpty()) {
             viewModel.initialize(email)
         }
     }
 
-    // Navegar a Login cuando la verificación sea exitosa
     LaunchedEffect(uiState.isVerificationSuccessful) {
         if (uiState.isVerificationSuccessful) {
-            // Si viene desde signup (con password), hacer popUpTo SignUp
-            // Si viene desde login (sin password), solo navegar a Login
             if (password.isNotEmpty()) {
                 navController.navigate(Screen.Login.route) {
                     popUpTo(Screen.SignUp.route) { inclusive = true }
@@ -96,7 +92,6 @@ fun VerifyAccountScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
-                // Main Content - White Card
                 Column(
                     modifier = Modifier
                         .then(
@@ -110,7 +105,6 @@ fun VerifyAccountScreen(
                         .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                         .padding(32.dp)
                 ) {
-                    // Title
                     Text(
                         text = stringResource(R.string.verify_account_title),
                         fontSize = 32.sp,
@@ -119,7 +113,6 @@ fun VerifyAccountScreen(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
-                    // Description
                     Text(
                         text = if (uiState.email.isNotEmpty()) {
                             stringResource(R.string.verify_account_description, uiState.email)
@@ -131,7 +124,6 @@ fun VerifyAccountScreen(
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
 
-                    // Code Field
                     OutlinedTextField(
                         value = uiState.code,
                         onValueChange = viewModel::onCodeChange,
@@ -153,7 +145,6 @@ fun VerifyAccountScreen(
                         )
                     )
 
-                    // Verificar Button
                     Button(
                         onClick = viewModel::onSubmit,
                         enabled = !uiState.isLoading && !uiState.isResendingCode,
@@ -173,7 +164,6 @@ fun VerifyAccountScreen(
                         Text(stringResource(R.string.verify_account_button), color = Color.White, fontSize = 16.sp)
                     }
 
-                    // Reenviar código Button
                     TextButton(
                         onClick = viewModel::onResendCode,
                         enabled = !uiState.isLoading && !uiState.isResendingCode && uiState.canResendCode,
@@ -202,7 +192,6 @@ fun VerifyAccountScreen(
                         )
                     }
 
-                    // Error Message
                     uiState.errorMessage?.let { error ->
                         Text(
                             text = error,
@@ -214,7 +203,6 @@ fun VerifyAccountScreen(
                         )
                     }
 
-                    // Success Message (si se reenvió el código)
                     if (!uiState.canResendCode && !uiState.isResendingCode && uiState.errorMessage == null) {
                         Text(
                             text = stringResource(R.string.verify_account_code_resent),

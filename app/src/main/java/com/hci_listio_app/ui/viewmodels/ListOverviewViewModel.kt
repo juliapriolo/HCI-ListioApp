@@ -104,8 +104,6 @@ class ListOverviewViewModel(
             }
         }
     }
-
-    // ListOverviewViewModel.kt
     suspend fun createList(name: String, description: String?, recurring: Boolean = false): Long? {
         _uiState.update { it.copy(isLoading = true) }
         val result = listRepository.createList(name, description ?: "", recurring)

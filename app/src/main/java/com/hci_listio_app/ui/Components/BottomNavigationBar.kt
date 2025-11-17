@@ -30,8 +30,8 @@ fun BottomNavigationBar(navController: NavController) {
     NavigationBar(
         containerColor = Color.White,
         modifier = Modifier
-            .height(70.dp) // Altura estándar de Material 3
-            .shadow(elevation = 8.dp) // Sombra sutil
+            .height(70.dp) 
+            .shadow(elevation = 8.dp) 
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Productos") },

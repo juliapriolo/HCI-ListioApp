@@ -34,7 +34,6 @@ fun CreateProductDialog(
     var expandedCategoryMenu by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     
-    // Obtener strings traducidos en el contexto @Composable
     val errorNameRequired = stringResource(R.string.create_product_error_name_required)
     val errorCategoryRequired = stringResource(R.string.create_product_error_category_required)
 
@@ -51,7 +50,6 @@ fun CreateProductDialog(
                     .fillMaxWidth()
                     .padding(24.dp)
             ) {
-                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -74,7 +72,6 @@ fun CreateProductDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Product name field
                 Text(
                     text = stringResource(R.string.add_product_name_label),
                     fontSize = 14.sp,
@@ -98,7 +95,6 @@ fun CreateProductDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Category selector
                 Text(
                     text = stringResource(R.string.create_product_category_label),
                     fontSize = 14.sp,
@@ -153,7 +149,6 @@ fun CreateProductDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Error message
                 errorMessage?.let { error ->
                     Text(
                         text = error,
@@ -163,7 +158,6 @@ fun CreateProductDialog(
                     )
                 }
 
-                // Create button
                 Button(
                     onClick = {
                         when {

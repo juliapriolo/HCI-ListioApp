@@ -28,7 +28,7 @@ import com.hci_listio_app.R
 data class SharedUser(
     val id: Long,
     val name: String,
-    val role: String, // "Creador" o "Editor"
+    val role: String, 
     val photoRes: Int = R.drawable.perfilpredeterminado
 )
 
@@ -57,7 +57,6 @@ fun ShareListDialog(
                     .fillMaxWidth()
                     .padding(24.dp)
             ) {
-                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -83,7 +82,6 @@ fun ShareListDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Email input con selector de rol
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -105,7 +103,6 @@ fun ShareListDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Sección de integrantes
                 if (currentUsers.isNotEmpty()) {
                     Text(
                         text = stringResource(id = R.string.share_list_members_title),
@@ -133,7 +130,6 @@ fun ShareListDialog(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Botón enviar
                 Button(
                     onClick = {
                         if (email.isNotBlank()) {
@@ -178,7 +174,6 @@ private fun SharedUserItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f)
         ) {
-            // Avatar
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -196,7 +191,6 @@ private fun SharedUserItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Nombre
             Text(
                 text = user.name,
                 fontSize = 16.sp,

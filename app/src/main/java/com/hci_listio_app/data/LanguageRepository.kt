@@ -29,12 +29,11 @@ class LanguageRepository(private val context: Context) {
         if (savedLanguage != null) {
             _currentLanguage.value = savedLanguage
         } else {
-            // Si no hay preferencia guardada, usar el idioma del sistema
             val systemLanguage = context.resources.configuration.locales[0].language
             val languageCode = if (systemLanguage == "es" || systemLanguage == "en") {
                 systemLanguage
             } else {
-                "es" // Por defecto español
+                "es" 
             }
             _currentLanguage.value = languageCode
         }

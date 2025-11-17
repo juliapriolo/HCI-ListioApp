@@ -20,7 +20,6 @@ class ListRemoteDataSource(
     private val listType = object : TypeToken<List<ShoppingListResponse>>() {}.type
     private val itemsType = object : TypeToken<List<ShoppingListItemResponse>>() {}.type
 
-    // Obtener todas las listas
     suspend fun getLists(
         token: String,
         page: Int? = null,
@@ -54,7 +53,6 @@ class ListRemoteDataSource(
             if (obj.has(key)) {
                 val candidate = obj.get(key)
                 if (candidate.isJsonArray) return candidate
-                // Si el nodo es un objeto que contiene un array, intenta encontrarlo recursivamente
                 if (candidate.isJsonObject) {
                     findArrayNode(candidate.asJsonObject, keys)?.let { return it }
                 }
@@ -63,11 +61,9 @@ class ListRemoteDataSource(
         return obj.entrySet().firstOrNull { it.value.isJsonArray }?.value
     }
 
-    // Obtener una lista específica
     suspend fun getList(token: String, listId: Long): Result<ShoppingListResponse> =
         safeApiCall { api.getList(bearer(token), listId) }
 
-    // Crear una nueva lista
     suspend fun createList(
         token: String,
         name: String,
@@ -81,15 +77,12 @@ class ListRemoteDataSource(
             )
         }
 
-    // Actualizar una lista (nombre y opción recurrente)
     suspend fun updateList(token: String, listId: Long, name: String, recurring: Boolean? = null): Result<ShoppingListResponse> =
         safeApiCall { api.updateList(bearer(token), listId, UpdateListRequest(name, recurring)) }
 
-    // Eliminar una lista
     suspend fun deleteList(token: String, listId: Long): Result<Unit> =
         safeApiCall { api.deleteList(bearer(token), listId) }
 
-    // Agregar item a lista
     suspend fun addItem(
         token: String,
         listId: Long,
@@ -110,7 +103,6 @@ class ListRemoteDataSource(
             )
         }
 
-    // Obtener items de lista
     suspend fun getItems(
         token: String,
         listId: Long,
@@ -139,7 +131,6 @@ class ListRemoteDataSource(
             response.data
         }
 
-    // Actualizar item
     suspend fun updateItem(
         token: String,
         listId: Long,
@@ -160,7 +151,6 @@ class ListRemoteDataSource(
             )
         }
 
-    // Toggle purchased status
     suspend fun togglePurchased(
         token: String,
         listId: Long,
@@ -176,11 +166,9 @@ class ListRemoteDataSource(
             )
         }
 
-    // Eliminar item
     suspend fun deleteItem(token: String, listId: Long, itemId: Long): Result<Unit> =
         safeApiCall { api.deleteItem(bearer(token), listId, itemId) }
 
-    // Añadir usuario a lista
     suspend fun addUserToList(
         token: String,
         listId: Long,
@@ -195,11 +183,9 @@ class ListRemoteDataSource(
             )
         }
 
-    // Remover usuario de lista
     suspend fun removeUserFromList(token: String, listId: Long, userId: Long): Result<Unit> =
         safeApiCall { api.removeUserFromList(bearer(token), listId, userId) }
 
-    // Helper functions
     private suspend fun <T> safeApiCall(block: suspend () -> T): Result<T> =
         withContext(Dispatchers.IO) {
             try {
@@ -212,7 +198,6 @@ class ListRemoteDataSource(
     private fun mapError(error: Throwable): Throwable {
         return when (error) {
             is HttpException -> {
-                // try to extract error body for more context
                 val response = error.response()
                 val bodyMsg = try {
                     response?.errorBody()?.string()?.takeIf { it.isNotBlank() }

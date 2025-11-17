@@ -1,12 +1,10 @@
 <resources>
     <string name="app_name">HCI-Listio-App</string>
     
-    <!-- Navigation -->
     <string name="nav_home">Inicio</string>
     <string name="nav_products">Productos</string>
     <string name="nav_profile">Configuración</string>
     
-    <!-- Login Screen -->
     <string name="login_title">Login</string>
     <string name="login_welcome">¡Bienvenido!</string>
     <string name="login_email">Email</string>
@@ -21,7 +19,6 @@
     <string name="login_email_icon">Icono de email</string>
     <string name="login_password_icon">Icono de contraseña</string>
     
-    <!-- Sign Up Screen -->
     <string name="signup_title">Registrarse</string>
     <string name="signup_name">Nombre</string>
     <string name="signup_surname">Apellido</string>
@@ -37,7 +34,6 @@
     <string name="signup_password_icon">Icono de contraseña</string>
     <string name="signup_confirm_password_icon">Icono de confirmar contraseña</string>
     
-    <!-- Forgot Password Screen -->
     <string name="forgot_password_title">Recuperar contraseña</string>
     <string name="forgot_password_recover">Recuperar contraseña</string>
     <string name="forgot_password_description">Ingresá tu email y te enviaremos un código para restablecer tu contraseña</string>
@@ -56,7 +52,6 @@
     <string name="forgot_password_password_icon">Icono de contraseña</string>
     <string name="forgot_password_confirm_password_icon">Icono de confirmar contraseña</string>
     
-    <!-- Verify Account Screen -->
     <string name="verify_account_title">Verificar cuenta</string>
     <string name="verify_account_description">Ingresá el código de verificación que enviamos a %1$s</string>
     <string name="verify_account_description_default">Ingresá el código de verificación que enviamos a tu email</string>
@@ -70,7 +65,6 @@
     <string name="verify_account_error_resend_failed">Error al reenviar código.</string>
     <string name="verify_account_error_verification_failed">Error al verificar la cuenta.</string>
     
-    <!-- Profile Screen -->
     <string name="profile_title">Configuración</string>
     <string name="profile_user">Usuario</string>
     <string name="profile_not_available">No disponible</string>
@@ -80,7 +74,6 @@
     <string name="profile_photo">Foto de perfil</string>
     <string name="profile_user_icon">Usuario</string>
     
-    <!-- Edit Profile Screen -->
     <string name="edit_profile_title">Editar perfil</string>
     <string name="edit_profile_edit">Editar Perfil</string>
     <string name="edit_profile_current_password">Contraseña actual</string>
@@ -92,19 +85,16 @@
     <string name="edit_profile_edit_photo">Editar foto</string>
     <string name="edit_profile_changes_saved">Cambios guardados</string>
     
-    <!-- Language Screen -->
     <string name="language_title">Idioma</string>
     <string name="language_select">Selecciona Idioma</string>
     <string name="language_spanish">Español</string>
     <string name="language_english">Inglés</string>
     <string name="language_save">Guardar</string>
     
-    <!-- Products Screen -->
     <string name="products_title">Productos</string>
     <string name="products_search">Buscar producto por nombre</string>
     <string name="products_search_categories">Buscar por categorías:</string>
     
-    <!-- Category Products Screen -->
     <string name="category_products_empty">Empieza a agregar productos a la categoria</string>
     <string name="category_products_empty_subtitle">Tu categoria está vacía</string>
     <string name="category_products_empty_instruction">Agrega tu primer producto presionando el icono +</string>
@@ -115,7 +105,6 @@
     <string name="category_products_error_add">Error al agregar producto</string>
     <string name="category_products_error_delete">Error al eliminar producto</string>
     
-    <!-- Create Product Dialog -->
     <string name="create_product_title">Crear Producto</string>
     <string name="create_product_button">Crear Producto</string>
     <string name="create_product_category_label">Categoría</string>
@@ -125,7 +114,6 @@
     <string name="create_product_error_name_required">Ingresa el nombre del producto</string>
     <string name="create_product_error_category_required">Selecciona una categoría</string>
     
-    <!-- List Screen -->
     <string name="list_completed">Lista %1$d/%2$d Completada</string>
     <string name="list_all">Todos</string>
     <string name="list_add_product">Agregar producto</string>
@@ -134,12 +122,10 @@
     <string name="list_options">Opciones</string>
     <string name="list_user">Usuario %1$d</string>
     
-    <!-- Home Screen -->
     <string name="home_title">Inicio</string>
     <string name="home_view_list">Ver mi lista</string>
     <string name="home_screen">Pantalla de Inicio</string>
     
-    <!-- Common -->
     <string name="common_save">Guardar</string>
     <string name="common_cancel">Cancelar</string>
     <string name="common_loading">Cargando…</string>

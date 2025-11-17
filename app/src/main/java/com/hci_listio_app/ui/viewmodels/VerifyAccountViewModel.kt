@@ -86,7 +86,6 @@ class VerifyAccountViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            // Verificar la cuenta con el código (no requiere token)
             val verifyResult = authRepository.verifyAccount(code)
 
             _uiState.update { current ->

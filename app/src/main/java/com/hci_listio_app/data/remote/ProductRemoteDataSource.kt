@@ -10,13 +10,11 @@ class ProductRemoteDataSource(
     private val api: ProductApiService = NetworkModule.productApiService
 ) {
 
-    // 🔹 CREAR PRODUCTO
     suspend fun addProduct(token: String, product: ProductRequest): Result<ProductResponse> =
         safeApiCall {
             api.addProduct("Bearer $token", product)
         }
 
-    // 🔹 BUSCAR PRODUCTOS POR NOMBRE
     suspend fun searchProductsByName(
         token: String,
         name: String
@@ -28,8 +26,6 @@ class ProductRemoteDataSource(
             ).data
         }
 
-
-    // 🔹 OBTENER PRODUCTOS POR CATEGORÍA (LO QUE TE FALTABA)
     suspend fun getProductsByCategory(
         token: String,
         categoryId: Long
@@ -41,7 +37,6 @@ class ProductRemoteDataSource(
             ).data
         }
 
-    // 🔹 ELIMINAR PRODUCTO (LO QUE TE FALTABA)
     suspend fun deleteProduct(
         token: String,
         id: Long
@@ -53,7 +48,6 @@ class ProductRemoteDataSource(
             )
         }
 
-    // 🔹 SAFE API CALL
     private suspend fun <T> safeApiCall(block: suspend () -> T): Result<T> =
         try {
             Result.success(block())

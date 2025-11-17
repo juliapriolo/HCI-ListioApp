@@ -62,7 +62,6 @@ fun ProductItem(
                 style = MaterialTheme.typography.bodyLarge
             )
 
-            // BOTÓN DE 3 PUNTITOS
             Box {
                 IconButton(onClick = { expanded = true }) {
                     Icon(

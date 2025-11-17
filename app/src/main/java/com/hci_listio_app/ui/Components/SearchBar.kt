@@ -36,7 +36,7 @@ fun SearchBar(
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFE8F5E9)),
         colors = TextFieldDefaults.colors(
-            focusedTextColor = Color(0xFF333333), // gris oscuro
+            focusedTextColor = Color(0xFF333333), 
             unfocusedTextColor = Color(0xFF333333),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,

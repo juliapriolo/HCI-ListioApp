@@ -69,7 +69,6 @@ class ProductsViewModel(
         viewModelScope.launch {
             productRepo.searchProducts(token, query).fold(
                 onSuccess = { products ->
-                    // Filtrado local por nombre (case-insensitive)
                     val filtered = products.filter { it.name.contains(query, ignoreCase = true) }
                     _searchResults.value = filtered
                 },

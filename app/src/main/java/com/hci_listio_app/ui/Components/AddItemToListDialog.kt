@@ -57,7 +57,7 @@ fun AddItemToListDialog(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                // Header
+                
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -80,7 +80,6 @@ fun AddItemToListDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Search bar
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -103,7 +102,6 @@ fun AddItemToListDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Create new product button
                 Button(
                     onClick = onCreateNewProduct,
                     modifier = Modifier
@@ -133,7 +131,6 @@ fun AddItemToListDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Products list
                 if (isLoadingProducts) {
                     Box(
                         modifier = Modifier

@@ -41,7 +41,6 @@ fun EditItemDialog(
                     .fillMaxWidth()
                     .padding(24.dp)
             ) {
-                // Header con título y botón cerrar
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -67,7 +66,6 @@ fun EditItemDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Nombre del item
                 Text(
                     text = nameInput,
                     fontSize = 20.sp,
@@ -77,12 +75,10 @@ fun EditItemDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Cantidad y Unidades
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Cantidad
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(id = R.string.quantity_label),
@@ -102,7 +98,6 @@ fun EditItemDialog(
                         )
                     }
 
-                    // Unidades
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(id = R.string.units_label),
@@ -125,7 +120,6 @@ fun EditItemDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botón Guardar
                 Button(
                     onClick = {
                         onSave(nameInput, quantityInput, unitInput)

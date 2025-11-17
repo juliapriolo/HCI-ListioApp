@@ -67,7 +67,7 @@ class SignUpViewModel(
         val password = uiState.value.password
         val confirmPassword = uiState.value.confirmPassword
 
-        // Validación de campos vacíos
+        
         if (nombre.isEmpty() || apellido.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             _uiState.update {
                 it.copy(
@@ -77,7 +77,7 @@ class SignUpViewModel(
             return
         }
 
-        // Validación de email básica
+        
         if (!email.contains("@")) {
             _uiState.update {
                 it.copy(
@@ -87,7 +87,7 @@ class SignUpViewModel(
             return
         }
 
-        // Validación de contraseñas coincidentes
+        
         if (password != confirmPassword) {
             _uiState.update {
                 it.copy(

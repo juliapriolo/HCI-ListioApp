@@ -34,10 +34,8 @@ class DefaultCategoriesInitializer {
             val found = existing.find { it.name.equals(name, ignoreCase = true) }
 
             if (found != null) {
-                // Ya existe en backend
                 result.add(Categoria(found.id, name, image, isDefault = true))
             } else {
-                // No existe → crear
                 val created = api.createCategory(auth, CategoryCreateRequest(name))
                 result.add(Categoria(created.id, name, image, isDefault = true))
             }

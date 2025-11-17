@@ -67,7 +67,6 @@ fun LoginScreen(
 
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) {
-            // Redirect user to the lists overview (home) after login
             navController.navigate(Screen.ListOverview.route) {
                 popUpTo(Screen.Login.route) { inclusive = true }
             }
@@ -75,7 +74,6 @@ fun LoginScreen(
         }
     }
 
-    // Redirección automática a verificación cuando se detecta cuenta no verificada
     LaunchedEffect(uiState.shouldNavigateToVerification) {
         if (uiState.shouldNavigateToVerification && uiState.verificationEmail.isNotEmpty()) {
             navController.navigate(

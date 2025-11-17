@@ -52,8 +52,6 @@ fun CreateListScreen(
             )
 
             Button(onClick = {
-                // TODO: Crear la lista en el repositorio y obtener un id real.
-                // Por ahora solo navegamos atrás.
                 navController.navigateUp()
             }) {
                 Text(text = stringResource(id = R.string.common_save))

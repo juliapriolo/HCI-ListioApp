@@ -57,14 +57,12 @@ fun ProductsScreen(navController: NavController) {
         }
     }
 
-    // ---- GRID COLUMNS SEGÚN ANCHO DE PANTALLA ----
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
-    // breakpoints aproximados: phone, tablet chica, tablet grande / iPad
     val gridColumns = when {
-        screenWidthDp >= 840 -> 4  // tablet grande / iPad horizontal
-        screenWidthDp >= 600 -> 3  // tablet chica / iPad vertical
-        else -> 2                  // teléfono
+        screenWidthDp >= 840 -> 4
+        screenWidthDp >= 600 -> 3
+        else -> 2
     }
 
     Scaffold(
@@ -104,7 +102,6 @@ fun ProductsScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
 
-                    // ==== SEARCH BAR ====
                     item(span = { GridItemSpan(gridColumns) }) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Spacer(modifier = Modifier.height(12.dp))
@@ -122,7 +119,6 @@ fun ProductsScreen(navController: NavController) {
 
                     if (searchQuery.isBlank()) {
 
-                        // ==== TÍTULO ====
                         item(span = { GridItemSpan(gridColumns) }) {
                             Text(
                                 text = stringResource(R.string.products_search_categories),
@@ -131,7 +127,6 @@ fun ProductsScreen(navController: NavController) {
                             )
                         }
 
-                        // ==== CATEGORÍAS ====
                         items(categoriasOrdenadas) { categoria ->
                             CategoriaCard(
                                 categoria = categoria,
@@ -151,7 +146,6 @@ fun ProductsScreen(navController: NavController) {
 
                         if (showNoResults) {
 
-                            // ==== SIN RESULTADOS ====
                             item(span = { GridItemSpan(gridColumns) }) {
                                 Box(
                                     modifier = Modifier
@@ -168,13 +162,12 @@ fun ProductsScreen(navController: NavController) {
                             }
                         } else {
 
-                            // ==== RESULTADOS ====
                             items(searchResults, span = { GridItemSpan(gridColumns) }) { product ->
                                 val brand = product.metadata?.get("brand") as? String
                                 ProductItem(
                                     productName = product.name,
                                     brand = brand,
-                                    onDelete = { /* implementar */ }
+                                    onDelete = { }
                                 )
                             }
                         }

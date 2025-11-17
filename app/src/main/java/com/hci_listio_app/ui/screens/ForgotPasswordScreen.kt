@@ -43,7 +43,7 @@ fun ForgotPasswordScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // Navegar a Login cuando el reset sea exitoso
+    
     LaunchedEffect(uiState.isPasswordReset) {
         if (uiState.isPasswordReset) {
             navController.navigate(Screen.Login.route) {
@@ -74,7 +74,7 @@ fun ForgotPasswordScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
-                // Main Content - White Card
+                
                 Column(
                     modifier = Modifier
                         .then(
@@ -90,7 +90,7 @@ fun ForgotPasswordScreen(
                 ) {
                     when (uiState.step) {
                         ForgotPasswordStep.STEP_EMAIL -> {
-                            // Paso 1: Ingresar email
+                            
                             Text(
                                 text = stringResource(R.string.forgot_password_recover),
                                 fontSize = 32.sp,
@@ -150,7 +150,7 @@ fun ForgotPasswordScreen(
                                 Text(stringResource(R.string.forgot_password_send_code), color = Color.White, fontSize = 16.sp)
                             }
 
-                            // Success Message
+                            
                             if (uiState.isEmailSent) {
                                 Text(
                                     text = stringResource(R.string.forgot_password_code_sent),
@@ -163,7 +163,7 @@ fun ForgotPasswordScreen(
                             }
                         }
                         ForgotPasswordStep.STEP_RESET -> {
-                            // Paso 2: Ingresar código y nueva contraseña
+                            
                             Text(
                                 text = stringResource(R.string.forgot_password_reset),
                                 fontSize = 32.sp,
@@ -316,7 +316,7 @@ fun ForgotPasswordScreen(
                         }
                     }
 
-                    // Error Message
+                    
                     uiState.errorMessage?.let { error ->
                         Text(
                             text = error,

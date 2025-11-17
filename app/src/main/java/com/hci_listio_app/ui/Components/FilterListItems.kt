@@ -18,7 +18,7 @@ import androidx.compose.ui.window.Dialog
 import com.hci_listio_app.R
 
 data class ListItemsFilter(
-    val purchased: Boolean? = null,      // null = todos, true = comprados, false = pendientes
+    val purchased: Boolean? = null,
     val categoryId: Long? = null,
     val search: String? = null,
     val sortBy: String? = null,
@@ -28,7 +28,7 @@ data class ListItemsFilter(
 @Composable
 fun FilterListItemsDialog(
     currentFilter: ListItemsFilter,
-    categories: List<Pair<Long, String>>, // List of (id, name)
+    categories: List<Pair<Long, String>>,
     onDismiss: () -> Unit,
     onApplyFilter: (ListItemsFilter) -> Unit
 ) {
@@ -54,7 +54,6 @@ fun FilterListItemsDialog(
                     .fillMaxWidth()
                     .padding(24.dp)
             ) {
-                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -77,7 +76,6 @@ fun FilterListItemsDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Estado de compra
                 Text(
                     text = stringResource(id = R.string.purchase_status),
                     fontSize = 14.sp,
@@ -125,7 +123,6 @@ fun FilterListItemsDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Filtro por categoría
                 if (categories.isNotEmpty()) {
                     Text(
                         text = stringResource(id = R.string.category),
@@ -218,7 +215,6 @@ fun FilterListItemsDialog(
                     Spacer(modifier = Modifier.height(20.dp))
                 }
 
-                // Ordenar por
                 Text(
                     text = stringResource(id = R.string.order_by),
                     fontSize = 14.sp,
@@ -230,7 +226,6 @@ fun FilterListItemsDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Dropdown de ordenamiento
                     Box(modifier = Modifier.weight(1f)) {
                         OutlinedButton(
                             onClick = { expandedSortMenu = true },
@@ -299,7 +294,6 @@ fun FilterListItemsDialog(
                         }
                     }
 
-                    // Botón de orden (asc/desc)
                     if (selectedSortBy != null) {
                         IconButton(
                             onClick = {
@@ -319,7 +313,6 @@ fun FilterListItemsDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Botones de acción
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)

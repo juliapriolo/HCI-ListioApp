@@ -129,7 +129,7 @@ fun ProfileScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Sección de Perfil de Usuario
+                    
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -142,7 +142,7 @@ fun ProfileScreen(
                                 .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Foto de perfil o placeholder
+                            
                             Box(
                                 modifier = Modifier
                                     .size(64.dp)
@@ -174,7 +174,7 @@ fun ProfileScreen(
 
                             Spacer(modifier = Modifier.size(16.dp))
 
-                            // Información del usuario
+                            
                             Column {
                                 Text(
                                     text = "${uiState.nombre} ${uiState.apellido}".trim().ifEmpty { stringResource(R.string.profile_user) },
@@ -191,7 +191,7 @@ fun ProfileScreen(
                         }
                     }
 
-                    // Lista de Opciones Configurables
+                    
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -199,7 +199,7 @@ fun ProfileScreen(
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
                         Column {
-                            // Opción: Editar Perfil
+                            
                             ConfigurationItem(
                                 text = stringResource(R.string.profile_edit),
                                 onClick = { navController.navigate(Screen.EditProfile.route) }
@@ -207,7 +207,7 @@ fun ProfileScreen(
 
                             HorizontalDivider(color = Color(0xFFE0E0E0))
 
-                            // Opción: Cambiar Idioma
+                            
                             ConfigurationItem(
                                 text = stringResource(R.string.profile_change_language),
                                 onClick = { navController.navigate(Screen.Language.route) }
@@ -215,7 +215,7 @@ fun ProfileScreen(
 
                             HorizontalDivider(color = Color(0xFFE0E0E0))
 
-                            // Opción: Cerrar sesión
+                            
                             ConfigurationItem(
                                 text = stringResource(R.string.profile_logout),
                                 onClick = { viewModel.logout() }
@@ -223,7 +223,7 @@ fun ProfileScreen(
                         }
                     }
 
-                    // Mostrar mensaje de error si existe
+                    
                     uiState.errorMessage?.let { error ->
                         Text(
                             text = error,
@@ -235,7 +235,7 @@ fun ProfileScreen(
                 }
             }
 
-            // Mostrar indicador de carga
+            
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),

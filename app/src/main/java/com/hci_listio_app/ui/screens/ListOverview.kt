@@ -69,7 +69,6 @@ fun ListOverview(
         }
     }
 
-    // Mostrar mensajes de error
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { error ->
             snackbarHostState.showToast(error)
@@ -81,7 +80,7 @@ fun ListOverview(
         containerColor = Color(0xFFFAFAFA),
         topBar = { ListioTopAppBar(title = stringResource(id = R.string.lists_title)) },
         floatingActionButton = {
-            if (selected.value != 2) { // si esta en la pestaña de historial no deja agregar productos
+            if (selected.value != 2) { 
                 FloatingActionButton(
                     onClick = { showCreateDialog.value = true },
                     containerColor = Color.White,
@@ -194,7 +193,6 @@ fun ListOverview(
                 }
             }
 
-            // Indicador de carga
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -206,7 +204,6 @@ fun ListOverview(
         }
     }
 
-    // Diálogo para crear lista
     if (showCreateDialog.value) {
         CreateEntityDialog(
             title = stringResource(id = R.string.create_list),

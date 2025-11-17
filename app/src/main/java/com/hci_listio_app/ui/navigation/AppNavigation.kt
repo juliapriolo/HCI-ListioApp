@@ -65,9 +65,6 @@ fun AppNavigation() {
             ListOverview(navController)
         }
 
-        // ------------------------
-        // ⭐ CATEGORY PRODUCTS
-        // ------------------------
         composable(
             route = "category/{categoryName}?categoryId={categoryId}",
             arguments = listOf(

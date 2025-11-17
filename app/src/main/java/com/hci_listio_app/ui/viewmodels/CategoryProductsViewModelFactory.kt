@@ -16,7 +16,6 @@ class CategoryProductsViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CategoryProductsViewModel::class.java)) {
 
-            // Repositorio REAL que sí existe
             val repository = CategoryProductsRepository(
                 remoteDataSource = ProductRemoteDataSource()
             )

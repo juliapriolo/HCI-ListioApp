@@ -72,7 +72,7 @@ class LoginViewModel(
                     )
                 } else {
                     val exception = result.exceptionOrNull()
-                    // Detectar cuenta no verificada
+                    
                     if (exception is UnverifiedAccountException) {
                         current.copy(
                             isLoading = false,

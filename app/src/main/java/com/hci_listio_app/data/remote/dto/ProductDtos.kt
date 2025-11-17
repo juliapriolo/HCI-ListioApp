@@ -2,7 +2,6 @@ package com.hci_listio_app.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-// ---------- REQUEST ----------
 data class ProductRequest(
     val name: String,
     val category: CategoryRef,
@@ -13,8 +12,6 @@ data class CategoryRef(
     val id: Long
 )
 
-
-// ---------- RESPONSE ----------
 data class ProductResponse(
     val id: Long,
     val name: String,

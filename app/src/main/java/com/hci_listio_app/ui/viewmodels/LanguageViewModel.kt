@@ -45,10 +45,8 @@ class LanguageViewModel(
             _uiState.update { it.copy(isLoading = true) }
             val languageCode = _uiState.value.selectedLanguage
             
-            // Guardar el idioma y esperar a que se complete
             languageRepository.setLanguageCode(languageCode)
             
-            // Esperar un momento para asegurar que DataStore haya guardado completamente
             kotlinx.coroutines.delay(200)
             
             _uiState.update { 
@@ -58,8 +56,6 @@ class LanguageViewModel(
                 )
             }
             
-            // Recrear la actividad en el hilo principal para aplicar el cambio
-            // La Activity se recreará y attachBaseContext leerá la preferencia guardada
             activity.runOnUiThread {
                 activity.recreate()
             }

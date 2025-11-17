@@ -17,7 +17,6 @@ import kotlinx.coroutines.runBlocking
 class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context?) {
         if (newBase != null) {
-            // Leer la preferencia guardada de forma síncrona usando el contexto de la aplicación
             val appContext = newBase.applicationContext
             val preferences = LanguagePreferences(appContext)
             val savedLanguage = runBlocking {
@@ -28,10 +27,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
             
-            // Usar el idioma guardado o el del sistema
             val languageCode = savedLanguage ?: LocaleHelper.getSystemLanguage(newBase)
             
-            // Aplicar el locale al contexto base
             val locale = java.util.Locale(languageCode)
             java.util.Locale.setDefault(locale)
             
@@ -58,7 +55,6 @@ class MainActivity : ComponentActivity() {
         ListHistoryManager.initialize(applicationContext)
         FavoritesManager.initialize(applicationContext)
 
-        // Se elimina enableEdgeToEdge() para resolver el fallo de inicio (pantalla negra).
         setContent {
             HCIListioAppTheme {
                 AppNavigation()

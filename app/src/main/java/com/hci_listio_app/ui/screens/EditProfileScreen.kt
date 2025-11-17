@@ -77,7 +77,7 @@ fun EditProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
     val changesSavedMessage = stringResource(R.string.edit_profile_changes_saved)
 
-    // Galería (solo opción activa)
+    
     val context = LocalContext.current
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -131,7 +131,7 @@ fun EditProfileScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
-                // Card principal similar a Login/SignUp
+                
                 Column(
                     modifier = Modifier
                         .then(
@@ -154,7 +154,7 @@ fun EditProfileScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // Avatar centrado con icono de editar superpuesto
+                    
                     Box(
                         modifier = Modifier
                             .size(96.dp)
@@ -198,7 +198,7 @@ fun EditProfileScreen(
 
                     Spacer(Modifier.height(24.dp))
 
-                    // Campos de contraseña
+                    
                     OutlinedTextField(
                         value = uiState.currentPassword,
                         onValueChange = viewModel::onCurrentPasswordChange,
@@ -280,9 +280,9 @@ fun EditProfileScreen(
                         }
                     )
 
-                    // (Se reemplazó el botón de galería por el icono de editar en el avatar)
+                    
 
-                    // Mostrar mensaje de error si existe
+                    
                     uiState.errorMessage?.let { error ->
                         Text(
                             text = error,
@@ -317,7 +317,7 @@ fun EditProfileScreen(
                 }
             }
 
-            // Mostrar indicador de carga
+            
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),

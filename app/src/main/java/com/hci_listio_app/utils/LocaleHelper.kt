@@ -37,7 +37,7 @@ object LocaleHelper {
         return if (languageCode == "es" || languageCode == "en") {
             languageCode
         } else {
-            "es" // Por defecto español
+            "es" 
         }
     }
 }

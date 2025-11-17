@@ -24,10 +24,10 @@ fun rememberAppSnackbarHostState(): SnackbarHostState = remember { SnackbarHostS
 
 @Composable
 fun AppSnackbarHost(hostState: SnackbarHostState) {
-    // Default snackbar style: dark green container, white text — most messages should use this.
+    
     SnackbarHost(hostState = hostState) { data ->
-        // Compose Material version differences make the direct Snackbar color parameters unavailable
-        // in some versions. Render a small custom Surface with message + optional action instead.
+        
+        
         Surface(
             color = Color(0xFF2E7D32),
             tonalElevation = 6.dp,

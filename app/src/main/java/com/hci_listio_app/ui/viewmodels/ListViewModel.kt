@@ -367,7 +367,6 @@ class ListViewModel(
                 )
 
                 if (result.isFailure) {
-                    // Revertir cambio
                     _uiState.update { current ->
                         val revertedItems = current.items.map { i ->
                             if (i.id == itemId) i.copy(isChecked = !isChecked) else i

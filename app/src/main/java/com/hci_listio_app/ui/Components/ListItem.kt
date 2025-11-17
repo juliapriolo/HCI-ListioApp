@@ -53,7 +53,6 @@ fun ListItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Checkbox
             Checkbox(
                 checked = item.isChecked,
                 onCheckedChange = onCheckedChange,
@@ -65,7 +64,6 @@ fun ListItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Item name
             Text(
                 text = item.name,
                 style = MaterialTheme.typography.bodyLarge,
@@ -74,7 +72,6 @@ fun ListItem(
                 modifier = Modifier.weight(1f)
             )
 
-            // More options button
             Box {
                 IconButton(onClick = { showMenu = true }) {
                     Icon(

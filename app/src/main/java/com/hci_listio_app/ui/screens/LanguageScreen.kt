@@ -118,13 +118,13 @@ fun LanguageScreen(
                         )
                     }
 
-                    // Sección con padding 16.dp para igualar márgenes de configuración de perfil
+                    
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
                     ) {
-                        // Card estilo lista de configuración de perfil
+                        
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),

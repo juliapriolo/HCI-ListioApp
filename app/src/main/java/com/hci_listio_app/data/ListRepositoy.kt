@@ -10,7 +10,6 @@ class ListRepository(
     private val authRepository: AuthRepository
 ) {
 
-    // Obtener todas las listas del usuario
     suspend fun getLists(
         page: Int? = null,
         size: Int? = null
@@ -23,7 +22,6 @@ class ListRepository(
         }
     }
 
-    // Obtener una lista específica
     suspend fun getList(listId: Long): Result<ShoppingListResponse> {
         val token = authRepository.authToken.value
         return if (token == null) {
@@ -33,7 +31,6 @@ class ListRepository(
         }
     }
 
-    // Crear una nueva lista
     suspend fun createList(
         name: String,
         description: String? = null,
@@ -47,7 +44,6 @@ class ListRepository(
         }
     }
 
-    // Actualizar una lista
     suspend fun updateList(
         listId: Long,
         name: String,
@@ -66,7 +62,6 @@ class ListRepository(
         return if (token == null) {
             Result.failure(Exception("No hay sesión activa."))
         } else {
-            // Primero obtener la lista para no perder datos
             val listResult = getList(listId)
             if (listResult.isFailure) return Result.failure(listResult.exceptionOrNull()!!)
 
@@ -80,7 +75,6 @@ class ListRepository(
         }
     }
 
-    // Eliminar una lista
     suspend fun deleteList(listId: Long): Result<Unit> {
         val token = authRepository.authToken.value
         return if (token == null) {
@@ -90,7 +84,6 @@ class ListRepository(
         }
     }
 
-    // Agregar item a lista
     suspend fun addItem(
         listId: Long,
         productId: Long,
@@ -105,7 +98,6 @@ class ListRepository(
         }
     }
 
-    // Obtener items de lista
     suspend fun getItems(
         listId: Long,
         purchased: Boolean? = null,
@@ -128,7 +120,6 @@ class ListRepository(
         )
     }
 
-    // Actualizar item
     suspend fun updateItem(
         listId: Long,
         itemId: Long,
@@ -143,7 +134,6 @@ class ListRepository(
         }
     }
 
-    // Toggle purchased status
     suspend fun togglePurchased(
         listId: Long,
         itemId: Long,
@@ -157,7 +147,6 @@ class ListRepository(
         }
     }
 
-    // Eliminar item
     suspend fun deleteItem(listId: Long, itemId: Long): Result<Unit> {
         val token = authRepository.authToken.value
         return if (token == null) {
@@ -167,7 +156,6 @@ class ListRepository(
         }
     }
 
-    // Añadir usuario a lista por ID (compatibilidad)
     suspend fun addUserToList(listId: Long, userId: Long): Result<Unit> {
         val token = authRepository.authToken.value
         return if (token == null) {
@@ -177,7 +165,6 @@ class ListRepository(
         }
     }
 
-    // Añadir usuario a lista por email
     suspend fun shareListWithEmail(listId: Long, email: String): Result<Unit> {
         val token = authRepository.authToken.value
         return if (token == null) {
@@ -187,7 +174,6 @@ class ListRepository(
         }
     }
 
-    // Remover usuario de lista
     suspend fun removeUserFromList(listId: Long, userId: Long): Result<Unit> {
         val token = authRepository.authToken.value
         return if (token == null) {

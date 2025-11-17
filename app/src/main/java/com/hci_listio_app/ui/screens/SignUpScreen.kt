@@ -77,7 +77,7 @@ fun SignUpScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = if (isTablet) Alignment.Center else Alignment.TopStart
             ) {
-                // Main Content - White Card
+                
                 Column(
                     modifier = Modifier
                         .then(
@@ -91,7 +91,7 @@ fun SignUpScreen(
                         .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                         .padding(32.dp)
                 ) {
-                    // Title
+                    
                     Text(
                         text = stringResource(R.string.signup_title),
                         fontSize = 32.sp,
@@ -100,7 +100,7 @@ fun SignUpScreen(
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
 
-                    // Nombre Field
+                    
                     OutlinedTextField(
                         value = uiState.nombre,
                         onValueChange = viewModel::onNombreChange,
@@ -122,7 +122,7 @@ fun SignUpScreen(
                         )
                     )
 
-                    // Apellido Field
+                    
                     OutlinedTextField(
                         value = uiState.apellido,
                         onValueChange = viewModel::onApellidoChange,
@@ -144,7 +144,7 @@ fun SignUpScreen(
                         )
                     )
 
-                    // Email Field
+                    
                     OutlinedTextField(
                         value = uiState.email,
                         onValueChange = viewModel::onEmailChange,
@@ -166,7 +166,7 @@ fun SignUpScreen(
                         )
                     )
 
-                    // Password Field
+                    
                     OutlinedTextField(
                         value = uiState.password,
                         onValueChange = viewModel::onPasswordChange,
@@ -198,7 +198,7 @@ fun SignUpScreen(
                         )
                     )
 
-                    // Confirm Password Field
+                    
                     OutlinedTextField(
                         value = uiState.confirmPassword,
                         onValueChange = viewModel::onConfirmPasswordChange,
@@ -230,7 +230,7 @@ fun SignUpScreen(
                         )
                     )
 
-                    // Registrarse Button
+                    
                     Button(
                         onClick = viewModel::onSubmit,
                         enabled = !uiState.isLoading,
@@ -250,7 +250,7 @@ fun SignUpScreen(
                         Text(stringResource(R.string.signup_button), color = Color.White, fontSize = 16.sp)
                     }
 
-                    // Error Message
+                    
                     uiState.errorMessage?.let { error ->
                         Text(
                             text = error,
@@ -262,7 +262,7 @@ fun SignUpScreen(
                         )
                     }
 
-                    // Footer Link
+                    
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

@@ -18,10 +18,10 @@ import com.hci_listio_app.R
 @Composable
 fun AddProductDialog(
     onDismiss: () -> Unit,
-    onSave: (name: String, brand: String?) -> Unit   // 👈 ahora devuelve nombre + marca
+    onSave: (name: String, brand: String?) -> Unit
 ) {
     var productName by remember { mutableStateOf("") }
-    var productBrand by remember { mutableStateOf("") }  // 👈 nuevo campo marca
+    var productBrand by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -32,7 +32,6 @@ fun AddProductDialog(
             Column(
                 modifier = Modifier.padding(24.dp)
             ) {
-                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -54,7 +53,6 @@ fun AddProductDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Nombre
                 Text(stringResource(R.string.add_product_name_label), color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(4.dp))
                 OutlinedTextField(
@@ -66,7 +64,6 @@ fun AddProductDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Marca
                 Text(stringResource(R.string.add_product_brand_label), color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(4.dp))
                 OutlinedTextField(
@@ -78,7 +75,6 @@ fun AddProductDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Botón Guardar
                 Button(
                     onClick = {
                         if (productName.isNotBlank()) {

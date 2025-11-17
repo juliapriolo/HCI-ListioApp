@@ -29,14 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 
-/**
- * Generic dialog for creating entities (lists, products, etc.).
- * - title: dialog title
- * - nameLabel: label for main text field
- * - showDescription: whether to show an additional description field
- * - onDismiss: called when dialog is dismissed
- * - onCreate: suspend function that should create the entity and return an id (Long) or null on failure
- */
 @Composable
 fun CreateEntityDialog(
     title: String,
@@ -108,12 +100,10 @@ fun CreateEntityDialog(
                         error = context.getString(R.string.error_name_required)
                     } else {
                         isLoading = true
-                        // launch coroutine to create
                         scope.launch {
                             try {
                                 val createdId = onCreate(name.trim(), if (showDescription) description.trim() else null, recurring)
                                 if (createdId != null) {
-                                    // success -> dismiss handled by caller (they will navigate)
                                     onDismiss()
                                 } else {
                                     error = context.getString(R.string.error_create_failed)

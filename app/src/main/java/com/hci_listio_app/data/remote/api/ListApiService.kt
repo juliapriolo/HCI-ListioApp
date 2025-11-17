@@ -52,7 +52,6 @@ interface ListApiService {
         @Path("user_id") userId: Long
     )
 
-    // ---------- Shopping List Items ----------
     @POST("shopping-lists/{id}/items")
     suspend fun addItem(
         @Header("Authorization") authorization: String,

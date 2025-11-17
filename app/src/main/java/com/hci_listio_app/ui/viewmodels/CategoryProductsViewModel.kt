@@ -30,7 +30,7 @@ class CategoryProductsViewModel(
     val uiState: StateFlow<CategoryProductsUiState> = _uiState.asStateFlow()
 
     init {
-        loadProducts()   // 👈 cada vez que se crea el VM, trae del backend
+        loadProducts()   
     }
 
     fun loadProducts() {

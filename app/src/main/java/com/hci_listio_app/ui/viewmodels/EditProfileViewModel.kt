@@ -79,7 +79,7 @@ class EditProfileViewModel(
     fun saveChanges() {
         val state = _uiState.value
         
-        // Validar que las contraseñas coincidan
+        
         if (!state.passwordsMatch) {
             _uiState.update {
                 it.copy(errorMessage = "Las contraseñas no coinciden.")
@@ -87,7 +87,7 @@ class EditProfileViewModel(
             return
         }
 
-        // Validar que si hay nueva contraseña, también haya contraseña actual
+        
         if (state.newPassword.isNotEmpty() && state.currentPassword.isEmpty()) {
             _uiState.update {
                 it.copy(errorMessage = "Debes ingresar tu contraseña actual para cambiarla.")
@@ -95,7 +95,7 @@ class EditProfileViewModel(
             return
         }
 
-        // Validar que la nueva contraseña no esté vacía si se intenta cambiar
+        
         if (state.currentPassword.isNotEmpty() && state.newPassword.isEmpty()) {
             _uiState.update {
                 it.copy(errorMessage = "Debes ingresar una nueva contraseña.")
@@ -108,15 +108,15 @@ class EditProfileViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            // Guardar la foto localmente (siempre se guarda)
+            
             userRepository.updatePhoto(state.photoBitmap)
 
-            // Cambiar contraseña en la API solo si hay nueva contraseña
+            
             var passwordChangeSuccess = true
             if (state.newPassword.isNotEmpty()) {
                 val result = authRepository.changePassword(state.currentPassword, state.newPassword)
                 if (result.isSuccess) {
-                    // Si el cambio de contraseña fue exitoso, también actualizar localmente
+                    
                     userRepository.updatePassword(state.newPassword)
                 } else {
                     passwordChangeSuccess = false
@@ -129,7 +129,7 @@ class EditProfileViewModel(
                 }
             }
 
-            // Solo emitir evento de éxito si todo fue exitoso
+            
             if (passwordChangeSuccess) {
                 _uiState.update { it.copy(isLoading = false) }
                 _events.emit(EditProfileEvent.Saved)
