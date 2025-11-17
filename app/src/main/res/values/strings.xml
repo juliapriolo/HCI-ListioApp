@@ -192,6 +192,7 @@
     <string name="add_category_text">Añadir\nNueva Categoría</string>
     <string name="search_bar_lists">Buscar lista por nombre</string>
     <string name="no_lists_yet">Todavía no hay listas...</string>
+    <string name="no_search_results">No se halló un resultado</string>
     <string name="create_first_list">¡Empieza a crear tu lista!</string>
     <string name="first_list_location">Tu lista aparecerá en esta sección</string>
 

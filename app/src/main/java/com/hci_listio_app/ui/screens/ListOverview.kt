@@ -146,7 +146,8 @@ fun ListOverview(
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        EmptyState()
+                        val emptyTitle = if (query.value.isNotBlank()) stringResource(id = R.string.no_search_results) else stringResource(id = R.string.no_lists_yet)
+                        EmptyState(title = emptyTitle)
                     }
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {

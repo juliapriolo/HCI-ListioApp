@@ -210,6 +210,7 @@
     <string name="filters">Filters</string>
     <string name="search_bar_lists">Search list by name</string>
     <string name="no_lists_yet">There are no lists yet…</string>
+    <string name="no_search_results">No results found</string>
     <string name="create_first_list">¡Start crating your list!</string>
     <string name="first_list_location">Your list will appear in this section</string>
     
