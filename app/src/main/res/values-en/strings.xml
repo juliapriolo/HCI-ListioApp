@@ -168,6 +168,22 @@
     <string name="add_product_name_label">Product name</string>
     <string name="add_product_brand_label">Brand (optional)</string>
     <string name="add_product_close_icon">Close</string>
+    <string name="filter_items">Filter Items</string>
+    <string name="close">Close</string>
+    <string name="purchase_status">Purchase status</string>
+    <string name="all">All</string>
+    <string name="pending">Pending</string>
+    <string name="purchased">Purchased</string>
+    <string name="category">Category</string>
+    <string name="all_categories">All categories</string>
+    <string name="expand">Expand</string>
+    <string name="order_by">Order by</string>
+    <string name="name">Name</string>
+    <string name="date">Date</string>
+    <string name="quantity">Quantity</string>
+    <string name="no_order">No order</string>
+    <string name="clean">Clean</string>
+    <string name="apply">Apply</string>
     
     <!-- Create Product Dialog -->
     <string name="create_product_title">Create Product</string>

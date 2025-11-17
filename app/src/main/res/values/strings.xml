@@ -223,6 +223,22 @@
     <string name="list_description_title">Descripción</string>
     <string name="list_recurring_label">Recurrente</string>
     <string name="filters">Filtros</string>
+    <string name="filter_items">Filtrar Items</string>
+    <string name="close">Cerrar</string>
+    <string name="purchase_status">Estado de Compra</string>
+    <string name="all">Todos</string>
+    <string name="pending">Pendientes</string>
+    <string name="purchased">Comprados</string>
+    <string name="category">Categoría</string>
+    <string name="all_categories">Todas las categorías</string>
+    <string name="expand">Expandir</string>
+    <string name="order_by">Ordenar por</string>
+    <string name="name">Nombre</string>
+    <string name="date">Fecha</string>
+    <string name="quantity">Cantidad</string>
+    <string name="no_order">Sin orden</string>
+    <string name="clean">Limpiar</string>
+    <string name="apply">Aplicar</string>
 
     <!-- Home Screen -->
     <string name="home_title">Inicio</string>

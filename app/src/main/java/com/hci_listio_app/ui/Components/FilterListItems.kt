@@ -10,60 +10,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.hci_listio_app.R
 
-/**
- * Data class que representa los filtros para items de una lista.
- * Estos parámetros se envían directamente al backend.
- */
 data class ListItemsFilter(
     val purchased: Boolean? = null,      // null = todos, true = comprados, false = pendientes
-    val categoryId: Long? = null,        // Filtrar por categoría
-    val search: String? = null,          // Búsqueda por nombre
-    val sortBy: String? = null,          // Campo por el cual ordenar
-    val order: String? = null            // "asc" o "desc"
-) {
-    fun isActive(): Boolean {
-        return purchased != null ||
-                categoryId != null ||
-                !search.isNullOrEmpty() ||
-                sortBy != null
-    }
-
-    fun getDescription(): String {
-        val parts = mutableListOf<String>()
-
-        when (purchased) {
-            true -> parts.add("Comprados")
-            false -> parts.add("Pendientes")
-            null -> {}
-        }
-
-        if (categoryId != null) {
-            parts.add("Por categoría")
-        }
-
-        if (!search.isNullOrEmpty()) {
-            parts.add("\"$search\"")
-        }
-
-        if (sortBy != null) {
-            val sortName = when(sortBy) {
-                "name" -> "Nombre"
-                "created_at" -> "Fecha"
-                "quantity" -> "Cantidad"
-                else -> sortBy
-            }
-            val orderName = if (order == "desc") "↓" else "↑"
-            parts.add("$sortName $orderName")
-        }
-
-        return if (parts.isEmpty()) "Todos" else parts.joinToString(" • ")
-    }
-}
+    val categoryId: Long? = null,
+    val search: String? = null,
+    val sortBy: String? = null,
+    val order: String? = null
+)
 
 @Composable
 fun FilterListItemsDialog(
@@ -101,7 +61,7 @@ fun FilterListItemsDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Filtrar Items",
+                        text = stringResource(id = R.string.filter_items),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF303F4F)
@@ -109,7 +69,7 @@ fun FilterListItemsDialog(
                     IconButton(onClick = onDismiss) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Cerrar",
+                            contentDescription = stringResource(id = R.string.close),
                             tint = Color(0xFF6DCB5A)
                         )
                     }
@@ -119,7 +79,7 @@ fun FilterListItemsDialog(
 
                 // Estado de compra
                 Text(
-                    text = "Estado de compra",
+                    text = stringResource(id = R.string.purchase_status),
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -132,7 +92,7 @@ fun FilterListItemsDialog(
                     FilterChip(
                         selected = selectedPurchased == null,
                         onClick = { selectedPurchased = null },
-                        label = { Text("Todos") },
+                        label = { Text(stringResource(id = R.string.all)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Color(0xFF6DCB5A),
                             selectedLabelColor = Color.White
@@ -143,7 +103,7 @@ fun FilterListItemsDialog(
                     FilterChip(
                         selected = selectedPurchased == false,
                         onClick = { selectedPurchased = false },
-                        label = { Text("Pendientes") },
+                        label = { Text(stringResource(id = R.string.pending)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Color(0xFF6DCB5A),
                             selectedLabelColor = Color.White
@@ -154,7 +114,7 @@ fun FilterListItemsDialog(
                     FilterChip(
                         selected = selectedPurchased == true,
                         onClick = { selectedPurchased = true },
-                        label = { Text("Comprados") },
+                        label = { Text(stringResource(id = R.string.purchased)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Color(0xFF6DCB5A),
                             selectedLabelColor = Color.White
@@ -168,7 +128,7 @@ fun FilterListItemsDialog(
                 // Filtro por categoría
                 if (categories.isNotEmpty()) {
                     Text(
-                        text = "Categoría",
+                        text = stringResource(id = R.string.category),
                         fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -191,9 +151,9 @@ fun FilterListItemsDialog(
                                 Text(
                                     text = if (selectedCategoryId != null) {
                                         categories.find { it.first == selectedCategoryId }?.second
-                                            ?: "Todas las categorías"
+                                            ?: stringResource(id = R.string.all_categories)
                                     } else {
-                                        "Todas las categorías"
+                                        stringResource(id = R.string.all_categories)
                                     },
                                     modifier = Modifier.weight(1f),
                                     color = if (selectedCategoryId != null)
@@ -205,7 +165,7 @@ fun FilterListItemsDialog(
                                     painter = painterResource(
                                         id = android.R.drawable.arrow_down_float
                                     ),
-                                    contentDescription = "Expandir",
+                                    contentDescription = stringResource(id = R.string.expand),
                                     tint = Color.Gray,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -220,7 +180,7 @@ fun FilterListItemsDialog(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "Todas las categorías",
+                                        stringResource(id = R.string.all_categories),
                                         fontWeight = if (selectedCategoryId == null)
                                             FontWeight.Bold
                                         else
@@ -260,7 +220,7 @@ fun FilterListItemsDialog(
 
                 // Ordenar por
                 Text(
-                    text = "Ordenar por",
+                    text = stringResource(id = R.string.order_by),
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -282,10 +242,10 @@ fun FilterListItemsDialog(
                         ) {
                             Text(
                                 text = when(selectedSortBy) {
-                                    "name" -> "Nombre"
-                                    "created_at" -> "Fecha"
-                                    "quantity" -> "Cantidad"
-                                    else -> "Sin orden"
+                                    "name" -> stringResource(id = R.string.name)
+                                    "created_at" -> stringResource(id = R.string.date)
+                                    "quantity" -> stringResource(id = R.string.quantity)
+                                    else -> stringResource(id = R.string.no_order)
                                 },
                                 color = if (selectedSortBy != null)
                                     Color(0xFF303F4F)
@@ -297,7 +257,7 @@ fun FilterListItemsDialog(
                                 painter = painterResource(
                                     id = android.R.drawable.arrow_down_float
                                 ),
-                                contentDescription = "Expandir",
+                                contentDescription = stringResource(id = R.string.expand),
                                 tint = Color.Gray,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -308,7 +268,7 @@ fun FilterListItemsDialog(
                             onDismissRequest = { expandedSortMenu = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Sin orden") },
+                                text = { Text(stringResource(id = R.string.no_order)) },
                                 onClick = {
                                     selectedSortBy = null
                                     expandedSortMenu = false
@@ -316,21 +276,21 @@ fun FilterListItemsDialog(
                             )
                             HorizontalDivider()
                             DropdownMenuItem(
-                                text = { Text("Nombre") },
+                                text = { Text(stringResource(id = R.string.name)) },
                                 onClick = {
                                     selectedSortBy = "name"
                                     expandedSortMenu = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Fecha") },
+                                text = { Text(stringResource(id = R.string.date)) },
                                 onClick = {
                                     selectedSortBy = "created_at"
                                     expandedSortMenu = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Cantidad") },
+                                text = { Text(stringResource(id = R.string.quantity)) },
                                 onClick = {
                                     selectedSortBy = "quantity"
                                     expandedSortMenu = false
@@ -378,7 +338,7 @@ fun FilterListItemsDialog(
                             contentColor = Color(0xFF6DCB5A)
                         )
                     ) {
-                        Text("Limpiar")
+                        Text(stringResource(id = R.string.clean))
                     }
 
                     Button(
@@ -401,7 +361,7 @@ fun FilterListItemsDialog(
                         )
                     ) {
                         Text(
-                            "Aplicar",
+                            stringResource(id = R.string.apply),
                             color = Color.White,
                             fontWeight = FontWeight.Medium
                         )
