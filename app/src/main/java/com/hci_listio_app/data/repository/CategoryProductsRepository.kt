@@ -3,7 +3,6 @@ package com.hci_listio_app.data.repository
 import com.hci_listio_app.data.model.Product
 import com.hci_listio_app.data.remote.ProductRemoteDataSource
 import com.hci_listio_app.data.remote.dto.ProductRequest
-import com.hci_listio_app.data.remote.dto.ProductResponse
 
 class CategoryProductsRepository(
     private val remoteDataSource: ProductRemoteDataSource

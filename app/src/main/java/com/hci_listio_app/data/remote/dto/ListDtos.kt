@@ -1,7 +1,6 @@
 package com.hci_listio_app.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
-import com.hci_listio_app.data.remote.dto.ProductResponse
 
 data class ShoppingListResponse(
     val id: Long = 0L,

@@ -4,14 +4,12 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.lifecycleScope
 import com.hci_listio_app.data.LanguagePreferences
 import com.hci_listio_app.data.ListHistoryManager
 import com.hci_listio_app.data.FavoritesManager
 import com.hci_listio_app.ui.navigation.AppNavigation
 import com.hci_listio_app.ui.theme.HCIListioAppTheme
 import com.hci_listio_app.utils.LocaleHelper
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {

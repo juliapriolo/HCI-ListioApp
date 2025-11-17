@@ -3,8 +3,7 @@ package com.hci_listio_app.data.remote
 import com.hci_listio_app.data.remote.api.ProductApiService
 import com.hci_listio_app.data.remote.dto.ProductRequest
 import com.hci_listio_app.data.remote.dto.ProductResponse
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+
 
 class ProductRemoteDataSource(
     private val api: ProductApiService = NetworkModule.productApiService
