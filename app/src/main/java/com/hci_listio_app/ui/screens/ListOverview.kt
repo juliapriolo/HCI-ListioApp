@@ -235,7 +235,7 @@ fun ListOverview(
         AlertDialog(
             onDismissRequest = { listBeingEdited = null },
             confirmButton = {
-                TextButton(onClick = {
+                Button(onClick = {
                     if (newName.isNotBlank()) {
                         viewModel.renameList(id, newName.trim(), recurring) { success, message ->
                             coroutineScope.launch {
@@ -246,10 +246,14 @@ fun ListOverview(
                         }
                         listBeingEdited = null
                     }
-                }) { Text(stringResource(id = R.string.common_save)) }
+                }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32), contentColor = Color.White)) {
+                    Text(stringResource(id = R.string.common_save))
+                }
             },
             dismissButton = {
-                TextButton(onClick = { listBeingEdited = null }) { Text(stringResource(id = R.string.common_cancel)) }
+                TextButton(onClick = { listBeingEdited = null }, colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF2E7D32))) {
+                    Text(stringResource(id = R.string.common_cancel))
+                }
             },
             title = { Text(stringResource(id = R.string.edit_list_title)) },
             text = {
@@ -262,8 +266,15 @@ fun ListOverview(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = stringResource(id = R.string.list_favorite_label), modifier = Modifier.weight(1f))
-                        Switch(checked = recurring, onCheckedChange = { recurring = it })
+                        Text(text = stringResource(id = R.string.list_favorite_label), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+                        Switch(
+                            checked = recurring,
+                            onCheckedChange = { recurring = it },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = Color(0xFF6DCB5A)
+                            )
+                        )
                     }
                 }
             }
